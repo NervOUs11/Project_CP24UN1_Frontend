@@ -1,0 +1,21 @@
+<script setup>
+import Navbar from '../components/Navbar.vue';
+</script>
+
+<template>
+    <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md"/>
+    <div class="app mt-16 w-full h-[80vh] bg-[#ffe5b4] flex justify-center items-center">
+        <div class="button-container flex justify-between w-4/5 max-w-[800px]">
+            <button class="large-button w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
+                ใบคำร้องขอลากิจ/ลาป่วย
+            </button>
+            <button class="large-button w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
+                แบบขออนุมัติการจัดกิจกรรม
+            </button>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+
+</style>
