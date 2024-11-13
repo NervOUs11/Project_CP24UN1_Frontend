@@ -6,11 +6,16 @@
       <li><a href="#">Status</a></li>
       <li><a href="#">About K-MUTTRACK</a></li>
     </ul>
+    <!-- <div v-if="userStore.isLoggedIn" class="navbar-username">
+      Welcome, {{ userStore.username }}
+    </div> -->
   </nav>
 </template>
   
   <script>
-  
+//   import { useUserStore } from '@/stores/useUserStore'
+
+// const useUserStore = useUserStore()
   </script>
   
   <style scoped>

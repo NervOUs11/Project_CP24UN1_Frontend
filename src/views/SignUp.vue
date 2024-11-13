@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getAllSigner, getAllFaculty, getAllDepartment } from "../functions/getData"
+import { getAllStaff, getAllFaculty, getAllDepartment } from "../functions/getData"
 import { signup } from '../functions/signup'
 import { useRouter } from 'vue-router'
 
@@ -11,7 +11,7 @@ const password = ref('')
 const firstname = ref('')
 const lastname = ref('')
 const phoneNumber = ref('')
-const backupEmail = ref('')
+const alterEmail = ref('')
 const advisor1 = ref('')
 const advisor2 = ref('')
 const faculty = ref('')
@@ -22,14 +22,14 @@ const advisors = ref([])
 // const errorMessage = ref('')
 // const successMessage = ref('')
 
-// fetch all faculty, department and signer from database
+// fetch all faculty, department and Staff from database
 onMounted(async () => {
   try {
     const facultyList = await getAllFaculty()
     allFaculties.value = facultyList.map(faculty => faculty[1])
     const departmentList = await getAllDepartment()
     allDepartments.value = departmentList.map(department => department[1])
-    const advisorsList = await getAllSigner()
+    const advisorsList = await getAllStaff()
     advisors.value = advisorsList.map(advisor => `${advisor[3]} ${advisor[4]}`)
   } 
   catch (error) {
@@ -41,7 +41,7 @@ const doSignUp = async () => {
   const signature = "dummySignature" 
   try {
     const res = await signup(studentID.value, username.value, password.value, firstname.value, 
-                             lastname.value, phoneNumber.value, backupEmail.value, advisor1.value,
+                             lastname.value, phoneNumber.value, alterEmail.value, advisor1.value,
                              advisor2.value, faculty.value, department.value, signature)
     if (res.status === 200) {
       alert("User signed up successfully")
@@ -132,11 +132,11 @@ const doSignUp = async () => {
         </div>
 
         <div class="mb-3">
-          <label for="backupEmail" class="block text-gray-700 mb-1">Backup Email</label>
+          <label for="alterEmail" class="block text-gray-700 mb-1">Another Email</label>
           <input 
             type="email" 
-            id="backupEmail" 
-            v-model="backupEmail" 
+            id="alterEmail" 
+            v-model="alterEmail" 
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
@@ -161,7 +161,6 @@ const doSignUp = async () => {
             id="advisor2" 
             v-model="advisor2" 
             class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
-            required
           >
             <option value="" disabled>Select Advisor 2</option>
             <option v-for="advisor in advisors" :key="advisor" :value="advisor">{{ advisor }}</option>

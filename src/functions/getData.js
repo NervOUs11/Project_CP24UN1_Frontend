@@ -2,17 +2,17 @@ const URL = import.meta.env.VITE_API_ROOT
 // import { getNewToken } from './token'
 // import router from "../router"
 
-const getAllSigner = async () => {
+const getAllStaff = async () => {
   try{
-    const res = await fetch(`${URL}/allSigner`, {
+    const res = await fetch(`${URL}/allStaff`, {
       method: "GET"
     })
     if(res.ok){
-      const allSigner = res.json()
-      return allSigner
+      const allStaff = res.json()
+      return allStaff
     }
     else {
-      throw new error("Error, can't get signer data")
+      throw new error("Error, can't get Staff data")
     }
   }
   catch (error){
@@ -55,4 +55,4 @@ const getAllFaculty = async () => {
       console.log(error)
     }
   }
-export { getAllSigner, getAllFaculty, getAllDepartment }
+export { getAllStaff, getAllFaculty, getAllDepartment }

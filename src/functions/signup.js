@@ -1,7 +1,7 @@
 const URL = import.meta.env.VITE_API_ROOT 
 
 const signup = async (studentID, username, password, firstname, lastname,
-                      phoneNumber, backupEmail, advisor1, advisor2,
+                      phoneNumber, alterEmail, advisor1, advisor2,
                       faculty, department, signature) => {
     try {
         const res = await fetch(`${URL}/signup`, {
@@ -16,12 +16,12 @@ const signup = async (studentID, username, password, firstname, lastname,
                 firstname: firstname,
                 lastname: lastname,
                 phone_number: phoneNumber,
-                backup_email: backupEmail,
+                alter_email: alterEmail,
                 advisor1_fullname: advisor1,
                 advisor2_fullname: advisor2,
                 faculty: faculty,
                 department: department,
-                signature: signature
+                // signature: signature
             })
         })
         return res
