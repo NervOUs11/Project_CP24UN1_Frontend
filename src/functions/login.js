@@ -23,6 +23,8 @@ const login = async (username, password) => {
       localStorage.setItem("signature", data.user.signature);
       localStorage.setItem("department", data.user.department);
       localStorage.setItem("faculty", data.user.faculty);
+      localStorage.setItem("facultyId", data.user.facultyID);
+      localStorage.setItem("departmentId", data.user.departmentID);
       if (!data.role) {
         localStorage.setItem("role", "student")
       } 

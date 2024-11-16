@@ -32,53 +32,116 @@ const userData = ref({
   currentGPA: '',
   cumulativeGPA: '',
   advisor: '',
-  contact: ''
+  tel: '',
+  email: ''
 })
 
 onMounted(() => {
   userData.value = {
-    name: 'นายพงศธร จันทร์สงเคราะห์',
-    studentId: '64130500051',
-    faculty: 'เทคโนโลยีสารสนเทศ',
-    department: 'เทคโนโลยีสารสนเทศ',
-    classLevel: 'ปีที่ 4',
-    studyLevel: 'ปริญญาตรี',
-    programType: 'ปกติ',
-    studentStatus: 'ปกติ',
-    currentGPA: '3.5',
-    cumulativeGPA: '3.4',
-    advisor: 'อ.สายชล ใจเย็น',
-    tel: '095-557-3902',
-    email: 'phongsathon.chan@kmutt.ac.th'  
+    name: localStorage.getItem("firstName") + " " + localStorage.getItem("lastName"),
+    studentId: localStorage.getItem("studentID"),
+    faculty: localStorage.getItem("faculty"),
+    department: localStorage.getItem("department"),
+    classLevel: "ชั้นปีที่ 4",
+    studyLevel: "ปริญญาตรี",
+    programType: "ปกติ",
+    studentStatus: "ปกติ",
+    currentGPA: "3.0",
+    cumulativeGPA: "3.0",
+    advisor: "John Doe",
+    tel: localStorage.getItem("tel"),
+    email: localStorage.getItem("username")
   }
 })
 
 const addDoc = async () => {
   try {
-    const res = await addDocument({
+    // ดึงค่า studentFacultyID และ studentDepartmentID จาก local storage
+    const studentFacultyID = parseInt(localStorage.getItem("facultyId"));
+    const studentDepartmentID = parseInt(localStorage.getItem("departmentId"));
+    const studentID = parseInt(localStorage.getItem("studentID"))
+    // ตรวจสอบว่าข้อมูลจำเป็นถูกต้อง
+    if (!studentFacultyID || !studentDepartmentID) {
+      throw new Error("ไม่พบข้อมูล studentFacultyID หรือ studentDepartmentID ใน local storage");
+    }
+
+    // กำหนดเวลา startTime และ endTime ตามประเภทการลา
+    let startTime = null;
+    let endTime = null;
+
+    if (leaveType.value === "oneDay") {
+      // ลาวันเดียว
+      const date = oneDayDate.value;
+      if (oneDaySession.value.morning && oneDaySession.value.afternoon) {
+        startTime = `${date}T09:00:00`;
+        endTime = `${date}T17:00:00`;
+      } else if (oneDaySession.value.morning) {
+        startTime = `${date}T09:00:00`;
+        endTime = `${date}T12:00:00`;
+      } else if (oneDaySession.value.afternoon) {
+        startTime = `${date}T13:00:00`;
+        endTime = `${date}T17:00:00`;
+      } else {
+        throw new Error("กรุณาเลือกช่วงเวลาการลาวันเดียว");
+      }
+    } else if (leaveType.value === "multipleDays") {
+      // ลาหลายวัน
+      startTime = `${starttime.value}T09:00:00`;
+      endTime = `${endtime.value}T17:00:00`;
+    } else {
+      throw new Error("กรุณาเลือกประเภทการลา");
+    }
+
+    // สร้าง JSON object สำหรับส่งไปยัง backend
+    const dataToSend = {
+      // studentID: parseInt(userData.value.studentId), // รหัสนักศึกษา
+      studentID: studentID,
       type: type.value,
-
-      leaveType: leaveType.value, //ประเภทการลา
-      //ลาวันเดียว
-      oneDayDate: oneDayDate.value, // วันที่ลา
-      oneDaySession: oneDaySession.value, // ช่วงเช้า-ช่วงบ่าย
-      //ลาหลายวัน
-      startTime: starttime.value, // วันที่เริ่มลา
-      endTime: endtime.value, // วันที่สิ้นสุด
-
+      createDate: new Date().toISOString(), // เวลาที่สร้าง
+      editDate: new Date().toISOString(), // เวลาที่แก้ไขล่าสุด
+      startTime: startTime,
+      endTime: endTime,
       detail: detail.value,
-      attachmentFile1: attachmentFile1.value,
-      attachmentFile2: attachmentFile2.value,
-    });
+      attachmentFile1: "",
+      attachmentFile2: "",
+      attachmentFile2Name: "File 2 name", // ชื่อไฟล์แนบ 2 (ถ้าต้องการแยกต่างหาก)
+      studentFacultyID: studentFacultyID,
+      studentDepartmentID: studentDepartmentID,
+    };
+    console.log(dataToSend)
+
+    // สร้าง FormData สำหรับการส่งไฟล์
+    // const formData = new FormData();
+    // formData.append("studentID", studentID);
+    // formData.append("type", type.value);
+    // formData.append("createDate", new Date().toISOString());
+    // formData.append("editDate", new Date().toISOString());
+    // formData.append("startTime", startTime);
+    // formData.append("endTime", endTime);
+    // formData.append("detail", detail.value);
+    // if (attachmentFile1.value) {
+    //   formData.append("attachmentFile1", attachmentFile1.value);
+    // }
+    // if (attachmentFile2.value) {
+    //   formData.append("attachmentFile2", attachmentFile2.value);
+    // }
+    // formData.append("attachmentFile2Name", "File 2 name");
+    // formData.append("studentFacultyID", studentFacultyID);
+    // formData.append("studentDepartmentID", studentDepartmentID);
+
+    // ส่งข้อมูลไปยัง backend
+    const res = await addDocument(dataToSend);
+    // const res = await addDocument(formData);
 
     if (res.status === 200) {
-      alert("Add new document successfully")
-      router.push("tracking")
+      alert("เพิ่มเอกสารใหม่สำเร็จ");
+      router.push("tracking"); // เปลี่ยนหน้าไปยัง tracking
     }
   } catch (error) {
-    console.error(error)
+    console.error("เกิดข้อผิดพลาด:", error.message);
   }
-}
+};
+
 </script>
 
 <template>
@@ -157,28 +220,6 @@ const addDoc = async () => {
           <div class="mb-3" style="margin-top: 30px;">
             <label for="email" class="block text-gray-700 mb-1">อาจารย์ที่ปรึกษา: {{ userData.advisor }}</label>
           </div>
-
-          <!-- <div class="mb-3">
-            <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่</label>
-            <input 
-              type="datetime-local" 
-              id="starttime" 
-              v-model="starttime"
-              class="form-input"
-              required
-            />
-          </div>
-
-          <div class="mb-3">
-            <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่</label>
-            <input 
-              type="datetime-local" 
-              id="endtime" 
-              v-model="endtime"
-              class="form-input"
-              required
-            />
-          </div> -->
 
           <div class="mb-3">
             <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา</label>
@@ -276,7 +317,7 @@ const addDoc = async () => {
               id="attachmentFile1" 
               @change="e => attachmentFile1.value = e.target.files[0]"
               class="form-input"
-              required
+              
             />
           </div>
 
