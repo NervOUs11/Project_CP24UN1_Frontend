@@ -5,8 +5,8 @@ import { addDocument } from '../functions/adddocument'
 const type = ref('');
 
 const detail = ref('');
-const attachmentFile1 = ref(null);
-const attachmentFile2 = ref(null);
+const attachmentFile1 = ref("");
+const attachmentFile2 = ref("");
 
 // ตัวแปรการเลือกประเภทการลาและช่วงเวลา
 const leaveType = ref('')
@@ -37,6 +37,7 @@ const userData = ref({
 })
 
 onMounted(() => {
+
   userData.value = {
     name: localStorage.getItem("firstName") + " " + localStorage.getItem("lastName"),
     studentId: localStorage.getItem("studentID"),
@@ -53,6 +54,34 @@ onMounted(() => {
     email: localStorage.getItem("username")
   }
 })
+
+const handleFileChange = async (e) => {
+  console.log("Input changed:", e.target.files)
+  const file = e.target.files[0];
+  if (file) {
+    const base64 = await fileToBase64(file);
+    console.log("Base64 file:", base64);
+    attachmentFile1.value = base64
+
+    // downloadPDF(base64, 'base64topdf.pdf');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function downloadPDF(base64String, filename) {
+    const link = document.createElement('a');
+    link.href = 'data:application/pdf;base64,' + base64String;
+    link.download = filename;
+    link.click();
+}
 
 const addDoc = async () => {
   try {
@@ -92,9 +121,7 @@ const addDoc = async () => {
       throw new Error("กรุณาเลือกประเภทการลา");
     }
 
-    // สร้าง JSON object สำหรับส่งไปยัง backend
     const dataToSend = {
-      // studentID: parseInt(userData.value.studentId), // รหัสนักศึกษา
       studentID: studentID,
       type: type.value,
       createDate: new Date().toISOString(), // เวลาที่สร้าง
@@ -102,40 +129,19 @@ const addDoc = async () => {
       startTime: startTime,
       endTime: endTime,
       detail: detail.value,
-      attachmentFile1: "",
+      attachmentFile1: attachmentFile1.value,
       attachmentFile2: "",
       attachmentFile2Name: "File 2 name", // ชื่อไฟล์แนบ 2 (ถ้าต้องการแยกต่างหาก)
       studentFacultyID: studentFacultyID,
       studentDepartmentID: studentDepartmentID,
     };
     console.log(dataToSend)
-
-    // สร้าง FormData สำหรับการส่งไฟล์
-    // const formData = new FormData();
-    // formData.append("studentID", studentID);
-    // formData.append("type", type.value);
-    // formData.append("createDate", new Date().toISOString());
-    // formData.append("editDate", new Date().toISOString());
-    // formData.append("startTime", startTime);
-    // formData.append("endTime", endTime);
-    // formData.append("detail", detail.value);
-    // if (attachmentFile1.value) {
-    //   formData.append("attachmentFile1", attachmentFile1.value);
-    // }
-    // if (attachmentFile2.value) {
-    //   formData.append("attachmentFile2", attachmentFile2.value);
-    // }
-    // formData.append("attachmentFile2Name", "File 2 name");
-    // formData.append("studentFacultyID", studentFacultyID);
-    // formData.append("studentDepartmentID", studentDepartmentID);
-
-    // ส่งข้อมูลไปยัง backend
     const res = await addDocument(dataToSend);
-    // const res = await addDocument(formData);
+
 
     if (res.status === 200) {
       alert("เพิ่มเอกสารใหม่สำเร็จ");
-      router.push("tracking"); // เปลี่ยนหน้าไปยัง tracking
+      router.push("tracking");
     }
   } catch (error) {
     console.error("เกิดข้อผิดพลาด:", error.message);
@@ -315,9 +321,8 @@ const addDoc = async () => {
             <input 
               type="file" 
               id="attachmentFile1" 
-              @change="e => attachmentFile1.value = e.target.files[0]"
+              @change="handleFileChange" 
               class="form-input"
-              
             />
           </div>
 
