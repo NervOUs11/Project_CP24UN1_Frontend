@@ -1,24 +1,39 @@
+<script setup>
+import { ref } from 'vue';  // Import ref from Vue
+import { useRouter } from 'vue-router';
+
+// Get the router instance to handle redirection
+const router = useRouter();
+
+// Define the firstName as a reactive property
+const firstName = ref(localStorage.getItem('firstName'));
+
+// Define the logout function
+const logout = () => {
+  localStorage.clear();  // Clear all data in localStorage
+  router.push('/login'); // Redirect to login page
+};
+</script>
+
 <template>
   <nav class="navbar">
     <div class="navbar-brand">K-MUTTRACK</div>
     <ul class="navbar-menu">
-      <li><a href="#">Home</a></li>
-      <li><a href="#">Status</a></li>
-      <li><a href="#">About K-MUTTRACK</a></li>
+      <li><router-link to="/home">Home</router-link></li>
+      <li><router-link to="/tracking">Status</router-link></li>
+      <li><router-link to="">About K-MUTTRACK</router-link></li>
+      <li v-if="firstName" class="navbar-item">
+        <span class="welcome-message">Welcome, {{ firstName }}!</span>
+      </li>
+      <li>
+        <button @click="logout()" class="logout-button">Logout</button>
+      </li>
     </ul>
-    <!-- <div v-if="userStore.isLoggedIn" class="navbar-username">
-      Welcome, {{ userStore.username }}
-    </div> -->
+    
   </nav>
 </template>
   
-  <script>
-//   import { useUserStore } from '@/stores/useUserStore'
-
-// const useUserStore = useUserStore()
-  </script>
-  
-  <style scoped>
+<style scoped>
   .navbar {
     display: flex;
     justify-content: space-between;
@@ -54,5 +69,5 @@
   .navbar-menu a:hover {
     text-decoration: underline;
   }
-  </style>
+</style>
   

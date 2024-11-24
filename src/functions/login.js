@@ -14,17 +14,19 @@ const login = async (username, password) => {
       })
       const data = await res.json()
       console.log(data.user)
-      localStorage.setItem("studentID", data.user.studentID);
-      localStorage.setItem("username", data.user.username);
-      localStorage.setItem("firstName", data.user.firstName);
-      localStorage.setItem("lastName", data.user.lastName);
-      localStorage.setItem("tel", data.user.tel);
-      localStorage.setItem("alterEmail", data.user.alterEmail);
-      localStorage.setItem("signature", data.user.signature);
-      localStorage.setItem("department", data.user.department);
-      localStorage.setItem("faculty", data.user.faculty);
-      localStorage.setItem("facultyId", data.user.facultyID);
-      localStorage.setItem("departmentId", data.user.departmentID);
+      localStorage.setItem("studentID", data.studentID);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("firstName", data.firstName);
+      localStorage.setItem("lastName", data.lastName);
+      localStorage.setItem("tel", data.tel);
+      localStorage.setItem("alterEmail", data.alterEmail);
+      localStorage.setItem("signature", data.signature);
+      localStorage.setItem("department", data.department);
+      localStorage.setItem("faculty", data.faculty);
+      localStorage.setItem("facultyId", data.facultyID);
+      localStorage.setItem("departmentId", data.departmentID);
+      localStorage.setItem("currentGPA", data.currentGPA);
+      localStorage.setItem("cumulativeGPA", data.cumulativeGPA);
       if (!data.role) {
         localStorage.setItem("role", "student")
       } 

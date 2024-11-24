@@ -2,8 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { getAllFaculty } from "../functions/getData"
 import { addDocument } from '../functions/adddocument'
-const type = ref('');
+import { useRouter } from "vue-router";
 
+const router = useRouter()
+
+const type = ref('');
 const detail = ref('');
 const attachmentFile1 = ref("");
 const attachmentFile2 = ref("");
@@ -47,8 +50,8 @@ onMounted(() => {
     studyLevel: "ปริญญาตรี",
     programType: "ปกติ",
     studentStatus: "ปกติ",
-    currentGPA: "3.0",
-    cumulativeGPA: "3.0",
+    currentGPA: localStorage.getItem("currentGPA"),
+    cumulativeGPA: localStorage.getItem("cumulativeGPA"),
     advisor: "John Doe",
     tel: localStorage.getItem("tel"),
     email: localStorage.getItem("username")
@@ -60,9 +63,8 @@ const handleFileChange = async (e) => {
   const file = e.target.files[0];
   if (file) {
     const base64 = await fileToBase64(file);
-    console.log("Base64 file:", base64);
+    // console.log("Base64 file:", base64);
     attachmentFile1.value = base64
-
     // downloadPDF(base64, 'base64topdf.pdf');
   }
 }
@@ -139,9 +141,13 @@ const addDoc = async () => {
     const res = await addDocument(dataToSend);
 
 
-    if (res.status === 200) {
-      alert("เพิ่มเอกสารใหม่สำเร็จ");
-      router.push("tracking");
+    if (res[1] === 201) {
+      alert("Add New Document Successfully!");
+      try {
+        router.push("/tracking");
+      } catch (error) {
+        console.error(error);
+      }
     }
   } catch (error) {
     console.error("เกิดข้อผิดพลาด:", error.message);
@@ -323,6 +329,7 @@ const addDoc = async () => {
               id="attachmentFile1" 
               @change="handleFileChange" 
               class="form-input"
+              required
             />
           </div>
 

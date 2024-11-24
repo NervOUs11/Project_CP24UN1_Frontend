@@ -62,9 +62,9 @@ const doLogin = async () => {
                     @click="doLogin">
                 Login
                 </button>
-                <p class="mt-4">
+                <!-- <p class="mt-4">
                     <router-link to="/signup" class="text-orange-500">Sign Up</router-link>
-                </p>
+                </p> -->
             </form>
         </div>
     </div>
