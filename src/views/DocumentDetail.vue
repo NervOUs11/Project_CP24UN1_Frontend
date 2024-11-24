@@ -12,8 +12,59 @@ const goBack = () => {
   router.push("/tracking");
 };
 
+const formatDateTime = (isoString) => {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  return {
+    date: date.toLocaleDateString('th-TH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }),
+    time: date.toLocaleTimeString('th-TH', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }) + ' น.'
+  };
+};
+const preview = ref({
+  visible: false,
+  title: '',
+  data: '',
+  type: ''
+});
+
+const openFileInNewTab = (base64String, mimeType) => {
+  const byteCharacters = atob(base64String.split(',')[1]);
+  const byteNumbers = new Uint8Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const blob = new Blob([byteNumbers], { type: mimeType });
+
+  const blobUrl = URL.createObjectURL(blob);
+
+  window.open(blobUrl);
+
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+  }, 1000);
+};
+
 onMounted(async () => {
-  data.value = await fetchDocumentDetail();
+  const rawData = await fetchDocumentDetail();
+  if (rawData) {
+    data.value = {
+      ...rawData,
+      startTime: formatDateTime(rawData.startTime),
+      endTime: formatDateTime(rawData.endTime),
+      createDate: formatDateTime(rawData.createDate),
+      editDate: formatDateTime(rawData.editDate),
+      file1: `data:image/jpeg;base64,${rawData.file1}`
+    };
+  }
+  // console.log(data.value); // ตรวจสอบข้อมูลใน console ว่าถูกต้องหรือไม่
 });
 
 </script>
@@ -37,11 +88,25 @@ onMounted(async () => {
             <span class="font-bold">Document ID:</span> {{ data.DocumentID }}
           </div>
           <div>
-            <span class="font-bold">Document Type:</span> {{ data.DocumentType }}
+            <span class="font-bold">ประเภทการลา:</span> {{ data.DocumentType }}
           </div>
           <div class="col-span-2">
-            <span class="font-bold">Detail:</span> {{ data.detail }}
+            <span class="font-bold">เหตุผลและรายละเอียด:</span> {{ data.detail }}
           </div>
+
+          <div>
+            <span class="font-bold">วันที่เริ่มลา:</span> {{ data.startTime.date }} เวลา {{ data.startTime.time }}
+          </div>
+          <div>
+            <span class="font-bold">ลาถึงวันที่:</span> {{ data.endTime.date }} เวลา {{ data.endTime.time }}
+          </div>
+          <div>
+            <span class="font-bold">วันที่สร้างแบบฟอร์ม:</span> {{ data.createDate.date }} เวลา {{ data.createDate.time }}
+          </div>
+          <div>
+            <span class="font-bold">วันที่แก้ไขแบบฟอร์ม:</span> {{ data.editDate.date }} เวลา {{ data.editDate.time }}
+          </div>
+
         </div>
       </div>
 
@@ -50,7 +115,10 @@ onMounted(async () => {
         <div class="grid grid-cols-2 gap-4">
           <div v-if="data.file1">
             <span class="font-bold">File 1:</span>
-            <a :href="data.file1" target="_blank" class="text-orange-500 underline">
+            <a 
+              href="javascript:void(0);" 
+              @click="openFileInNewTab(data.file1, 'application/pdf')" 
+              class="text-orange-500 underline">
               View File
             </a>
           </div>

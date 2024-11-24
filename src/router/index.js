@@ -10,6 +10,10 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      redirect: '/login'
+    },
+    {
       path: '/login',
       name: 'login',
       component: Login
@@ -39,12 +43,18 @@ const router = createRouter({
       name: "DocumentDetail",
       component: DocumentDetail
     },
-    
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    // }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = !!localStorage.getItem('username');
+
+  if (to.name !== 'login' && to.name !== 'signup' && !isLoggedIn) {
+    next({ name: 'login' });
+  } else {
+    next();
+  }
+  
+});
 
 export default router
