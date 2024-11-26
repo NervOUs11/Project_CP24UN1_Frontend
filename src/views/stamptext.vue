@@ -19,6 +19,17 @@ export default {
     };
   },
   methods: {
+    formatDateToThai(date) {
+      const options = {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      };
+      const formatter = new Intl.DateTimeFormat('th-TH', options);
+      const formattedDate = formatter.format(date);
+      return formattedDate
+    },
+
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -49,12 +60,10 @@ export default {
           }
           const fontBytes = await response.arrayBuffer();
 
-
-        // const fontBytes = await fetch(fontUrl).then((res) => res.arrayBuffer());
-
         // สร้างข้อมูลตัวอย่าง
         const studentData = {
           studentID: 64130500051,
+          gender: "นาย",
           firstName: "พงศธร",
           lastName: "จันทร์สงเคราะห์",
           faculty: "เทคโนโลยีสารสนเทศ",
@@ -116,11 +125,11 @@ export default {
       const fields2 = [
         { text: `/`, x: 148, y: 223 },
         { text: `/`, x: 148, y: 247 },
-        { text: `/`, x: 148, y: 272 }
+        { text: `/`, x: 148, y: 272 },
       ]
 
       async function drawTextWithSpacing(page, text, startX, startY, font, size, color, letterSpacing) {
-        let currentX = startX; // ตำแหน่งเริ่มต้นสำหรับวาดข้อความ
+        let currentX = startX;
 
         for (const char of text) {
           page.drawText(char, {
@@ -131,28 +140,30 @@ export default {
             color: color,
           });
 
-          // เลื่อนตำแหน่ง x ตามขนาดตัวอักษรและ letterSpacing
           currentX += font.widthOfTextAtSize(char, size) + letterSpacing;
         }
       }
 
       const studentID = `${studentData.studentID}`;
-      const startX = 438;
-      const startY = 668;
-      const letterSpacing = 4;
 
-      await drawTextWithSpacing(firstPage, studentID, startX, startY, thaiFont, 12, rgb(0, 0, 0), letterSpacing);
+      await drawTextWithSpacing(firstPage, studentID, 438, 668, thaiFont, 12, rgb(0, 0, 0), 4); // stamp studentID
+
+      const currentDate = new Date();
+      const formattedDate = this.formatDateToThai(currentDate);
+      const [day, month, year] = formattedDate.split(' ');
+
+      await drawTextWithSpacing(firstPage, day, 375, 323, thaiFont, 10, rgb(0, 0, 0), 0); // stamp day
+      await drawTextWithSpacing(firstPage, month, 410, 323, thaiFont, 10, rgb(0, 0, 0), 0); // stamp month
+      await drawTextWithSpacing(firstPage, year, 445, 323, thaiFont, 10, rgb(0, 0, 0), 0); // stamp year
 
       fields.forEach(({ text, x, y }) => {
         firstPage.drawText(text, {
           x,
           y: firstPage.getHeight() - y,
           size: 10,
-          font: thaiFont, // ใช้ฟอนต์ภาษาไทย
+          font: thaiFont,
           color: rgb(0, 0, 0),
         });
-
-
       });
 
       fields2.forEach(({ text, x, y }) => {
@@ -160,11 +171,9 @@ export default {
           x,
           y: firstPage.getHeight() - y,
           size: 16,
-          font: thaiFont, // ใช้ฟอนต์ภาษาไทย
+          font: thaiFont,
           color: rgb(0, 0, 0),
         });
-
-
       });
 
       const stampedPdfBytes = await pdfDoc.save();
