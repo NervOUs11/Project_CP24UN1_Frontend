@@ -8,6 +8,12 @@ const router = useRouter()
 
 const type = ref('');
 const detail = ref('');
+const remainingCharacters = ref(500);
+
+const updateRemainingCharacters = () => {
+  remainingCharacters.value = 500 - detail.value.length;
+};
+
 const attachmentFile1 = ref("");
 const attachmentFile2 = ref("");
 
@@ -317,9 +323,13 @@ const addDoc = async () => {
               id="detail" 
               v-model="detail"
               class="form-input detail-input"
-              required
               maxlength="500"
+              required
+              @input="updateRemainingCharacters"
             ></textarea>
+            <div class="text-right text-sm text-gray-600">
+              ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }} 
+            </div>
           </div>
 
           <div class="mb-3">

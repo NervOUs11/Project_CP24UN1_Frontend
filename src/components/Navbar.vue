@@ -1,32 +1,41 @@
 <script setup>
-import { ref } from 'vue';  // Import ref from Vue
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-// Get the router instance to handle redirection
 const router = useRouter();
 
-// Define the firstName as a reactive property
 const firstName = ref(localStorage.getItem('firstName'));
 
-// Define the logout function
 const logout = () => {
-  localStorage.clear();  // Clear all data in localStorage
-  router.push('/login'); // Redirect to login page
+  localStorage.clear();
+  router.push('/login');
 };
+
+const navigateTo = (path) => {
+  router.push(path);
+};
+
 </script>
 
 <template>
   <nav class="navbar">
     <div class="navbar-brand">K-MUTTRACK</div>
     <ul class="navbar-menu">
-      <li><router-link to="/home">Home</router-link></li>
-      <li><router-link to="/tracking">Status</router-link></li>
-      <li><router-link to="">About K-MUTTRACK</router-link></li>
+      <li>
+        <button @click="navigateTo('/home')" class="nav-button">Home</button>
+      </li>
+      <li>
+        <button @click="navigateTo('/tracking')" class="nav-button">Status</button>
+      </li>
+      <li>
+        <!-- <button @click="navigateTo('/about')" class="nav-button">About K-MUTTRACK</button> -->
+        <button class="nav-button">About K-MUTTRACK</button>
+      </li>
       <li v-if="firstName" class="navbar-item">
         <span class="welcome-message">Welcome, {{ firstName }}!</span>
       </li>
       <li>
-        <button @click="logout()" class="logout-button">Logout</button>
+        <button @click="logout()" class="nav-button logout-button">Logout</button>
       </li>
     </ul>
     
@@ -41,7 +50,7 @@ const logout = () => {
     padding: 1rem 2rem;
     background-color: #ff6600;
     color: white;
-    height: 30px;
+    height: 65px;
     font-family: 'Arial', sans-serif;
   }
   
@@ -53,21 +62,22 @@ const logout = () => {
   .navbar-menu {
     list-style: none;
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
   }
   
   .navbar-menu li {
-    display: inline;
-    margin: 0 25px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease; 
   }
   
   .navbar-menu a {
     color: white;
     text-decoration: none;
   }
-  
-  .navbar-menu a:hover {
-    text-decoration: underline;
-  }
+
+  .navbar-menu li:hover {
+  background-color: #ff8540; /* สีส้มอ่อนลง */
+}
 </style>
   

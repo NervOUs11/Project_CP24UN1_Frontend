@@ -6,22 +6,32 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const username = ref('')
 const password = ref('')
+const message = ref('')
+const messageType = ref('')
 
 const doLogin = async () => {
   try {
     const res = await login(username.value, password.value)
     if (res.status === 200) {
-      alert("Login successfully")
-      router.push("home")
+      message.value = "Login successfully"
+      messageType.value = "success"
+      setTimeout(() => {
+        router.push("home")
+      }, 1500)
     }
     else if (res.status === 404) {
-      alert("User not found")
+      //alert("User not found")
+      message.value = 'User not found'
+      messageType.value = "error"
     }
     else if (res.status === 400) {
-      alert("Invalid password")
+      //alert("Invalid password")
+      message.value = 'Invalid password'
+      messageType.value = "error"
     }
     else {
-      alert("Login failed")
+      message.value = "Login failed"
+      messageType.value = "error"
     }
   }
   catch (error) {
@@ -33,6 +43,10 @@ const doLogin = async () => {
     <div class="flex justify-center items-center min-h-screen bg-orange-100">
         <div class="bg-white p-8 rounded-lg shadow-lg text-center w-1/3">
             <h1 class="text-orange-500 text-4xl font-bold mb-8">K-MUTTRACK</h1>
+            <div v-if="message" :class="{ 'bg-red-100 text-red-700 border-red-500': messageType === 'error', 'bg-green-100 text-green-700 border-green-500': messageType === 'success'}" 
+            class="mb-6 border-l-4 p-4 rounded" >
+            {{ message }}
+          </div>
             <form @submit.prevent="handleLogin">
                 <div class="mb-6">
                     <label for="username" class="block text-black text-left mb-2">Username</label>

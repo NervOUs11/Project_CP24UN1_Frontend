@@ -17,5 +17,21 @@ import Navbar from '../components/Navbar.vue';
 </template>
 
 <style scoped>
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* ทำให้ครอบคลุมทั้งหน้าจอ */
+}
 
+.app {
+  min-height: 93.3vh;
+  background-color: #fdf6ec;
+
+}
+
+.large-button {
+  text-align: center;
+}
 </style>
+

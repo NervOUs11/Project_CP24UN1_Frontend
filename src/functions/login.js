@@ -29,11 +29,8 @@ const login = async (username, password) => {
       localStorage.setItem("cumulativeGPA", data.cumulativeGPA);
       if (!data.role) {
         localStorage.setItem("role", "student")
-      } 
-      // else {
-      //   localStorage.setItem("role", data.roleID)
-      // }
-      console.log(localStorage.getItem("role"))
+      }
+      //console.log(localStorage.getItem("role"))
       return res
     } 
     catch (error) {
