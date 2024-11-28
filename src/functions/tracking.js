@@ -1,13 +1,8 @@
 const URL = import.meta.env.VITE_API_ROOT;
 
-const tracking = async () => {
+const tracking = async (id) => {
     try {
-        const studentID = localStorage.getItem("studentID");
-        if (!studentID) {
-            throw new Error("Student ID not found in localStorage");
-        }
-
-        const res = await fetch(`${URL}/allDocument/${studentID}`, {
+        const res = await fetch(`${URL}/allDocument/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -19,6 +14,7 @@ const tracking = async () => {
         }
 
         const data = await res.json();
+        // console.log(data)
         return data;  // Return the document data
     } catch (error) {
         console.error("Error fetching tracking data:", error);

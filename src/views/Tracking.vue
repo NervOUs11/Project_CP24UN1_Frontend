@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed  } from 'vue';
 import { useRouter } from 'vue-router';
 import { tracking } from '../functions/tracking.js';
 import Navbar from '../components/Navbar.vue';
@@ -13,13 +13,17 @@ const formatDate = (date) => {
 
 onMounted(async () => {
   try {
-    const studentID = localStorage.getItem("studentID");
-    if (!studentID) {
-      console.error("Student ID not found in localStorage");
-      return;
+    let id =  null
+    const role = localStorage.getItem("role");
+
+    if(role === "Student"){
+      id = localStorage.getItem("studentID");
+    }
+    else if (role !== "Student") {
+      id = localStorage.getItem("staffID");
     }
 
-    documents.value = await tracking(studentID);
+    documents.value = await tracking(id);
   } catch (error) {
     console.error("Error fetching documents:", error);
   }
@@ -32,6 +36,12 @@ const goHome = () => {
 const goToDocumentDetail = (documentID) => {
   router.push({ name: 'DocumentDetail', params: { id: documentID } }); 
 };
+
+const filteredDocuments = computed(() =>
+  documents.value.filter(
+    (doc) => doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve'
+  )
+);
 
 </script>
 
@@ -52,7 +62,7 @@ const goToDocumentDetail = (documentID) => {
         </thead>
         <tbody>
           <tr
-            v-for="(doc, index) in documents"
+            v-for="(doc, index) in filteredDocuments"
             :key="doc.documentID"
             class="hover:bg-orange-100 border-b border-gray-200"
             @click="goToDocumentDetail(doc.documentID)"
@@ -62,12 +72,13 @@ const goToDocumentDetail = (documentID) => {
             <td class="px-4 py-2">
               <span
                 :class="{
-                  'text-green-500 font-bold': doc.status === 'Approved',
-                  'text-red-500 font-bold': doc.status === 'Rejected',
-                  'text-yellow-500 font-bold': doc.status === 'Pending',
+                  'text-green-500 font-bold': doc.status||doc.isApprove === 'Approved',
+                  'text-red-500 font-bold': doc.status||doc.isApprove === 'Rejected',
+                  'text-yellow-500 font-bold': doc.status||doc.isApprove === 'Pending',
+                  'text-orange-500 font-bold': doc.status||doc.isApprove === 'Waiting for approve',
                 }"
               >
-                {{ doc.status }}
+                {{ doc.status || doc.isApprove }}
               </span>
             </td>
             <td class="px-4 py-2">{{ formatDate(doc.createDate) }}</td>

@@ -3,13 +3,65 @@ import { fetchDocumentDetail } from '../functions/documentDetail';
 import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
 import Navbar from '../components/Navbar.vue';
+import { approveDocument } from '../functions/approve.js';
+import { rejectDocument } from '../functions/reject.js';
 
 const data = ref(null);
-
 const router = useRouter();
+
+// ดึง role และข้อมูล Document
+const staffID = localStorage.getItem('staffID');
+const role = localStorage.getItem('role');
+
+// สร้างตัวแปร ref สำหรับเก็บ documentID และ progressID
+const documentID = ref(null);
+const progressID = ref(null);
+
+const comment = ref('');
+const showCommentPopup = ref(false);
+
 
 const goBack = () => {
   router.push("/tracking");
+};
+
+// ฟังก์ชัน Approve
+const handleApprove = async () => {
+  try {
+    const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value}
+    const result = await approveDocument(data);
+    alert('Document approved successfully');
+    router.push('/tracking');
+  } catch (error) {
+    alert('Failed to approve document');
+  }
+};
+
+// ฟังก์ชัน Reject
+const handleReject = async () => {
+  if (!comment.value) {
+    alert('Please provide a comment before rejecting the document.');
+    return;
+  }
+  try {
+    const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value, comment: comment.value}
+    const result = await rejectDocument(data);
+    alert('Document rejected successfully');
+    router.push('/tracking');
+  } catch (error) {
+    alert('Failed to reject document');
+  }
+};
+
+// เปิด popup สำหรับกรอกคอมเมนต์
+const openRejectPopup = () => {
+  showCommentPopup.value = true;
+};
+
+// ปิด popup
+const closeRejectPopup = () => {
+  showCommentPopup.value = false;
+  comment.value = ''; // เคลียร์คอมเมนต์
 };
 
 const formatDateTime = (isoString) => {
@@ -53,7 +105,15 @@ const openFileInNewTab = (base64String, mimeType) => {
 };
 
 onMounted(async () => {
-  const rawData = await fetchDocumentDetail();
+  let userid = null
+  const role = localStorage.getItem("role")
+  if(role != "Student"){
+    userid = localStorage.getItem("staffID")
+  } 
+  else if (role === "Student"){
+    userid = localStorage.getItem("studentID")
+  }
+  const rawData = await fetchDocumentDetail(userid);
   if (rawData) {
     data.value = {
       ...rawData,
@@ -61,10 +121,11 @@ onMounted(async () => {
       endTime: formatDateTime(rawData.endTime),
       createDate: formatDateTime(rawData.createDate),
       editDate: formatDateTime(rawData.editDate),
-      file1: `data:image/jpeg;base64,${rawData.file1}`
+      file1: `data:image/jpeg;base64,${rawData.file1}`,
     };
   }
-  // console.log(data.value); // ตรวจสอบข้อมูลใน console ว่าถูกต้องหรือไม่
+  documentID.value = rawData.DocumentID;
+  progressID.value = rawData.minProgressID;
 });
 
 </script>
@@ -139,6 +200,45 @@ onMounted(async () => {
           </li>
         </ul>
       </div>
+      <div class="text-center">
+
+    <div v-if="role !== 'Student'" class="mt-4 flex justify-center gap-4">
+        <button class="button bg-green-500 text-white mx-2" @click="handleApprove">
+          Approve
+        </button>
+        <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
+          Reject
+        </button>
+      </div>
+    </div>
+
+    <!-- Popup สำหรับกรอก Comment -->
+    <div 
+      v-if="showCommentPopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]">
+        <h2 class="text-lg font-bold mb-4">Provide a Comment</h2>
+        <textarea
+          v-model="comment"
+          class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+          placeholder="Enter your comment here..."
+          rows="4"
+          maxlength="400"
+        ></textarea>
+        <div class="mt-4 flex justify-end gap-2">
+          <button 
+            class="button bg-gray-500 text-white"
+            @click="closeRejectPopup">
+            Cancel
+          </button>
+          <button 
+            class="button bg-red-500 text-white"
+            @click="handleReject">
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
 
       <div class="text-center">
         <button class="form-button" @click="goBack">
@@ -160,6 +260,20 @@ onMounted(async () => {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+}
+
+.button {
+  width: 50%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 100px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+textarea {
+  resize: none;
 }
 
 .form-button:hover {

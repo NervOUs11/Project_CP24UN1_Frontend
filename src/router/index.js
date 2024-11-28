@@ -53,10 +53,18 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const isLoggedIn = !!localStorage.getItem('username');
-
+  const role = localStorage.getItem('role');
   if (to.name !== 'login' && to.name !== 'signup' && !isLoggedIn) {
     next({ name: 'login' });
-  } else {
+  } 
+  else if (to.name === 'home') {
+    if (role === 'Student') {
+      next();
+    } else if (role !== 'Student') {
+      next({ name: 'tracking' });
+    }
+  }
+  else {
     next();
   }
   
