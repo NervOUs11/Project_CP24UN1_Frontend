@@ -23,7 +23,7 @@ html, body, #app {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%; /* ครอบคลุมทั้งหน้าจอ */
+  height: 100%;
 }
 
 .app {
@@ -33,13 +33,13 @@ html, body, #app {
 
 .button-container {
   display: flex;
-  justify-content: center; /* จัดตำแหน่งปุ่มให้อยู่ตรงกลาง */
-  align-items: center; /* จัดแนวในแนวตั้ง */
+  justify-content: center;
+  align-items: center;
   width: 100%; 
 }
 
 .large-button {
-  display: inline-block; /* ทำให้ router-link มีขนาดตามเนื้อหา */
+  display: inline-block;
   text-align: center;
 }
 </style>
