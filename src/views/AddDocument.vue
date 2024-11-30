@@ -339,7 +339,6 @@ const addDoc = async () => {
               id="attachmentFile1" 
               @change="handleFileChange" 
               class="form-input"
-              required
             />
           </div>
 
