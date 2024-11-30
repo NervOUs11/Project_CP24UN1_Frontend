@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar.vue';
     <div class="app mt-16 w-full h-[80vh] bg-[#ffe5b4] flex justify-center items-center">
          <div class="button-container flex justify-between w-4/5 max-w-[800px]">
             <button class="large-button w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
-                <router-link to="/adddocument">ใบคำร้องขอลากิจ/ลาป่วย</router-link>
+              <router-link :to="{ name: 'adddocument' }">ใบคำร้องขอลากิจ/ลาป่วย</router-link>
             </button> 
             <!-- <button class="large-button w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
                 แบบขออนุมัติการจัดกิจกรรม

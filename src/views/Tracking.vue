@@ -37,11 +37,11 @@ const goToDocumentDetail = (documentID) => {
   router.push({ name: 'DocumentDetail', params: { id: documentID } }); 
 };
 
-const filteredDocuments = computed(() =>
-  documents.value.filter(
-    (doc) => doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve'
-  )
-);
+// const filteredDocuments = computed(() =>
+//   documents.value.filter(
+//     (doc) => doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve' || 
+//   )
+// );
 
 </script>
 
@@ -62,7 +62,7 @@ const filteredDocuments = computed(() =>
         </thead>
         <tbody>
           <tr
-            v-for="(doc, index) in filteredDocuments"
+            v-for="(doc, index) in documents"
             :key="doc.documentID"
             class="hover:bg-orange-100 border-b border-gray-200"
             @click="goToDocumentDetail(doc.documentID)"
@@ -72,10 +72,9 @@ const filteredDocuments = computed(() =>
             <td class="px-4 py-2">
               <span
                 :class="{
-                  'text-green-500 font-bold': doc.status||doc.isApprove === 'Approved',
-                  'text-red-500 font-bold': doc.status||doc.isApprove === 'Rejected',
-                  'text-yellow-500 font-bold': doc.status||doc.isApprove === 'Pending',
-                  'text-orange-500 font-bold': doc.status||doc.isApprove === 'Waiting for approve',
+                  'text-green-500 font-bold': doc.status === 'Approve' || doc.isApprove === 'Approve',
+                  'text-red-500 font-bold': doc.status === 'Reject' || doc.isApprove === 'Reject',
+                  'text-orange-500 font-bold': doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve',
                 }"
               >
                 {{ doc.status || doc.isApprove }}

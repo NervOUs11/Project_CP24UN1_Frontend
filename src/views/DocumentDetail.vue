@@ -197,9 +197,13 @@ onMounted(async () => {
         <ul class="list-disc pl-6 text-gray-700">
           <li v-for="(step, index) in data.allProgress" :key="index">
             {{ step.staffName }} - {{ step.staffRole }} - {{ step.status }}
+            <span v-if="step.comment != null" class="text-red-600 mt-1">
+              &nbsp; สาเหตุที่ยกเลิก: {{ step.comment }}
+            </span>
           </li>
         </ul>
       </div>
+
       <div class="text-center">
 
     <div v-if="role !== 'Student'" class="mt-4 flex justify-center gap-4">

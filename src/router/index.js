@@ -29,7 +29,7 @@ const router = createRouter({
       component: Home
     },
     {
-      path: '/adddocument',
+      path: '/document/add',
       name: 'adddocument',
       component: AddDocument
     },
