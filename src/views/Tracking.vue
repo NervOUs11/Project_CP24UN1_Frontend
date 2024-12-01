@@ -37,11 +37,11 @@ const goToDocumentDetail = (documentID) => {
   router.push({ name: 'DocumentDetail', params: { id: documentID } }); 
 };
 
-// const filteredDocuments = computed(() =>
-//   documents.value.filter(
-//     (doc) => doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve' || 
-//   )
-// );
+const filteredDocuments = computed(() =>
+  documents.value.filter(
+    (doc) => doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve'
+  )
+);
 
 </script>
 
@@ -50,8 +50,10 @@ const goToDocumentDetail = (documentID) => {
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
-
-      <table class="document-table w-full text-left border-collapse">
+      <div v-if="documents.length === 0">
+        <h1 class="text-center text-red-600 font-bold text-2xl">No Absence Document</h1>
+      </div>
+      <table v-else class="document-table w-full text-left border-collapse">
         <thead>
           <tr class="bg-orange-500 text-white">
             <th class="px-4 py-2">#</th>
