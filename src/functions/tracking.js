@@ -2,7 +2,7 @@ const URL = import.meta.env.VITE_API_ROOT;
 
 const tracking = async (id) => {
     try {
-        const res = await fetch(`${URL}/allDocument/${id}`, {
+        const res = await fetch(`${URL}/document/all/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

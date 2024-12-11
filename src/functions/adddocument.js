@@ -2,7 +2,7 @@ const URL = import.meta.env.VITE_API_ROOT
 
 const addDocument = async (dataToSend) => {
     try {
-        const res = await fetch(`${URL}/add`, { //backend api path
+        const res = await fetch(`${URL}/document/add`, { //backend api path
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

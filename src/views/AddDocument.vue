@@ -123,8 +123,17 @@ const addDoc = async () => {
       }
     } else if (leaveType.value === "multipleDays") {
       // ลาหลายวัน
+      const startDate = new Date(starttime.value);
+      const endDate = new Date(endtime.value);
+
+      if (endDate <= startDate) {
+        alert("วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น")
+        throw new Error("EndDate must more than StartDate");
+      }
+      
       startTime = `${starttime.value}T09:00:00`;
       endTime = `${endtime.value}T17:00:00`;
+
     } else {
       throw new Error("กรุณาเลือกประเภทการลา");
     }

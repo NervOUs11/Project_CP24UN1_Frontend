@@ -27,6 +27,10 @@ const goBack = () => {
 
 // ฟังก์ชัน Approve
 const handleApprove = async () => {
+  console.log("hello")
+  console.log(progressID.value)
+  console.log(staffID)
+  console.log(documentID.value)
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value}
     const result = await approveDocument(data);
@@ -113,7 +117,7 @@ onMounted(async () => {
   else if (role === "Student"){
     userid = localStorage.getItem("studentID")
   }
-  const rawData = await fetchDocumentDetail(userid);
+  const rawData = await fetchDocumentDetail(userid, role);
   if (rawData) {
     data.value = {
       ...rawData,
@@ -125,7 +129,7 @@ onMounted(async () => {
     };
   }
   documentID.value = rawData.DocumentID;
-  progressID.value = rawData.minProgressID;
+  progressID.value = rawData.progressID;
 });
 
 </script>
@@ -206,15 +210,23 @@ onMounted(async () => {
 
       <div class="text-center">
 
-    <div v-if="role !== 'Student'" class="mt-4 flex justify-center gap-4">
-        <button class="button bg-green-500 text-white mx-2" @click="handleApprove">
-          Approve
-        </button>
-        <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
-          Reject
-        </button>
+        <div v-if="role !== 'Student'" class="mt-4 flex justify-center gap-4">
+          <button class="button bg-green-500 text-white mx-2" @click="handleApprove">
+            Approve
+          </button>
+          <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
+            Reject
+          </button>
+        </div>
+        <div v-else class="mt-4 flex justify-center gap-4">
+          <button class="button bg-blue-500 text-white mx-2" @click="handleEdit">
+            Edit
+          </button>
+          <button class="button bg-red-500 text-white mx-2" @click="handleDelete">
+            Delete
+          </button>
+        </div>
       </div>
-    </div>
 
     <!-- Popup สำหรับกรอก Comment -->
     <div 
@@ -274,6 +286,9 @@ onMounted(async () => {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+}
+.button:hover {
+  opacity: 0.9;
 }
 
 textarea {
