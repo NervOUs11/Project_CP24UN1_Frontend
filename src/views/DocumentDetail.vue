@@ -1,10 +1,11 @@
 <script setup>
 import { fetchDocumentDetail } from '../functions/documentDetail';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from "vue-router";
 import Navbar from '../components/Navbar.vue';
 import { approveDocument } from '../functions/approve.js';
 import { rejectDocument } from '../functions/reject.js';
+import { deleteDocument } from '../functions/deleteDocument.js'
 
 const data = ref(null);
 const router = useRouter();
@@ -19,18 +20,34 @@ const progressID = ref(null);
 
 const comment = ref('');
 const showCommentPopup = ref(false);
-
+const showDeletePopup = ref(false);
 
 const goBack = () => {
   router.push("/tracking");
 };
 
+// ใช้ computed ในการสร้าง canApprove ที่จะตรวจสอบสถานะ
+const canApprove = computed(() => {
+  if (!staffID) return false;
+
+  // ตรวจสอบว่า progress ที่มี staffID ตรงกันและ status เป็น "Waiting for approve"
+  const progressMatch = data.value.allProgress.find(
+    (progress) =>
+      progress.staffID === parseInt(staffID) && progress.status === "Waiting for approve"
+  );
+
+  return !!progressMatch; // ถ้ามี progress ที่ตรงตามเงื่อนไข จะคืนค่า true
+});
+
+const canShowButtons = computed(() => {
+  if (role === 'Student') {
+    return true; // ถ้าเป็น student ให้แสดงปุ่ม edit กับ delete
+  }
+  return canApprove.value; // ถ้าไม่ใช่ student ให้แสดงปุ่ม approve กับ reject ถ้า canApprove เป็น true
+});
+
 // ฟังก์ชัน Approve
 const handleApprove = async () => {
-  console.log("hello")
-  console.log(progressID.value)
-  console.log(staffID)
-  console.log(documentID.value)
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value}
     const result = await approveDocument(data);
@@ -62,10 +79,45 @@ const openRejectPopup = () => {
   showCommentPopup.value = true;
 };
 
-// ปิด popup
+// ปิด popup สำหรับกรอกคอมเมนต์
 const closeRejectPopup = () => {
   showCommentPopup.value = false;
   comment.value = ''; // เคลียร์คอมเมนต์
+};
+
+// เปิด Popup สำหรับ confirm delete
+const openDeletePopup = () => {
+  showDeletePopup.value = true;
+};
+
+// ปิด Popup สำหรับ confirm delete
+const closeDeletePopup = () => {
+  showDeletePopup.value = false;
+};
+
+// เรียกฟังก์ชันลบเอกสาร
+const handleDelete = async () => {
+  try {
+    const documentID = data.value ? data.value.DocumentID : null; // ใช้ documentID จาก data.value
+    const studentID = localStorage.getItem("studentID");
+
+    // ตรวจสอบว่ามี documentID และ studentID หรือไม่
+    if (!documentID || !studentID) {
+      alert('Missing document ID or student ID');
+      return;
+    }
+
+    await deleteDocument(studentID, documentID);
+    router.push('/tracking');
+  } catch (error) {
+    console.error('Delete failed:', error);
+  }
+};
+
+// ฟังก์ชัน handleEdit เมื่อคลิกปุ่ม Edit
+const handleEdit = () => {
+  const documentId = data.value ? data.value.DocumentID : null; // ใช้ documentID จาก data.value
+  router.push(`/documentEdit/${documentId}`);
 };
 
 const formatDateTime = (isoString) => {
@@ -149,13 +201,14 @@ onMounted(async () => {
       <div class="mb-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-2">Document Information</h2>
         <div class="grid grid-cols-2 gap-4">
-          <div>
+          <!-- <div>
             <span class="font-bold">Document ID:</span> {{ data.DocumentID }}
-          </div>
+          </div> -->
           <div>
             <span class="font-bold">ประเภทการลา:</span> {{ data.DocumentType }}
           </div>
-          <div class="col-span-2">
+          <!-- <div class="col-span-2"> -->
+          <div>  
             <span class="font-bold">เหตุผลและรายละเอียด:</span> {{ data.detail }}
           </div>
 
@@ -208,25 +261,29 @@ onMounted(async () => {
         </ul>
       </div>
 
-      <div class="text-center">
-
-        <div v-if="role !== 'Student'" class="mt-4 flex justify-center gap-4">
+    <div class="text-center">
+      <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
+        <!-- ถ้าเป็น staff และสามารถ approve ได้ จะมีปุ่ม approve และ reject -->
+        <template v-if="canApprove">
           <button class="button bg-green-500 text-white mx-2" @click="handleApprove">
             Approve
           </button>
           <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
             Reject
           </button>
-        </div>
-        <div v-else class="mt-4 flex justify-center gap-4">
+        </template>
+        
+        <!-- ถ้าเป็น student จะมีปุ่ม edit และ delete -->
+        <template v-else>
           <button class="button bg-blue-500 text-white mx-2" @click="handleEdit">
             Edit
           </button>
-          <button class="button bg-red-500 text-white mx-2" @click="handleDelete">
+          <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
             Delete
           </button>
-        </div>
+        </template>
       </div>
+    </div>
 
     <!-- Popup สำหรับกรอก Comment -->
     <div 
@@ -253,6 +310,27 @@ onMounted(async () => {
             Reject
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Popup สำหรับ confirm การ delete document -->
+    <div 
+      v-if="showDeletePopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to delete?</h2>
+          <div class="flex justify-end gap-2">
+            <button 
+              class="button bg-gray-500 text-white"
+              @click="closeDeletePopup">
+              Cancel
+            </button>
+            <button 
+              class="button bg-red-500 text-white"
+              @click="handleDelete">
+              Delete
+            </button>
+        </div>    
       </div>
     </div>
 

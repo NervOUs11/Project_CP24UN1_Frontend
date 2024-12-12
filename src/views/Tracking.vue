@@ -7,8 +7,10 @@ import Navbar from '../components/Navbar.vue';
 const documents = ref([]);
 const router = useRouter();
 const firstName = ref(localStorage.getItem('firstName'));
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString();
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+  const date = new Date(dateString);
+  return date.toLocaleString('th-TH', options);
 }
 
 onMounted(async () => {
@@ -60,6 +62,7 @@ const filteredDocuments = computed(() =>
             <th class="px-4 py-2">Document Name</th>
             <th class="px-4 py-2">Status</th>
             <th class="px-4 py-2">Date Sent</th>
+            <th class="px-4 py-2">Last Edit</th>
           </tr>
         </thead>
         <tbody v-if="documents.length === 0">
@@ -80,12 +83,14 @@ const filteredDocuments = computed(() =>
                   'text-green-500 font-bold': doc.status === 'Approve' || doc.isApprove === 'Approve',
                   'text-red-500 font-bold': doc.status === 'Reject' || doc.isApprove === 'Reject',
                   'text-orange-500 font-bold': doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve',
+                  'text-blue-500 font-bold': doc.status === 'Other advisor approve' || doc.isApprove === 'Other advisor approve',
                 }"
               >
                 {{ doc.status || doc.isApprove }}
               </span>
             </td>
             <td class="px-4 py-2">{{ formatDate(doc.createDate) }}</td>
+            <td class="px-4 py-2">{{ formatDate(doc.editDate) }}</td>
           </tr>
         </tbody>
       </table>

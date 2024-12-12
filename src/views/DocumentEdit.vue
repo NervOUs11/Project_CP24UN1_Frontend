@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getAllFaculty } from "../functions/getData"
-import { addDocument } from '../functions/adddocument'
-import { useRouter } from "vue-router";
+import { ref, onMounted, reactive } from 'vue';
+import { editDocument } from '../functions/editDocument.js'; // นำเข้า editDocument
+import { useRouter } from 'vue-router';
+import { fetchDocumentDetail } from '../functions/documentDetail.js'
 
-const router = useRouter()
+const router = useRouter();
 
 const type = ref('');
 const detail = ref('');
@@ -14,20 +14,19 @@ const updateRemainingCharacters = () => {
   remainingCharacters.value = 500 - detail.value.length;
 };
 
-const attachmentFile1 = ref("");
-const attachmentFile2 = ref("");
+const attachmentFile1 = ref('');
+const attachmentFile2 = ref('');
 
 // ตัวแปรการเลือกประเภทการลาและช่วงเวลา
-const leaveType = ref('')
-const oneDayDate = ref('')
-const oneDaySession = ref({
+const leaveType = ref('');
+const oneDayDate = ref('');
+const oneDaySession = reactive({
   morning: false,
   afternoon: false
-})
+});
 
-// ตัวแปรสำหรับการลาแบบหลายวัน
-const starttime = ref('')
-const endtime = ref('')
+const starttime = ref('');
+const endtime = ref('');
 
 const userData = ref({
   name: '',
@@ -43,10 +42,11 @@ const userData = ref({
   advisor: '',
   tel: '',
   email: ''
-})
+});
 
-onMounted(() => {
+const documentID = ref(null);
 
+onMounted(async () => {
   userData.value = {
     name: localStorage.getItem("firstName") + " " + localStorage.getItem("lastName"),
     studentId: localStorage.getItem("studentID"),
@@ -62,52 +62,83 @@ onMounted(() => {
     tel: localStorage.getItem("tel"),
     email: localStorage.getItem("username")
   }
-})
 
-const handleFileChange = async (e) => {
-  console.log("Input changed:", e.target.files)
-  const file = e.target.files[0];
-  if (file) {
-    const base64 = await fileToBase64(file);
-    // console.log("Base64 file:", base64);
-    attachmentFile1.value = base64
-    // downloadPDF(base64, 'base64topdf.pdf');
-  }
-}
+    const studentID = localStorage.getItem("studentID");
+    const role = "Student";
+    const documentData = await fetchDocumentDetail(studentID, role);
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
-  });
-}
+    if (documentData) {
+        type.value = documentData.DocumentType || '';
+        detail.value = documentData.detail || '';
 
-function downloadPDF(base64String, filename) {
-    const link = document.createElement('a');
-    link.href = 'data:application/pdf;base64,' + base64String;
-    link.download = filename;
-    link.click();
-}
+        attachmentFile1.value = documentData.attachmentFile1 || null;
+        attachmentFile2.value = documentData.attachmentFile2 || null;
+
+        starttime.value = documentData.startTime || '';
+        endtime.value = documentData.endTime || '';
+
+        // ตรวจสอบว่า starttime และ endtime เป็นวันเดียวกันหรือไม่
+        const startDate = new Date(starttime.value).toDateString();
+        const endDate = new Date(endtime.value).toDateString();
+
+        // ถ้า startDate และ endDate เป็นวันเดียวกัน ให้เลือก leaveType = "oneDay"
+        if (startDate === endDate) {
+            leaveType.value = 'oneDay';
+            oneDayDate.value = starttime.value.split('T')[0]; // ตั้งค่า oneDayDate ให้เป็นวันที่ของ starttime
+            const startTimeHour = new Date(starttime.value).getHours();
+            const endTimeHour = new Date(endtime.value).getHours();
+            
+            // เช็คช่วงเวลา
+            if (startTimeHour === 9 && endTimeHour === 12) {
+                oneDaySession.morning = true;
+                oneDaySession.afternoon = false;
+            } else if (startTimeHour === 13 && endTimeHour === 17) {
+                oneDaySession.morning = false;
+                oneDaySession.afternoon = true;
+            } else if (startTimeHour === 9 && endTimeHour === 17) {
+                oneDaySession.morning = true;
+                oneDaySession.afternoon = true;
+            } else {
+                oneDaySession.morning = false;
+                oneDaySession.afternoon = false;
+            }
+
+        } else {
+            leaveType.value = 'multipleDays';
+            starttime.value = documentData.startTime.split('T')[0]; // ตั้งค่า starttime เป็นวันที่ของ startTime
+            endtime.value = documentData.endTime.split('T')[0]; // ตั้งค่า endtime เป็นวันที่ของ endTime
+            
+        }
+    }
+
+    documentID.value = documentData.DocumentID
+});
 
 function convertToISOWithTimezone(dateString, time) {
+  if (!dateString || typeof dateString !== "string" || !dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    throw new Error(`Invalid dateString: ${dateString}`);
+  }
+
+  if (!time || typeof time !== "string" || !time.match(/^\d{2}:\d{2}:\d{2}$/)) {
+    throw new Error(`Invalid time: ${time}`);
+  }
+
   const date = new Date(`${dateString}T${time}`);
+
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid combined date/time: ${dateString}T${time}`);
+  }
+
   const timezoneOffset = date.getTimezoneOffset(); // offset เป็นนาที
   date.setMinutes(date.getMinutes() - timezoneOffset); // ปรับเวลาให้ตรงกับ timezone ของระบบ
   return date.toISOString();
 }
 
-const addDoc = async () => {
+
+// ฟังก์ชันสำหรับการอัพเดตเอกสาร
+const handleEditDocument = async () => {
   try {
-    // ดึงค่า studentFacultyID และ studentDepartmentID จาก local storage
-    const studentFacultyID = parseInt(localStorage.getItem("facultyId"));
-    const studentDepartmentID = parseInt(localStorage.getItem("departmentId"));
-    const studentID = parseInt(localStorage.getItem("studentID"))
-    // ตรวจสอบว่าข้อมูลจำเป็นถูกต้อง
-    if (!studentFacultyID || !studentDepartmentID) {
-      throw new Error("ไม่พบข้อมูล studentFacultyID หรือ studentDepartmentID ใน local storage");
-    }
+    const studentID = localStorage.getItem("studentID");
 
     // ตรวจสอบวันที่วันนี้
     const today = new Date();
@@ -119,24 +150,28 @@ const addDoc = async () => {
 
     if (leaveType.value === "oneDay") {
       // ลาวันเดียว
-
       const date = new Date(oneDayDate.value);
+      const dateString = date.toISOString().split("T")[0];
 
       if (date < today) {
         alert("วันลาต้องเป็นวันนี้หรือหลังจากวันนี้");
         throw new Error("Leave date must be today or in the future");
       }
 
-      // const date = oneDayDate.value;
-      if (oneDaySession.value.morning && oneDaySession.value.afternoon) {
-        startTime = convertToISOWithTimezone(date, "09:00:00");
-        endTime = convertToISOWithTimezone(date, "17:00:00");
-      } else if (oneDaySession.value.morning) {
-        startTime = convertToISOWithTimezone(date, "09:00:00");
-        endTime = convertToISOWithTimezone(date, "12:00:00");
-      } else if (oneDaySession.value.afternoon) {
-        startTime = convertToISOWithTimezone(date, "13:00:00");
-        endTime = convertToISOWithTimezone(date, "17:00:00");
+      const isMorning = oneDaySession.morning
+      const isAfternoon = oneDaySession.afternoon
+
+
+      // ตรวจสอบช่วงเวลาที่เลือก
+      if (isMorning && isAfternoon) {
+        startTime = convertToISOWithTimezone(dateString, "09:00:00");
+        endTime = convertToISOWithTimezone(dateString, "17:00:00");
+      } else if (isMorning) {
+        startTime = convertToISOWithTimezone(dateString, "09:00:00");
+        endTime = convertToISOWithTimezone(dateString, "12:00:00");
+      } else if (isAfternoon) {
+        startTime = convertToISOWithTimezone(dateString, "13:00:00");
+        endTime = convertToISOWithTimezone(dateString, "17:00:00");
       } else {
         throw new Error("กรุณาเลือกช่วงเวลาการลาวันเดียว");
       }
@@ -151,10 +186,9 @@ const addDoc = async () => {
       }
 
       if (endDate <= startDate) {
-        alert("วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น")
+        alert("วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น");
         throw new Error("EndDate must more than StartDate");
       }
-      
       startTime = convertToISOWithTimezone(starttime.value, "09:00:00");
       endTime = convertToISOWithTimezone(endtime.value, "17:00:00");
 
@@ -162,45 +196,37 @@ const addDoc = async () => {
       throw new Error("กรุณาเลือกประเภทการลา");
     }
 
-    const dataToSend = {
-      studentID: studentID,
+    // อัปเดตข้อมูล
+    const dataToUpdate = {
       type: type.value,
-      createDate: new Date().toISOString(), // เวลาที่สร้าง
-      editDate: new Date().toISOString(), // เวลาที่แก้ไขล่าสุด
       startTime: startTime,
       endTime: endTime,
       detail: detail.value,
       attachmentFile1: attachmentFile1.value,
-      attachmentFile2: "",
-      attachmentFile2Name: "File 2 name", // ชื่อไฟล์แนบ 2 (ถ้าต้องการแยกต่างหาก)
-      studentFacultyID: studentFacultyID,
-      studentDepartmentID: studentDepartmentID,
+      attachmentFile2: attachmentFile2.value,
+      attachmentFile2Name: "File2Name",
+
     };
-    console.log(dataToSend)
-    const res = await addDocument(dataToSend);
 
+    const result = await editDocument(studentID, documentID.value, dataToUpdate);
 
-    if (res[1] === 201) {
-      alert("Add New Document Successfully!");
-      try {
-        router.push("/tracking");
-      } catch (error) {
-        console.error(error);
-      }
+    if (result) {
+      alert("Document updated successfully");
+      router.push("/tracking"); // ไปยังหน้า tracking เมื่ออัพเดตสำเร็จ
     }
   } catch (error) {
-    console.error("เกิดข้อผิดพลาด:", error.message);
+    console.error("Failed to update document:", error);
   }
 };
-
 </script>
 
 <template>
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
-      <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">Add Absence Document</h1>
+      <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">Edit Absence Document</h1>
 
-      <form @submit.prevent="addDoc">
+      <form @submit.prevent="handleEditDocument">
+        <!-- ใส่ฟอร์มต่าง ๆ ที่ต้องการให้ผู้ใช้กรอก เช่น เรื่องการลา, วันที่, รายละเอียด, ไฟล์แนบ -->
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div class="mb-3">
             <label for="name" class="block text-gray-700 mb-1">ชื่อ: {{ userData.name }}</label>
@@ -385,14 +411,12 @@ const addDoc = async () => {
             />
           </div>
         </div>
-
         <button 
           type="submit" 
           class="form-button"
         >
-          Add New Document
+          Update Document
         </button>
-
       </form>
     </div>
   </div>
