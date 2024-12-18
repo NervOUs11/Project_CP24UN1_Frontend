@@ -14,8 +14,7 @@ const tracking = async (id) => {
         }
 
         const data = await res.json();
-        console.log(data)
-        return data;  // Return the document data
+        return data;
     } catch (error) {
         console.error("Error fetching tracking data:", error);
         throw error;

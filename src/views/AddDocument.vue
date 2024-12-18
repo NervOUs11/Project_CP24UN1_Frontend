@@ -4,6 +4,10 @@ import { getAllFaculty } from "../functions/getData"
 import { addDocument } from '../functions/adddocument'
 import { useRouter } from "vue-router";
 
+import ModalPopup from "../components/ModalPopup.vue"
+const showModal = ref(false);
+const alertMessage = ref("");
+
 const router = useRouter()
 
 const type = ref('');
@@ -176,11 +180,14 @@ const addDoc = async () => {
       studentFacultyID: studentFacultyID,
       studentDepartmentID: studentDepartmentID,
     };
-    console.log(dataToSend)
+    console.log("Data to send:", dataToSend);
     const res = await addDocument(dataToSend);
+    console.log("API response:", res[1]);
 
 
     if (res[1] === 201) {
+      // alertMessage.value = "Add Document Successfully!";
+      // showModal.value = true;
       alert("Add New Document Successfully!");
       try {
         router.push("/tracking");
@@ -189,6 +196,8 @@ const addDoc = async () => {
       }
     }
   } catch (error) {
+    // alertMessage.value = "Add Document Failed";
+    // showModal.value = true;
     console.error("เกิดข้อผิดพลาด:", error.message);
   }
 };
@@ -394,6 +403,8 @@ const addDoc = async () => {
         </button>
 
       </form>
+      <!-- Modal Popup -->
+      <ModalPopup :show="showModal" :message="alertMessage" @close="showModal = false" />
     </div>
   </div>
 </template>

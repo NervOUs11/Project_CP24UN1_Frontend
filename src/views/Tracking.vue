@@ -4,6 +4,9 @@ import { useRouter } from 'vue-router';
 import { tracking } from '../functions/tracking.js';
 import Navbar from '../components/Navbar.vue';
 
+const currentPage = ref(1);
+const itemsPerPage = 5;
+
 const documents = ref([]);
 const router = useRouter();
 const firstName = ref(localStorage.getItem('firstName'));
@@ -31,6 +34,24 @@ onMounted(async () => {
   }
 });
 
+const sortedDocuments = computed(() =>
+  documents.value.slice().sort((a, b) => new Date(b.editDate) - new Date(a.editDate))
+);
+
+const totalPages = computed(() => Math.ceil(sortedDocuments.value.length / itemsPerPage));
+
+const paginatedDocuments = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return sortedDocuments.value.slice(start, end);
+});
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
 const goHome = () => {
   router.push({ name: 'home' });
 }
@@ -48,13 +69,10 @@ const filteredDocuments = computed(() =>
 </script>
 
 <template>
-  <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md"/>
+  <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md" />
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
-      <!-- <div v-if="documents.length === 0">
-        <h1 class="text-center text-red-600 font-bold text-2xl">No Absence Document</h1>
-      </div> -->
       <table class="document-table w-full text-left border-collapse">
         <thead>
           <tr class="bg-orange-500 text-white">
@@ -66,16 +84,16 @@ const filteredDocuments = computed(() =>
           </tr>
         </thead>
         <tbody v-if="documents.length === 0">
-          <td class="text-center text-red-600 font-bold text-2xl" colspan="4">No Absence Document</td>
+          <td class="text-center text-red-600 font-bold text-2xl" colspan="5">No Absence Document</td>
         </tbody>
         <tbody v-else>
           <tr
-            v-for="(doc, index) in documents"
+            v-for="(doc, index) in paginatedDocuments"
             :key="doc.documentID"
             class="hover:bg-orange-100 border-b border-gray-200"
             @click="goToDocumentDetail(doc.documentID)"
           >
-            <td class="px-4 py-2">{{ index + 1 }}</td>
+            <td class="px-4 py-2">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
             <td class="px-4 py-2">{{ doc.documentType }}</td>
             <td class="px-4 py-2">
               <span
@@ -95,6 +113,18 @@ const filteredDocuments = computed(() =>
         </tbody>
       </table>
 
+      <!-- Pagination -->
+      <div class="flex justify-center mt-4 space-x-2">
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          :class="['pagination-button', { 'bg-orange-500 text-white': currentPage === page }]"
+          @click="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
+
       <div class="text-center mt-6">
         <button 
           @click="goHome"
@@ -103,12 +133,31 @@ const filteredDocuments = computed(() =>
           Back to Home
         </button>
       </div>
-
     </div>
   </div>
 </template>
 
 <style scoped>
+.pagination-button {
+  /* padding: 10px 15px; */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  color: #fb923c;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.pagination-button:hover {
+  background-color: #fb923c;
+  color: white;
+}
+
+.pagination-button.bg-orange-500 {
+  border-color: #fb923c;
+}
+
 .form-button {
   width: 100%;
   padding: 10px 0;
