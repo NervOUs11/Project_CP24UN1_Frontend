@@ -2,7 +2,7 @@ const URL = import.meta.env.VITE_API_ROOT
 
 const deleteDocument = async (studentID, documentID) => {
     try {
-      const res = await fetch(`${URL}/userID/${studentID}/document/delete/${documentID}`, {
+      const res = await fetch(`${URL}/userID/${studentID}/document/absence/delete/${documentID}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

@@ -62,7 +62,7 @@ const goToDocumentDetail = (documentID) => {
 
 const filteredDocuments = computed(() =>
   documents.value.filter(
-    (doc) => doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve'
+    (doc) => doc.status === 'Waiting for approve' || doc.status === 'Waiting for approve'
   )
 );
 
@@ -98,13 +98,13 @@ const filteredDocuments = computed(() =>
             <td class="px-4 py-2">
               <span
                 :class="{
-                  'text-green-500 font-bold': doc.status === 'Approve' || doc.isApprove === 'Approve',
-                  'text-red-500 font-bold': doc.status === 'Reject' || doc.isApprove === 'Reject',
-                  'text-orange-500 font-bold': doc.status === 'Waiting for approve' || doc.isApprove === 'Waiting for approve',
-                  'text-blue-500 font-bold': doc.status === 'Other advisor approve' || doc.isApprove === 'Other advisor approve',
+                  'text-green-500 font-bold': doc.status === 'Approve',
+                  'text-red-500 font-bold': doc.status === 'Reject',
+                  'text-orange-500 font-bold': doc.status === 'Waiting for approve',
+                  'text-blue-500 font-bold': doc.status === 'Other advisor approve',
                 }"
               >
-                {{ doc.status || doc.isApprove }}
+                {{ doc.status }}
               </span>
             </td>
             <td class="px-4 py-2">{{ formatDate(doc.createDate) }}</td>
@@ -114,7 +114,7 @@ const filteredDocuments = computed(() =>
       </table>
 
       <!-- Pagination -->
-      <div class="flex justify-center mt-4 space-x-2">
+      <div class="flex justify-center mt-4">
         <button
           v-for="page in totalPages"
           :key="page"
@@ -139,7 +139,8 @@ const filteredDocuments = computed(() =>
 
 <style scoped>
 .pagination-button {
-  /* padding: 10px 15px; */
+  padding: 10px 15px;
+  margin-left: 0px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: white;

@@ -56,7 +56,7 @@ onMounted(() => {
     studentId: localStorage.getItem("studentID"),
     faculty: localStorage.getItem("faculty"),
     department: localStorage.getItem("department"),
-    classLevel: "ชั้นปีที่ 4",
+    classLevel: localStorage.getItem("year"),
     studyLevel: "ปริญญาตรี",
     programType: "ปกติ",
     studentStatus: "ปกติ",
@@ -96,10 +96,34 @@ function downloadPDF(base64String, filename) {
 }
 
 function convertToISOWithTimezone(dateString, time) {
-  const date = new Date(`${dateString}T${time}`);
-  const timezoneOffset = date.getTimezoneOffset(); // offset เป็นนาที
-  date.setMinutes(date.getMinutes() - timezoneOffset); // ปรับเวลาให้ตรงกับ timezone ของระบบ
-  return date.toISOString();
+  try {
+    let date;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      date = new Date(`${dateString}T${time}`);
+    } else {
+      date = new Date(dateString);
+      if (isNaN(date)) {
+        throw new Error(`Invalid dateString: "${dateString}".`);
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      dateString = `${year}-${month}-${day}`;
+      date = new Date(`${dateString}T${time}`);
+    }
+
+    if (isNaN(date)) {
+      throw new Error("Invalid date or time value.");
+    }
+
+    const timezoneOffset = date.getTimezoneOffset();
+    date.setMinutes(date.getMinutes() - timezoneOffset);
+
+    return date.toISOString();
+  } catch (error) {
+    return `Error: ${error.message}`;
+  }
 }
 
 const addDoc = async () => {

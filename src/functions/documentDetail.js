@@ -8,7 +8,7 @@ const fetchDocumentDetail = async (userid, role) => {
   const documentID = route.params.id;
   try {
     if(role === "Student"){
-      const response = await fetch(`${URL}/userID/${userid}/document/detail/${documentID}`);
+      const response = await fetch(`${URL}/userID/${userid}/document/absence/detail/${documentID}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch document details');
@@ -21,7 +21,7 @@ const fetchDocumentDetail = async (userid, role) => {
     }
 
     else{
-      const response = await fetch(`${URL}/userID/${userid}/document/detail/${documentID}`);
+      const response = await fetch(`${URL}/userID/${userid}/document/absence/detail/${documentID}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch document details');

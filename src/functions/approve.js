@@ -2,7 +2,7 @@ const URL = import.meta.env.VITE_API_ROOT;
 
 const approveDocument = async (data) => {
   try {
-    const response = await fetch(`${URL}/document/approve`, {
+    const response = await fetch(`${URL}/document/absence/approve`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

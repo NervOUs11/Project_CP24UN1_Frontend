@@ -15,7 +15,7 @@ import Navbar from '../components/Navbar.vue';
         </button>
       </router-link>
       <router-link 
-        :to="{ name: 'adddocument' }" 
+        :to="{ name: 'AddActivityDocument' }" 
         class="large-button flex justify-center items-center w-full"
       >
         <button class="w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">

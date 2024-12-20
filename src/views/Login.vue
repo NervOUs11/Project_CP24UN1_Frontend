@@ -51,7 +51,7 @@ const doLogin = async () => {
                 <div class="mb-6">
                     <label for="username" class="block text-black text-left mb-2">Username</label>
                     <input
-                        type="email"
+                        type="text"
                         id="username"
                         v-model="username"
                         required

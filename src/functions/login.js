@@ -32,6 +32,7 @@ const login = async (username, password) => {
         localStorage.setItem("cumulativeGPA", data.cumulativeGPA);
         localStorage.setItem("signature", data.signature);
         localStorage.setItem("advisor", data.advisor);
+        localStorage.setItem("year", data.year);
       } else if (data.studentID === undefined) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("staffID", data.staffID);
