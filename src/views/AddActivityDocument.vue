@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 
 const activityHours = ref('')
 const writtenDate = ref('');
@@ -113,7 +113,99 @@ const sdgsGoals = [
 const selectedSustainabilityOptions = ref([]);
 const selectedGoals = ref([]);
 
+const rationale = ref(''); // หลักการและเหตุผล
+const objectives = ref(['', '', '']); // วัตถุประสงค์ 3 ช่อง
+const participants = reactive({
+  students: 0, // จำนวนผู้เข้าร่วมนักศึกษา
+  teachers: 0, // จำนวนผู้เข้าร่วมอาจารย์
+  staff: 0, // จำนวนผู้เข้าร่วมเจ้าหน้าที่
+  community: 0, // จำนวนผู้เข้าร่วมบุคคลในชุมชน/นักเรียน
+});
+const activityDescription = ref(''); // ลักษณะกิจกรรม
 
+const timeframes = ref({
+      preparation: { start: '', end: '' },
+      implementation: { start: '', end: '' }
+    });
+
+const addObjective = () => {
+  objectives.value.push(''); // เพิ่มช่องวัตถุประสงค์
+};
+
+const operationFile = ref(null);
+
+// รายชื่อ Student ที่ตั้งไว้
+const students = ref([
+  { id: '64130500001', name: 'Alice A', department: 'เทคโนโลยีสารสนเทศปี4', phone: '0812345678', position: '' },
+  { id: '64130500002', name: 'Bob B', department: 'วิศวกรรมคอมพิวเตอร์ปี4', phone: '0812345679', position: '' },
+  { id: '64130500003', name: 'Charlie C', department: 'วิทยาศาสตร์คอมพิวเตอร์ปี4', phone: '0812345680', position: '' },
+]);
+const selectedStudent = ref(''); // ตัวแปรสำหรับเก็บนักเรียนที่เลือก
+
+// รายการคณะกรรมการ
+const committee = ref([]);
+
+// เพิ่มชื่อเข้าในคณะกรรมการ
+const addCommitteeMember = () => {
+  // ค้นหานักเรียนที่เลือกจาก students
+  const studentToAdd = students.value.find(student => student.id === selectedStudent.value);
+  if (studentToAdd) {
+    // เพิ่มสมาชิกเข้าในคณะกรรมการ
+    committee.value.push({ id: studentToAdd.id, name: studentToAdd.name, department: studentToAdd.department, phone: studentToAdd.phone, position: '' });
+    selectedStudent.value = ''; // รีเซ็ตค่า dropdown
+  }
+};
+
+// ลบสมาชิกจากคณะกรรมการ
+const removeCommitteeMember = (index) => {
+  committee.value.splice(index, 1); // ลบสมาชิกจากคณะกรรมการ
+};
+
+const evaluationOptions = {
+  observation: { label: 'การสังเกต (Observation)' },
+  interview: { label: 'การสัมภาษณ์ (Interview)' },
+  questionnaires: { label: 'การใช้แบบสอบถาม (Questionnaires)' },
+  test: { label: 'การใช้แบบทดสอบ (Test)' },
+  other: { label: 'อื่นๆ โปรดระบุ' },
+};
+
+// ติดตามตัวเลือกที่ถูกติ้ก
+const selectedOptions = reactive({
+  observation: false,
+  interview: false,
+  questionnaires: false,
+  test: false,
+  other: false,
+});
+
+// เก็บรายละเอียดของ "อื่นๆ"
+const otherDescription = ref('');
+
+// เก็บไฟล์ที่อัปโหลด
+const uploadedFiles = reactive({});
+
+// จัดการอัปโหลดไฟล์
+const handleFileUpload = (key, event) => {
+  const file = event.target.files[0];
+  if (file) {
+    uploadedFiles[key] = file;
+  }
+};
+
+const expectedResults = reactive([
+  { result: '', kpi: '', target: '' },
+  { result: '', kpi: '', target: '' },
+  { result: '', kpi: '', target: '' },
+]);
+
+
+const pastEvaluations = reactive([
+  { problem: '', solution: '' },
+  { problem: '', solution: '' },
+  { problem: '', solution: '' },
+]);
+
+const budgetFileName = ref('');
 
 // ฟังก์ชันส่งข้อมูล
 const addActivityDocument = () => {
@@ -128,7 +220,7 @@ const addActivityDocument = () => {
 
 
 <template>
-    <div class="flex justify-center items-center min-h-screen bg-blue-50">
+  <div class="flex justify-center items-center min-h-screen bg-blue-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-2xl font-bold mb-4 text-center text-blue-500">Add Activity Document</h1>
 
@@ -372,7 +464,6 @@ const addActivityDocument = () => {
             </div>
         </div>
 
-        <h1>Page 2</h1>
         <!-- เลือกทักษะ (checkbox) -->
         <div>
           <h1>KMUTT Student QF</h1>
@@ -393,45 +484,45 @@ const addActivityDocument = () => {
         </div>
 
         <!-- แสดงทักษะที่เลือก -->
-        <div v-if="selectedSkills.length > 0" class="mt-4">
+        <!-- <div v-if="selectedSkills.length > 0" class="mt-4">
           <h3>ทักษะที่เลือก:</h3>
           <ul class="inline-list">
             <li v-for="(skill, index) in selectedSkills" :key="skill">
               {{ skill }}<span v-if="index < selectedSkills.length - 1">,</span>
             </li>
           </ul>
-        </div>
-
-
-        <!-- แสดงช่องกรอกเปอร์เซ็นต์หากเลือกครบ 3 ทักษะ -->
-        <!-- <div v-if="isValidSelection" class="mt-4">
-          <label class="block mb-2">กรอกเปอร์เซ็นต์ (รวมกัน 100%):</label>
-          <div v-for="skill in selectedSkills" :key="skill" class="mb-2">
-            <label :for="skill">{{ skill }}:</label>
-            <input 
-              type="number" 
-              v-model="percentages[skill]" 
-              class="form-input" 
-              min="0" 
-              max="100" 
-            />
-          </div>
         </div> -->
 
-        <!-- ข้อความแสดงผลการตรวจสอบเปอร์เซ็นต์ -->
-        <!-- <div v-if="!isPercentageValid && isValidSelection" class="text-red-500 mt-2">
-          <p>เปอร์เซ็นต์ทั้งหมดต้องรวมกันเป็น 100%</p>
-        </div> -->
+        <!-- แสดงทักษะที่เลือก -->
+        <div v-if="selectedSkills.length > 0" class="mt-4">
+          <h3>ทักษะที่เลือกและกำหนดเปอร์เซ็นต์:</h3>
+          <ul class="inline-list">
+            <li 
+              v-for="(skill, index) in selectedSkills" 
+              :key="skill" 
+              class="flex items-center mb-2"
+            >
+              <!-- แสดงชื่อทักษะ -->
+              <span>{{ skill }}<span v-if="index < selectedSkills.length - 1">,</span></span>
 
-        <!-- แสดงผลข้อมูลที่กรอก -->
-        <!-- <div v-if="isValidSelection && isPercentageValid" class="mt-4">
-          <h3>ข้อมูลที่เลือก:</h3>
-          <ul>
-            <li v-for="skill in selectedSkills" :key="skill">
-              {{ skill }}: {{ percentages[skill] }}%
+              <!-- ช่องกรอกเปอร์เซ็นต์ -->
+              <input 
+                type="number" 
+                v-model="percentages[skill]" 
+                min="0" 
+                max="100" 
+                class="form-input ml-2 w-20"
+                placeholder="%"
+              />
             </li>
           </ul>
-        </div> -->
+
+          <!-- ข้อความเตือนถ้าเปอร์เซ็นต์รวมไม่เท่ากับ 100% -->
+          <p v-if="!isPercentageValid" class="text-red-500 mt-2">
+            เปอร์เซ็นต์ทั้งหมดต้องรวมกันเป็น 100%
+          </p>
+        </div>
+
 
         <!-- Entrepreneurial -->
         <div>
@@ -491,21 +582,397 @@ const addActivityDocument = () => {
               {{ goal.id }}: {{ goal.name }}
             </li>
           </ul>
+        </div> 
+      </div>
+
+      <!-- หลักการและเหตุผล -->
+    <div class="mb-6">
+      <label for="rationale" class="block text-gray-700 mb-2">หลักการและเหตุผล</label>
+      <textarea 
+        id="rationale" 
+        v-model="rationale" 
+        class="form-textarea w-full h-32" 
+        placeholder="กรอกหลักการและเหตุผล"
+      ></textarea>
+    </div>
+
+    <!-- วัตถุประสงค์ -->
+    <div class="mb-6">
+      <label class="block text-gray-700 mb-2">วัตถุประสงค์</label>
+      <div v-for="(objective, index) in objectives" :key="index" class="flex items-center mb-2">
+        <span class="mr-2 w-6 text-right">{{ index + 1 }}.</span>
+        <input 
+          type="text" 
+          v-model="objectives[index]" 
+          class="form-input flex-1" 
+          placeholder="กรอกวัตถุประสงค์"
+        />
+      </div>
+    </div>
+
+    <!-- ผู้เข้าร่วมโครงการ -->
+    <div class="mb-6">
+      <label class="block text-gray-700 mb-2">ผู้เข้าร่วมโครงการ</label>
+      <div class="flex items-center mb-2">
+        <label class="w-48">นักศึกษา จำนวน:</label>
+        <input 
+          type="number" 
+          v-model="participants.students" 
+          class="form-input w-20 mr-2"
+        /> 
+        <span>คน</span>
+      </div>
+      <div class="flex items-center mb-2">
+        <label class="w-48">อาจารย์ จำนวน:</label>
+        <input 
+          type="number" 
+          v-model="participants.teachers" 
+          class="form-input w-20 mr-2"
+        /> 
+        <span>คน</span>
+      </div>
+      <div class="flex items-center mb-2">
+        <label class="w-48">เจ้าหน้าที่ จำนวน:</label>
+        <input 
+          type="number" 
+          v-model="participants.staff" 
+          class="form-input w-20 mr-2"
+        /> 
+        <span>คน</span>
+      </div>
+      <div class="flex items-center mb-2">
+        <label class="w-48">บุคคลในชุมชน/นักเรียน จำนวน:</label>
+        <input 
+          type="number" 
+          v-model="participants.community" 
+          class="form-input w-20 mr-2"
+        /> 
+        <span>คน</span>
+      </div>
+    </div>
+
+    <!-- ลักษณะกิจกรรม -->
+    <div class="mb-6">
+      <label for="activityDescription" class="block text-gray-700 mb-2">ลักษณะกิจกรรม</label>
+      <textarea 
+        id="activityDescription" 
+        v-model="activityDescription" 
+        class="form-textarea w-full h-32" 
+        placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม"
+      ></textarea>
+    </div>
+
+    <!-- ระยะเวลาดำเนินงาน -->
+    <div class="mb-6">
+      <label class="block text-gray-700 mb-2">ระยะเวลาดำเนินงาน</label>
+
+      <!-- ระยะเวลาเตรียมงาน -->
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">ระยะเวลาเตรียมงาน:</label>
+        <div class="flex items-center">
+          <label class="mr-2">เริ่มต้น:</label>
+          <input 
+            type="date" 
+            v-model="timeframes.preparation.start" 
+            class="form-input w-40 mr-4"
+            style="width: 80%;"
+          />
+          <label class="mr-2">สิ้นสุด:</label>
+          <input 
+            type="date" 
+            v-model="timeframes.preparation.end" 
+            class="form-input w-40"
+            style="width: 80%;" 
+          />
         </div>
       </div>
 
-        <button 
-          type="submit" 
-          class="form-button"
-        >
-          Add Activity Document
-        </button>
-      </form>
+      <!-- ระยะเวลาปฏิบัติงาน -->
+      <div>
+        <label class="block text-gray-700 mb-2">ระยะเวลาปฏิบัติงาน:</label>
+        <div class="flex items-center">
+          <label class="mr-2">เริ่มต้น:</label>
+          <input 
+            type="date" 
+            v-model="timeframes.implementation.start" 
+            class="form-input w-40 mr-4"
+            style="width: 80%;"
+          />
+          <label class="mr-2">สิ้นสุด:</label>
+          <input 
+            type="date" 
+            v-model="timeframes.implementation.end" 
+            class="form-input w-40"
+            style="width: 80%;"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- ขั้นตอนการดำเนินงาน -->
+    <div class="mb-6">
+      <label for="operation-steps" class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน</label>
+      
+      <div class="mb-2">
+        <label for="operation-steps">ตัวอย่างการประเมินผล:</label>
+        <input 
+          id="operation-steps" 
+          type="file" 
+          @change="handleOperationFileUpload" 
+          class="form-input mt-2"
+        />
+      </div>
+    </div>
+
+    <!-- คณะกรรมการจัดโครงการ -->
+    <div class="mb-6">
+    <label class="block text-gray-700 mb-2">คณะกรรมการจัดโครงการ</label>
+
+    <!-- Dropdown สำหรับเลือกชื่อ -->
+    <!-- <div class="mb-4">
+      <label for="select-student" class="block mb-1">เลือกชื่อจากรายการ:</label>
+      <select 
+        id="select-student" 
+        v-model="selectedStudent" 
+        class="form-select w-60"
+      >
+        <option value="" disabled>รายชื่อ</option>
+        <option v-for="student in students" :key="student.id" :value="student">
+          {{ student.name }}
+        </option>
+      </select>
+      <button 
+        @click="addCommitteeMember" 
+        :disabled="!selectedStudent" 
+        class="bg-green-500 text-white px-4 py-2 ml-2 rounded"
+      >
+        เพิ่มคณะกรรมการ
+      </button>
+    </div> -->
+
+    <!-- แสดงรายการคณะกรรมการ -->
+    <!-- <div v-for="(member, index) in students" :key="member.id" class="mb-4 flex items-center justify-between border-b pb-2">
+      <div class="flex space-x-4 w-full">
+        <span class="w-10">{{ index + 1 }}</span>
+        <span class="w-32">{{ member.id }}</span>
+        <span class="w-48">{{ member.name }}</span>
+        <span class="w-48">{{ member.department }}</span>
+        <span class="w-40">{{ member.phone }}</span> -->
+        
+        <!-- ช่องกรอกตำแหน่ง -->
+        <!-- <input 
+          type="text" 
+          v-model="member.position" 
+          placeholder="กรอกตำแหน่ง" 
+          class="form-input w-36"
+        />
+      </div> -->
+
+      <!-- ปุ่มลบ -->
+      <!-- <button 
+        type="button" 
+        @click="removeCommitteeMember(index)" 
+        class="bg-red-500 text-white px-4 py-2 rounded mt-2 sm:mt-0"
+      >
+        ลบ
+      </button>
+    </div> -->
+
+    <!-- Dropdown สำหรับเลือกชื่อ -->
+    <div class="mb-4">
+      <label for="select-student" class="block mb-1">เลือกชื่อจากรายการ:</label>
+      <select 
+        id="select-student" 
+        v-model="selectedStudent" 
+        class="form-select w-60"
+      >
+        <option value="" disabled>รายชื่อ</option>
+        <option v-for="student in students" :key="student.id" :value="student.id">
+          {{ student.name }}
+        </option>
+      </select>
+      <button 
+        @click="addCommitteeMember" 
+        :disabled="!selectedStudent" 
+        class="bg-green-500 text-white px-4 py-2 ml-2 rounded"
+      >
+        เพิ่มคณะกรรมการ
+      </button>
+    </div>
+
+    <!-- แสดงรายการคณะกรรมการ -->
+    <div v-for="(member, index) in committee" :key="member.id" class="mb-4 flex items-center justify-between border-b pb-2">
+      <div class="flex space-x-4 w-full">
+        <span class="w-10">{{ index + 1 }}</span>
+        <span class="w-32">{{ member.id }}</span>
+        <span class="w-48">{{ member.name }}</span>
+        <span class="w-48">{{ member.department }}</span>
+        <span class="w-40">{{ member.phone }}</span>
+        
+        <!-- ช่องกรอกตำแหน่ง -->
+        <input 
+          type="text" 
+          v-model="member.position" 
+          placeholder="กรอกตำแหน่ง" 
+          class="form-input w-36"
+        />
+      </div>
+
+      <!-- ปุ่มลบ -->
+      <button 
+        type="button" 
+        @click="removeCommitteeMember(index)" 
+        class="bg-red-500 text-white px-4 py-2 rounded mt-2 sm:mt-0"
+      >
+        ลบ
+      </button>
+    </div>
+
+
+    <!-- รูปแบบการประเมินผล -->
+    <div class="mb-6">
+    <label class="block text-gray-700 mb-2">รูปแบบการประเมินผล</label>
+
+    <!-- รายการตัวเลือก -->
+    <div v-for="(option, key) in evaluationOptions" :key="key" class="mb-4">
+      <input 
+        type="checkbox" 
+        :id="key" 
+        v-model="selectedOptions[key]" 
+        class="mr-2"
+      />
+      <label :for="key">{{ option.label }}</label>
+
+      <!-- ช่องอัพโหลดไฟล์ -->
+      <div v-if="selectedOptions[key]" class="mt-2 ml-6">
+        <label :for="'upload-' + key" class="block mb-1">
+          อัพโหลดไฟล์สำหรับ {{ option.label }}
+        </label>
+        <input 
+          :id="'upload-' + key" 
+          type="file" 
+          @change="handleFileUpload(key, $event)" 
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <!-- ผลที่คาดว่าจะได้รับ -->
+    <div class="mb-6">
+    <label class="block text-gray-700 mb-2">ผลที่คาดว่าจะได้รับ</label>
+
+    <div v-for="(expectedResult, index) in expectedResults" :key="index" class="flex items-center gap-4 mb-4">
+      <!-- ผลที่คาดว่าจะได้รับ -->
+      <div class="flex-1">
+        <label :for="'expected-' + index" class="block mb-1">ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1 }}</label>
+        <input 
+          type="text" 
+          :id="'expected-' + index" 
+          v-model="expectedResults[index].result" 
+          class="form-input w-full"
+          placeholder="ผลที่คาดว่าจะได้รับ"
+        />
+      </div>
+
+      <!-- ตัวชี้วัด (KPI) -->
+      <div class="flex-1">
+        <label :for="'kpi-' + index" class="block mb-1">ตัวชี้วัด (KPI)</label>
+        <input 
+          type="text" 
+          :id="'kpi-' + index" 
+          v-model="expectedResults[index].kpi" 
+          class="form-input w-full"
+          placeholder="KPI"
+        />
+      </div>
+
+      <!-- ค่าเป้าหมาย -->
+      <div class="flex-1">
+        <label :for="'target-' + index" class="block mb-1">ค่าเป้าหมาย</label>
+        <input 
+          type="text" 
+          :id="'target-' + index" 
+          v-model="expectedResults[index].target" 
+          class="form-input w-full"
+          placeholder="ค่าเป้าหมาย"
+        />
+      </div>
     </div>
   </div>
+
+    <!-- ผลการดำเนินงานที่ผ่านมา -->
+    <div class="mb-6">
+    <label class="block text-gray-700 mb-2">
+      ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
+    </label>
+
+    <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 mb-4">
+      <!-- ปัญหาอุปสรรค -->
+      <div class="flex items-center gap-2">
+        <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
+        <input 
+          :id="'problem-' + index" 
+          v-model="item.problem" 
+          type="text" 
+          class="form-input w-90" 
+          placeholder="กรอกปัญหาอุปสรรค"
+        />
+      </div>
+
+      <!-- แนวทางการแก้ไข -->
+      <div class="flex items-center gap-2">
+        <label :for="'solution-' + index" class="w-40">แนวทางข้อที่ {{ index + 1 }}:</label>
+        <input 
+          :id="'solution-' + index" 
+          v-model="item.solution" 
+          type="text" 
+          class="form-input w-90" 
+          placeholder="กรอกแนวทางการแก้ไข"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- รายละเอียดงบประมาณ -->
+  <div class="mb-6">
+    <label for="budgetDetails" class="block text-gray-700 mb-2">รายละเอียดงบประมาณ</label>
+    <input 
+      id="budgetDetails" 
+      type="file" 
+      @change="handleBudgetFileUpload" 
+      class="form-input"
+    />
+  </div>
+
+    
+  </div>
+  </div>
+
+  <button 
+    type="submit" 
+    class="form-button"
+  >
+    Add Activity Document
+  </button>
+</form>
+</div>
+</div>
 </template>
 
 <style scoped>
+.form-input {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.form-textarea {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  resize: vertical;
+}
+
 .inline-list {
   list-style: none; /* เอา bullet points ออก */
   padding: 0;
