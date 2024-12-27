@@ -44,6 +44,50 @@ const skillsList = [
   'Communication Skill', 'Management Skill', 'Leadership', 'KMUTT’s Citizenship'
 ];
 
+const expenses = ref(0); // ค่าใช้จ่ายที่กรอก
+// ฟังก์ชันจำกัดจำนวนหลักของตัวเลข
+const limitExpensesLength = () => {
+  if (expenses.value.toString().length > 7) {
+    expenses.value = parseInt(expenses.value.toString().slice(0, 7));
+  }
+};
+// ฟังก์ชันแปลงตัวเลขเป็นข้อความภาษาไทย
+const convertNumberToThaiText = (num) => {
+  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  
+  if (isNaN(num) || num === 0) return 'ศูนย์บาท';
+
+  let bahtText = '';
+  const numStr = num.toString();
+  const len = numStr.length;
+
+  for (let i = 0; i < len; i++) {
+    const digit = parseInt(numStr[i]);
+    const position = len - i - 1;
+
+    if (digit !== 0) {
+      if (position === 1 && digit === 1) {
+        bahtText += 'สิบ';
+      } else if (position === 1 && digit === 2) {
+        bahtText += 'ยี่สิบ';
+      } else if (position === 0 && digit === 1 && len > 1) {
+        bahtText += 'เอ็ด';
+      } else {
+        bahtText += numbers[digit] + units[position];
+      }
+    }
+  }
+
+  return bahtText + 'บาท';
+};
+
+// คำนวณข้อความภาษาไทยของค่าใช้จ่าย
+const expensesThaiText = computed(() => {
+  return convertNumberToThaiText(expenses.value);
+});
+
+
 // ทักษะที่เลือก
 const selectedSkills = ref([]);
 
@@ -349,27 +393,26 @@ const addActivityDocument = () => {
             </div>
 
           <!-- ค่าใช้จ่าย -->
-          <div class="mb-3">
-            <label for="expenses" class="block text-gray-700 mb-1">ค่าใช้จ่าย (ตัวเลข)</label>
+          <div class="mb-3 flex items-center">
+            <label for="expenses" class="text-gray-700 mr-2" style="width: 85px;">ค่าใช้จ่าย</label>
             <input 
               type="number" 
               id="expenses" 
-              v-model="expenses" 
-              class="form-input" 
+              v-model.number="expenses" 
+              class="form-input w-40 mr-2" 
               required
+              :max="9999999" 
+              maxlength="7"
+              @input="limitExpensesLength"
             />
+          </div>
+          <div class="mb-3 mt-4">
+            <span class="text-gray-500">
+              ( {{ expensesThaiText }} )
+            </span>
           </div>
 
-          <div class="mb-3">
-            <label for="expensesText" class="block text-gray-700 mb-1">ค่าใช้จ่าย (ตัวอักษร)</label>
-            <input 
-              type="text" 
-              id="expensesText" 
-              v-model="expensesText" 
-              class="form-input" 
-              required
-            />
-          </div>
+
 
           <!-- ชั่วโมงกิจกรรม -->
           <div class="mb-3">
