@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-
+const role = localStorage.getItem("role")
 const firstName = ref(localStorage.getItem('firstName'));
 
 const logout = () => {
@@ -26,6 +26,9 @@ const navigateTo = (path) => {
       </li>
       <li>
         <button @click="navigateTo('/tracking')" class="nav-button">Status</button>
+      </li>
+      <li v-if="role !== 'Student'">
+        <button @click="navigateTo('/allUser')" class="nav-button">Users</button>
       </li>
       <li>
         <!-- <button @click="navigateTo('/about')" class="nav-button">About K-MUTTRACK</button> -->

@@ -7,7 +7,8 @@ import Tracking from '../views/Tracking.vue'
 import DocumentDetail from '../views/DocumentDetail.vue'
 import DocumentEdit from '../views/DocumentEdit.vue'
 import StampText from '../views/stamptext.vue'
-import AddActivityDocument from '@/views/AddActivityDocument.vue'
+import AddActivityDocument from '../views/AddActivityDocument.vue'
+import AllUser from '../views/AllUser.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -60,6 +61,11 @@ const router = createRouter({
       name: "AddActivityDocument",
       component: AddActivityDocument
     },
+    {
+      path: "/allUser",
+      name: "AllUser",
+      component: AllUser
+    }
   ]
 })
 
