@@ -84,7 +84,9 @@ const filteredDocuments = computed(() =>
           </tr>
         </thead>
         <tbody v-if="documents.length === 0">
-          <td class="text-center text-red-600 font-bold text-2xl" colspan="5">No Absence Document</td>
+          <tr>
+            <td class="text-center text-red-600 font-bold text-2xl" colspan="5">No Absence Document</td>
+          </tr>
         </tbody>
         <tbody v-else>
           <tr

@@ -222,7 +222,7 @@ const addDoc = async () => {
   } catch (error) {
     // alertMessage.value = "Add Document Failed";
     // showModal.value = true;
-    console.error("เกิดข้อผิดพลาด:", error.message);
+    console.error("Failed to add absence document:", error.message);
   }
 };
 

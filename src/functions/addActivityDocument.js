@@ -1,22 +1,22 @@
-const URL = import.meta.env.VITE_API_ROOT 
+const URL = import.meta.env.VITE_API_ROOT;
 
-const addDocument = async (dataToSend) => {
+const addActivityDocument = async (dataToSend) => {
     try {
-        const res = await fetch(`${URL}/document/absence/add`, { //backend api path
+        const res = await fetch(`${URL}/document/activity/add`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(dataToSend),
-        })
+        });
         if (!res.ok) {
             throw new Error(`HTTP error! Status: ${res.status}`);
         }
+        console.log(dataToSend)
         return await res.json();
-    } 
-    catch (error) {
-      console.error(error)
+    } catch (error) {
+        console.error(error)
     }
-  }
+};
 
-export { addDocument }
+export { addActivityDocument };

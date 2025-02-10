@@ -1,33 +1,50 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { addActivityDocument } from '../functions/addActivityDocument'
+import { fetchAllStaff } from '../functions/fetchAllStaff';
+import { fetchAllStudent } from '../functions/fetchAllStudent';
+import { fetchAllGoal } from '../functions/fetchAllGoal';
+import { fetchAllStudentQF } from '../functions/fetchAllStudentQF';
 
 const activityHours = ref('')
 const writtenDate = ref('');
 const agencyName = ref('');
 const reason = computed(() => agencyName.value);
-const projectName = ref('');
+
 const organizeProject = computed(() => projectName.value);
 const responsibleStudent = localStorage.getItem("firstName") + " " + localStorage.getItem("lastName")
 
+const rawStaffData = ref([]);
+const advisorList = ref([]);
+const presidentList = ref([]);
+const studentQFList = ref([]);
+const objectives = ref(['','','']);
 
 // กำหนดค่าตั้งต้นเป็นวันที่ปัจจุบันเมื่อโหลด
-onMounted(() => {
+onMounted(async() => {
   writtenDate.value = new Date().toISOString().split('T')[0];
-});
+  try {
+    studentQFList.value = await fetchAllStudentQF();
+    // console.log("StudentQF:", studentQFList.value);
+    rawStaffData.value = await fetchAllStaff();
+    advisorList.value = rawStaffData.value.map((staff) => ({
+      staffId: staff[0],
+      fullName: `${staff[2]} ${staff[3]}`,
+    }));
+    presidentList.value = rawStaffData.value.map((staff) => ({
+      staffId: staff[0],
+      fullName: `${staff[2]} ${staff[3]}`,
+    }));
+    // console.log("rawStaffData:", rawStaffData.value);
+    // console.log("advisorList:", advisorList.value);
 
-// ข้อมูลที่ใช้ในฟอร์ม
-const formData = ref({
-  agencyName: '', // ชื่อหน่วยงาน
-  projectName: '', // ชื่อโครงการ
-  startDate: '', // วันที่เริ่ม
-  endDate: '', // วันที่สิ้นสุด
-  location: '', // สถานที่
-  objective: '', // วัตถุประสงค์
-  expenses: '', // ค่าใช้จ่าย (ตัวเลข)
-  expensesText: '', // ค่าใช้จ่าย (ตัวอักษร)
-  activityHours: '', // ชั่วโมงกิจกรรม (เลือก: นับหรือไม่นับ)
-  activityCategory: '', // ด้านกิจกรรม
-  hoursCount: '', // จำนวนชั่วโมง
+    const studentData = await fetchAllStudent();
+    const goalData = await fetchAllGoal();
+    // console.log(studentData)
+    // console.log(goalData)
+  } catch (error) {
+    console.error('Error fetching staff:', error);
+  }
 });
 
 // ฟังก์ชันตรวจสอบการเปลี่ยนแปลงของ activityHours
@@ -44,7 +61,6 @@ const skillsList = [
   'Communication Skill', 'Management Skill', 'Leadership', 'KMUTT’s Citizenship'
 ];
 
-const expenses = ref(0); // ค่าใช้จ่ายที่กรอก
 // ฟังก์ชันจำกัดจำนวนหลักของตัวเลข
 const limitExpensesLength = () => {
   if (expenses.value.toString().length > 7) {
@@ -157,24 +173,12 @@ const sdgsGoals = [
 const selectedSustainabilityOptions = ref([]);
 const selectedGoals = ref([]);
 
-const rationale = ref(''); // หลักการและเหตุผล
-const objectives = ref(['', '', '']); // วัตถุประสงค์ 3 ช่อง
 const participants = reactive({
   students: 0, // จำนวนผู้เข้าร่วมนักศึกษา
   teachers: 0, // จำนวนผู้เข้าร่วมอาจารย์
   staff: 0, // จำนวนผู้เข้าร่วมเจ้าหน้าที่
   community: 0, // จำนวนผู้เข้าร่วมบุคคลในชุมชน/นักเรียน
 });
-const activityDescription = ref(''); // ลักษณะกิจกรรม
-
-const timeframes = ref({
-      preparation: { start: '', end: '' },
-      implementation: { start: '', end: '' }
-    });
-
-const addObjective = () => {
-  objectives.value.push(''); // เพิ่มช่องวัตถุประสงค์
-};
 
 const operationFile = ref(null);
 
@@ -251,13 +255,76 @@ const pastEvaluations = reactive([
 
 const budgetFileName = ref('');
 
-// ฟังก์ชันส่งข้อมูล
-const addActivityDocument = () => {
-  console.log('Activity Document:', {
-    ...formData,
-    dueTo: dueTo.value,
-    organizeBy: organizeBy.value,
-  });
+const agencyCode = ref("");
+const type = ref("");
+const typeOptions = ["Workshop", "Volunteer", "Seminar"];
+const startDate = ref("");
+const endDate = ref("");
+const projectName = ref("");
+const location = ref("");
+const purpose = ref("");
+const expenses = ref(0);
+const advisor = ref(""); // StaffID
+const sustainabilityDetail = ref("")
+const sustainabilityPropose = ref("")
+sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`)
+const activityCharacteristic = ref("");
+const codeOfHonor = ref("");
+
+
+const prepareStart = ref("");
+const prepareEnd = ref("");
+
+const studentQF = ref([]);
+
+const president = ref(""); // StaffIDProgress2
+
+const selectAdvisor = () => {
+  const selectedAdvisor = advisorList.value.find(a => a.staffId === advisor.value);
+  if (selectedAdvisor) {
+    console.log(`Advisor ที่เลือก: ${selectedAdvisor.fullName} (ID: ${selectedAdvisor.staffId})`);
+  }
+};
+const selectPresident = () => {
+  const selectPresident = presidentList.value.find(a => a.staffId === president.value);
+  if (selectPresident) {
+    console.log(`President ที่เลือก: ${selectPresident.fullName} (ID: ${selectPresident.staffId})`);
+  }
+};
+const addDoc = async () => {
+  try {
+    const studentID = parseInt(localStorage.getItem("studentID"))
+    const departmentName = localStorage.getItem("department")
+    const dataToSend = {
+      studentID: studentID,
+      type: type.value,
+      startTime: startDate.value,
+      endTime: endDate.value,
+      code: agencyCode.value,
+      departmentName: departmentName,
+      title: projectName.value,
+      location: location.value,
+      propose: purpose.value, // อู๋เขียน purpose ผิด
+      payment: expenses.value,
+      staffID: advisor.value,
+      sustainabilityDetail: sustainabilityDetail.value,
+      sustainabilityPropose: sustainabilityPropose.value,
+      activityCharacteristic: activityCharacteristic.value,
+      codeOfHonor: codeOfHonor.value,
+      prepareStart: prepareStart.value,
+      prepareEnd: prepareEnd.value,
+
+      studentQF: studentQF.value,
+
+      staffIDProgress2: president.value,
+
+    }
+    console.log("Data to send:", dataToSend);
+    const res = await addActivityDocument(dataToSend);
+    console.log("API response:", res[1]);
+  } catch (error) {
+    console.error("Failed to add activity document:", error.message);
+  }
 };
 
 </script>
@@ -268,7 +335,7 @@ const addActivityDocument = () => {
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-2xl font-bold mb-4 text-center text-blue-500">Add Activity Document</h1>
 
-      <form @submit.prevent="addActivityDocument">
+      <form @submit.prevent="addDoc">
         <div class="grid grid-cols-2 gap-4 mb-4">
           <!-- ที่ (รหัสหน่วยงาน) -->
           <div class="mb-3">
@@ -291,7 +358,6 @@ const addActivityDocument = () => {
               value="currentDate" 
               id="writtenDate" 
               v-model="writtenDate" 
-              
               class="form-input" 
               disabled
             />
@@ -369,23 +435,34 @@ const addActivityDocument = () => {
           </div>
 
           <!-- ณ สถานที่ -->
-            <div class="col-span-1">
-                <label for="location" class="block text-gray-700 mb-1">ณ สถานที่</label>
-                <input 
-                type="text" 
-                id="location" 
-                v-model="location" 
-                class="form-input" 
-                required
-                />
-            </div>
+          <div class="mb-3">
+              <label for="location" class="block text-gray-700 mb-1">ณ สถานที่</label>
+              <input 
+              type="text" 
+              id="location" 
+              v-model="location" 
+              class="form-input" 
+              required
+              />
+          </div>
+
+          <!-- ประเภทกิจกรรม -->
+          <div class="mb-3">
+            <label for="type" class="block text-gray-700 mb-1">ประเภทกิจกรรม</label>
+            <select id="type" v-model="type" class="form-input" style="margin-top: 10px;" required>
+              <option value="">-- เลือกประเภท --</option>
+              <option v-for="option in typeOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
 
             <!-- วัตถุประสงค์ -->
             <div class="col-span-2">
-                <label for="objective" class="block text-gray-700 mb-1">วัตถุประสงค์</label>
+                <label for="purpose" class="block text-gray-700 mb-1">วัตถุประสงค์</label>
                 <textarea 
-                id="objective" 
-                v-model="objective" 
+                id="purpose" 
+                v-model="purpose"
                 class="form-input detail-input w-full" 
                 rows="4" 
                 required
@@ -464,34 +541,36 @@ const addActivityDocument = () => {
         <div class="grid grid-cols-3 gap-4 items-center mb-4">
             <!-- อาจารย์ที่ปรึกษา/รองคณบดี -->
             <div>
-            <label for="advisor" class="block text-gray-700 mb-1">อาจารย์ที่ปรึกษา/รองคณบดี</label>
-            <select 
-                id="advisor" 
-                v-model="advisor" 
-                class="form-input" 
-                required
-            >
-                <option value="" disabled>เลือกชื่อ</option>
-                <option v-for="name in advisorList" :key="name" :value="name">
-                {{ name }}
-                </option>
-            </select>
+              <label for="advisor" class="block text-gray-700 mb-1">อาจารย์ที่ปรึกษา/รองคณบดี</label>
+              <select 
+                  id="advisor" 
+                  v-model="advisor" 
+                  class="form-input" 
+                  required
+                  @change="selectAdvisor"
+              >
+                  <option value="" disabled>เลือกอาจารย์ที่ปรึกษา/รองคณบดี</option>
+                  <option v-for="advisor in advisorList" :key="advisor.staffId" :value="advisor.staffId">
+                    {{ advisor.fullName }}
+                  </option>
+              </select>
             </div>
 
             <!-- นายก/ประธานชมรม -->
             <div>
-            <label for="president" class="block text-gray-700 mb-1">นายก/ประธานชมรม</label>
-            <select 
-                id="president" 
-                v-model="president" 
-                class="form-input" 
-                required
-            >
-                <option value="" disabled>เลือกชื่อ</option>
-                <option v-for="name in presidentList" :key="name" :value="name">
-                {{ name }}
-                </option>
-            </select>
+              <label for="president" class="block text-gray-700 mb-1">นายก/ประธานชมรม</label>
+              <select 
+                  id="president" 
+                  v-model="president" 
+                  class="form-input" 
+                  required
+                  @change="selectPresident"
+              >
+                  <option value="" disabled>เลือกนายก/ประธานชมรม</option>
+                  <option v-for="president in presidentList" :key="president.staffId" :value="president.staffId">
+                  {{ president.fullName }}
+                  </option>
+              </select>
             </div>
 
             <!-- นักศึกษาผู้รับผิดชอบ -->
@@ -507,34 +586,25 @@ const addActivityDocument = () => {
             </div>
         </div>
 
-        <!-- เลือกทักษะ (checkbox) -->
+        <!-- เลือกทักษะ StudentQF (checkbox) -->
         <div>
           <h1>KMUTT Student QF</h1>
           <label class="block mb-2">เลือกทักษะ (สูงสุด 3 ทักษะ):</label>
-          <div v-for="skill in skillsList" :key="skill" class="mb-2">
+          <div v-for="skill in studentQFList" :key="skill.studentQF_ID" class="mb-2">
             <input 
               type="checkbox" 
-              :id="skill" 
-              :value="skill" 
-              v-model="selectedSkills" 
-              :disabled="selectedSkills.length >= 3 && !selectedSkills.includes(skill)"
+              :id="'skill-' + skill.studentQF_ID"
+              :value="skill.studentQF_ID" 
+              v-model="studentQF"
+              :disabled="studentQF.length >= 3 && !studentQF.includes(skill.studentQF_ID)"
             />
-              <label :for="skill">{{ skill }}</label>
+            <label :for="'skill-' + skill.studentQF_ID">{{ skill.studentQF_Name }}</label>
           </div>
-          <p v-if="selectedSkills.length >= 3" class="text-red-500 mt-2">
+          <p v-if="studentQF.length >= 3" class="text-red-500 mt-2">
             คุณเลือกทักษะครบแล้ว (สูงสุด 3 ทักษะ)
           </p>
         </div>
 
-        <!-- แสดงทักษะที่เลือก -->
-        <!-- <div v-if="selectedSkills.length > 0" class="mt-4">
-          <h3>ทักษะที่เลือก:</h3>
-          <ul class="inline-list">
-            <li v-for="(skill, index) in selectedSkills" :key="skill">
-              {{ skill }}<span v-if="index < selectedSkills.length - 1">,</span>
-            </li>
-          </ul>
-        </div> -->
 
         <!-- แสดงทักษะที่เลือก -->
         <div v-if="selectedSkills.length > 0" class="mt-4">
@@ -630,10 +700,10 @@ const addActivityDocument = () => {
 
       <!-- หลักการและเหตุผล -->
     <div class="mb-6">
-      <label for="rationale" class="block text-gray-700 mb-2">หลักการและเหตุผล</label>
+      <label for="sustainabilityDetail" class="block text-gray-700 mb-2">หลักการและเหตุผล</label>
       <textarea 
-        id="rationale" 
-        v-model="rationale" 
+        id="sustainabilityDetail" 
+        v-model="sustainabilityDetail" 
         class="form-textarea w-full h-32" 
         placeholder="กรอกหลักการและเหตุผล"
       ></textarea>
@@ -693,22 +763,32 @@ const addActivityDocument = () => {
         <span>คน</span>
       </div>
     </div>
-
-    <!-- ลักษณะกิจกรรม -->
+    
+    <!-- ลักษณะกิจกรรม (activityCharacteristic) -->
     <div class="mb-6">
-      <label for="activityDescription" class="block text-gray-700 mb-2">ลักษณะกิจกรรม</label>
+      <label for="activityCharacteristic" class="block text-gray-700 mb-2">ลักษณะกิจกรรม</label>
       <textarea 
-        id="activityDescription" 
-        v-model="activityDescription" 
+        id="activityCharacteristic" 
+        v-model="activityCharacteristic" 
         class="form-textarea w-full h-32" 
-        placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม"
+        placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม ให้เห็นภาพการจัดกิจกรรม"
+      ></textarea>
+    </div>
+
+    <!-- Code of Honor -->
+    <div class="mb-6">
+      <label for="codeOfHonor" class="block text-gray-700 mb-2">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code of Honor) ดังนี้</label>
+      <textarea 
+        id="codeOfHonor" 
+        v-model="codeOfHonor" 
+        class="form-textarea w-full h-22" 
+        placeholder="อธิบายความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor"
       ></textarea>
     </div>
 
     <!-- ระยะเวลาดำเนินงาน -->
     <div class="mb-6">
-      <label class="block text-gray-700 mb-2">ระยะเวลาดำเนินงาน</label>
-
+      <!-- <label class="block text-gray-700 mb-2">ระยะเวลาดำเนินงาน</label> -->
       <!-- ระยะเวลาเตรียมงาน -->
       <div class="mb-4">
         <label class="block text-gray-700 mb-2">ระยะเวลาเตรียมงาน:</label>
@@ -716,14 +796,14 @@ const addActivityDocument = () => {
           <label class="mr-2">เริ่มต้น:</label>
           <input 
             type="date" 
-            v-model="timeframes.preparation.start" 
+            v-model="prepareStart" 
             class="form-input w-40 mr-4"
             style="width: 80%;"
           />
           <label class="mr-2">สิ้นสุด:</label>
           <input 
             type="date" 
-            v-model="timeframes.preparation.end" 
+            v-model="prepareEnd" 
             class="form-input w-40"
             style="width: 80%;" 
           />
@@ -731,7 +811,7 @@ const addActivityDocument = () => {
       </div>
 
       <!-- ระยะเวลาปฏิบัติงาน -->
-      <div>
+      <!-- <div>
         <label class="block text-gray-700 mb-2">ระยะเวลาปฏิบัติงาน:</label>
         <div class="flex items-center">
           <label class="mr-2">เริ่มต้น:</label>
@@ -749,7 +829,7 @@ const addActivityDocument = () => {
             style="width: 80%;"
           />
         </div>
-      </div>
+      </div> -->
     </div>
 
     <!-- ขั้นตอนการดำเนินงาน -->
@@ -770,56 +850,6 @@ const addActivityDocument = () => {
     <!-- คณะกรรมการจัดโครงการ -->
     <div class="mb-6">
     <label class="block text-gray-700 mb-2">คณะกรรมการจัดโครงการ</label>
-
-    <!-- Dropdown สำหรับเลือกชื่อ -->
-    <!-- <div class="mb-4">
-      <label for="select-student" class="block mb-1">เลือกชื่อจากรายการ:</label>
-      <select 
-        id="select-student" 
-        v-model="selectedStudent" 
-        class="form-select w-60"
-      >
-        <option value="" disabled>รายชื่อ</option>
-        <option v-for="student in students" :key="student.id" :value="student">
-          {{ student.name }}
-        </option>
-      </select>
-      <button 
-        @click="addCommitteeMember" 
-        :disabled="!selectedStudent" 
-        class="bg-green-500 text-white px-4 py-2 ml-2 rounded"
-      >
-        เพิ่มคณะกรรมการ
-      </button>
-    </div> -->
-
-    <!-- แสดงรายการคณะกรรมการ -->
-    <!-- <div v-for="(member, index) in students" :key="member.id" class="mb-4 flex items-center justify-between border-b pb-2">
-      <div class="flex space-x-4 w-full">
-        <span class="w-10">{{ index + 1 }}</span>
-        <span class="w-32">{{ member.id }}</span>
-        <span class="w-48">{{ member.name }}</span>
-        <span class="w-48">{{ member.department }}</span>
-        <span class="w-40">{{ member.phone }}</span> -->
-        
-        <!-- ช่องกรอกตำแหน่ง -->
-        <!-- <input 
-          type="text" 
-          v-model="member.position" 
-          placeholder="กรอกตำแหน่ง" 
-          class="form-input w-36"
-        />
-      </div> -->
-
-      <!-- ปุ่มลบ -->
-      <!-- <button 
-        type="button" 
-        @click="removeCommitteeMember(index)" 
-        class="bg-red-500 text-white px-4 py-2 rounded mt-2 sm:mt-0"
-      >
-        ลบ
-      </button>
-    </div> -->
 
     <!-- Dropdown สำหรับเลือกชื่อ -->
     <div class="mb-4">
@@ -974,6 +1004,7 @@ const addActivityDocument = () => {
         />
       </div>
     </div>
+  
   </div>
 
   <!-- รายละเอียดงบประมาณ -->
