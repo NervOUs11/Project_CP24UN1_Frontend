@@ -5,6 +5,8 @@ import { fetchAllStaff } from '../functions/fetchAllStaff';
 import { fetchAllStudent } from '../functions/fetchAllStudent';
 import { fetchAllGoal } from '../functions/fetchAllGoal';
 import { fetchAllStudentQF } from '../functions/fetchAllStudentQF';
+import { fetchAllEvaluation } from '../functions/fetchAllEvaluation';
+
 
 const activityHours = ref('')
 const writtenDate = ref('');
@@ -19,6 +21,22 @@ const advisorList = ref([]);
 const presidentList = ref([]);
 const studentQFList = ref([]);
 const objectives = ref(['','','']);
+
+// รายชื่อ Student ที่ตั้งไว้
+// const students = ref([
+//   { id: '64130500001', name: 'Alice A', department: 'เทคโนโลยีสารสนเทศปี4', phone: '0812345678', position: '' },
+//   { id: '64130500002', name: 'Bob B', department: 'วิศวกรรมคอมพิวเตอร์ปี4', phone: '0812345679', position: '' },
+//   { id: '64130500003', name: 'Charlie C', department: 'วิทยาศาสตร์คอมพิวเตอร์ปี4', phone: '0812345680', position: '' },
+// ]);
+const students = ref([]);
+const selectedStudent = ref(''); // ตัวแปรสำหรับเก็บนักเรียนที่เลือก
+const committee = ref([]); // รายการคณะกรรมการ
+
+const goalData = ref([]);
+const evaluationData = ref([]);
+
+const selectedEvaluation = ref([]);
+
 
 // กำหนดค่าตั้งต้นเป็นวันที่ปัจจุบันเมื่อโหลด
 onMounted(async() => {
@@ -39,9 +57,22 @@ onMounted(async() => {
     // console.log("advisorList:", advisorList.value);
 
     const studentData = await fetchAllStudent();
-    const goalData = await fetchAllGoal();
-    // console.log(studentData)
-    // console.log(goalData)
+    students.value = studentData.map(([id, name, department, year, phone]) => ({
+      id,
+      name,
+      department: `${department} ปี${year}`,
+      phone,
+      position: "",
+    }));
+    // console.log(students.value)
+
+    goalData.value = await fetchAllGoal();
+    console.log(goalData.value)
+
+    evaluationData.value = await fetchAllEvaluation();
+    console.log(evaluationData.value)
+
+
   } catch (error) {
     console.error('Error fetching staff:', error);
   }
@@ -182,16 +213,7 @@ const participants = reactive({
 
 const operationFile = ref(null);
 
-// รายชื่อ Student ที่ตั้งไว้
-const students = ref([
-  { id: '64130500001', name: 'Alice A', department: 'เทคโนโลยีสารสนเทศปี4', phone: '0812345678', position: '' },
-  { id: '64130500002', name: 'Bob B', department: 'วิศวกรรมคอมพิวเตอร์ปี4', phone: '0812345679', position: '' },
-  { id: '64130500003', name: 'Charlie C', department: 'วิทยาศาสตร์คอมพิวเตอร์ปี4', phone: '0812345680', position: '' },
-]);
-const selectedStudent = ref(''); // ตัวแปรสำหรับเก็บนักเรียนที่เลือก
 
-// รายการคณะกรรมการ
-const committee = ref([]);
 
 // เพิ่มชื่อเข้าในคณะกรรมการ
 const addCommitteeMember = () => {
@@ -209,13 +231,13 @@ const removeCommitteeMember = (index) => {
   committee.value.splice(index, 1); // ลบสมาชิกจากคณะกรรมการ
 };
 
-const evaluationOptions = {
-  observation: { label: 'การสังเกต (Observation)' },
-  interview: { label: 'การสัมภาษณ์ (Interview)' },
-  questionnaires: { label: 'การใช้แบบสอบถาม (Questionnaires)' },
-  test: { label: 'การใช้แบบทดสอบ (Test)' },
-  other: { label: 'อื่นๆ โปรดระบุ' },
-};
+// const evaluationOptions = {
+//   observation: { label: 'การสังเกต (Observation)' },
+//   interview: { label: 'การสัมภาษณ์ (Interview)' },
+//   questionnaires: { label: 'การใช้แบบสอบถาม (Questionnaires)' },
+//   test: { label: 'การใช้แบบทดสอบ (Test)' },
+//   other: { label: 'อื่นๆ โปรดระบุ' },
+// };
 
 // ติดตามตัวเลือกที่ถูกติ้ก
 const selectedOptions = reactive({
@@ -240,6 +262,17 @@ const handleFileUpload = (key, event) => {
   }
 };
 
+const handleFileChange = async (e) => {
+  console.log("Input changed:", e.target.files)
+  const file = e.target.files[0];
+  if (file) {
+    const base64 = await fileToBase64(file);
+    // console.log("Base64 file:", base64);
+    attachmentFile1.value = base64
+    // downloadPDF(base64, 'base64topdf.pdf');
+  }
+}
+
 const expectedResults = reactive([
   { result: '', kpi: '', target: '' },
   { result: '', kpi: '', target: '' },
@@ -253,7 +286,7 @@ const pastEvaluations = reactive([
   { problem: '', solution: '' },
 ]);
 
-const budgetFileName = ref('');
+// const budgetFileName = ref('');
 
 const agencyCode = ref("");
 const type = ref("");
@@ -270,10 +303,11 @@ const sustainabilityPropose = ref("")
 sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`)
 const activityCharacteristic = ref("");
 const codeOfHonor = ref("");
-
-
 const prepareStart = ref("");
 const prepareEnd = ref("");
+
+const budgetDetails = ref(null);
+const scheduleDetails= ref(null);
 
 const studentQF = ref([]);
 
@@ -314,8 +348,18 @@ const addDoc = async () => {
       prepareStart: prepareStart.value,
       prepareEnd: prepareEnd.value,
 
+
+      budgetDetails: budgetDetails.value,
+      scheduleDetails: scheduleDetails.value,
+
+
+      problem: pastEvaluations.map(item => [item.problem, item.solution]),
       studentQF: studentQF.value,
 
+      evaluation: selectedEvaluation.value.map(id => [id, null]),
+      result: expectedResults.map(item => [item.kpi, item.result, item.target]),
+
+      committee: committee.value.map(member => [member.id, member.position]),
       staffIDProgress2: president.value,
 
     }
@@ -834,14 +878,14 @@ const addDoc = async () => {
 
     <!-- ขั้นตอนการดำเนินงาน -->
     <div class="mb-6">
-      <label for="operation-steps" class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน</label>
+      <label for="scheduleDetails" class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน</label>
       
       <div class="mb-2">
-        <label for="operation-steps">ตัวอย่างการประเมินผล:</label>
+        <label for="scheduleDetails">อัพโหลดไฟล์ขั้นตอนการดำเนินงาน:</label>
         <input 
-          id="operation-steps" 
+          id="scheduleDetails" 
           type="file" 
-          @change="handleOperationFileUpload" 
+          @change="handleFileChange" 
           class="form-input mt-2"
         />
       </div>
@@ -907,14 +951,15 @@ const addDoc = async () => {
     <label class="block text-gray-700 mb-2">รูปแบบการประเมินผล</label>
 
     <!-- รายการตัวเลือก -->
-    <div v-for="(option, key) in evaluationOptions" :key="key" class="mb-4">
-      <input 
-        type="checkbox" 
-        :id="key" 
-        v-model="selectedOptions[key]" 
-        class="mr-2"
-      />
-      <label :for="key">{{ option.label }}</label>
+    <div v-for="(option, key) in evaluationData" :key="key" class="mb-4">
+    <input 
+      type="checkbox" 
+      :id="option.evaluationID" 
+      :value="option.evaluationID" 
+      v-model="selectedEvaluation" 
+      class="mr-2"
+    />
+    <label :for="option.evaluationID">{{ option.evaluationName }}</label>
 
       <!-- ช่องอัพโหลดไฟล์ -->
       <div v-if="selectedOptions[key]" class="mt-2 ml-6">
@@ -930,8 +975,8 @@ const addDoc = async () => {
       </div>
     </div>
 
-    <!-- ผลที่คาดว่าจะได้รับ -->
-    <div class="mb-6">
+  <!-- ผลที่คาดว่าจะได้รับ -->
+  <div class="mb-6">
     <label class="block text-gray-700 mb-2">ผลที่คาดว่าจะได้รับ</label>
 
     <div v-for="(expectedResult, index) in expectedResults" :key="index" class="flex items-center gap-4 mb-4">
@@ -973,8 +1018,8 @@ const addDoc = async () => {
     </div>
   </div>
 
-    <!-- ผลการดำเนินงานที่ผ่านมา -->
-    <div class="mb-6">
+  <!-- ผลการดำเนินงานที่ผ่านมา -->
+  <div class="mb-6">
     <label class="block text-gray-700 mb-2">
       ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
     </label>
@@ -1004,7 +1049,6 @@ const addDoc = async () => {
         />
       </div>
     </div>
-  
   </div>
 
   <!-- รายละเอียดงบประมาณ -->
@@ -1013,7 +1057,7 @@ const addDoc = async () => {
     <input 
       id="budgetDetails" 
       type="file" 
-      @change="handleBudgetFileUpload" 
+      @change="handleFileChange"
       class="form-input"
     />
   </div>
