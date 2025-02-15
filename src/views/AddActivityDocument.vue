@@ -6,9 +6,13 @@ import { fetchAllStudent } from '../functions/fetchAllStudent';
 import { fetchAllGoal } from '../functions/fetchAllGoal';
 import { fetchAllStudentQF } from '../functions/fetchAllStudentQF';
 import { fetchAllEvaluation } from '../functions/fetchAllEvaluation';
+import { fetchAllParticipant } from '../functions/fetchAllParticipant';
+import { fetchAllActivity } from '../functions/fetchAllActivity';
+import { fetchAllEntrepreneurial } from '../functions/fetchAllEntrepreneurial';
+import { fetchAllSustainability } from '../functions/fetchAllSustainability';
 
 
-const activityHours = ref('')
+
 const writtenDate = ref('');
 const agencyName = ref('');
 const reason = computed(() => agencyName.value);
@@ -19,15 +23,11 @@ const responsibleStudent = localStorage.getItem("firstName") + " " + localStorag
 const rawStaffData = ref([]);
 const advisorList = ref([]);
 const presidentList = ref([]);
+const departmentPresidentList = ref([]);
+
 const studentQFList = ref([]);
 const objectives = ref(['','','']);
 
-// รายชื่อ Student ที่ตั้งไว้
-// const students = ref([
-//   { id: '64130500001', name: 'Alice A', department: 'เทคโนโลยีสารสนเทศปี4', phone: '0812345678', position: '' },
-//   { id: '64130500002', name: 'Bob B', department: 'วิศวกรรมคอมพิวเตอร์ปี4', phone: '0812345679', position: '' },
-//   { id: '64130500003', name: 'Charlie C', department: 'วิทยาศาสตร์คอมพิวเตอร์ปี4', phone: '0812345680', position: '' },
-// ]);
 const students = ref([]);
 const selectedStudent = ref(''); // ตัวแปรสำหรับเก็บนักเรียนที่เลือก
 const committee = ref([]); // รายการคณะกรรมการ
@@ -37,6 +37,21 @@ const evaluationData = ref([]);
 
 const selectedEvaluation = ref([]);
 
+const participantData = ref([]);
+// const participant = ref([]);
+const participant = computed(() => {
+  return participantData.value
+    .filter(item => item.count > 0)
+    .map(item => [item.participantID, item.count]);
+});
+
+// กำหนดตัวแปรเพื่อเก็บข้อมูลกิจกรรมที่ดึงจาก backend
+const activityData = ref([]);
+const hoursCount = ref({});
+const isHourCount = ref(false);
+
+const entrepreneurialData = ref([]);
+const sustainabilityData = ref([]);
 
 // กำหนดค่าตั้งต้นเป็นวันที่ปัจจุบันเมื่อโหลด
 onMounted(async() => {
@@ -53,6 +68,13 @@ onMounted(async() => {
       staffId: staff[0],
       fullName: `${staff[2]} ${staff[3]}`,
     }));
+    departmentPresidentList.value = rawStaffData.value
+      .filter((staff) => staff[10].includes('ประธานฝ่าย')) // กรองเฉพาะที่ตำแหน่งมีคำว่า 'ประธานฝ่าย'
+      .map((staff) => ({
+        staffId: staff[0],
+        fullName: `${staff[2]} ${staff[3]}`,
+    }));
+    // console.log("departmentPresidentList:", departmentPresidentList.value);
     // console.log("rawStaffData:", rawStaffData.value);
     // console.log("advisorList:", advisorList.value);
 
@@ -67,30 +89,40 @@ onMounted(async() => {
     // console.log(students.value)
 
     goalData.value = await fetchAllGoal();
-    console.log(goalData.value)
+    // console.log(goalData.value)
 
     evaluationData.value = await fetchAllEvaluation();
-    console.log(evaluationData.value)
+    // console.log(evaluationData.value)
 
+    participantData.value = await fetchAllParticipant();
+    // console.log(participantData.value)
+
+    activityData.value = await fetchAllActivity();
+    // console.log(activityData.value)
+    activityData.value.forEach(activity => { 
+      hoursCount.value[activity.activityID] = 0;  
+    });
+
+    entrepreneurialData.value = await fetchAllEntrepreneurial();
+    // console.log(entrepreneurialData.value)
+
+    sustainabilityData.value = await fetchAllSustainability();
+    // console.log(sustainabilityData.value)
 
   } catch (error) {
     console.error('Error fetching staff:', error);
   }
 });
 
-// ฟังก์ชันตรวจสอบการเปลี่ยนแปลงของ activityHours
+
 const handleActivityHoursChange = () => {
-  if (formData.activityHours !== 'count') {
-    formData.activityCategory = '';
-    formData.hoursCount = '';
+  console.log(isHourCount.value); // จะได้เป็น "true" หรือ "false"
+  if (isHourCount.value) {
+    console.log('เลือกนับชั่วโมง');
+  } else {
+    console.log('เลือกไม่นับชั่วโมง');
   }
 };
-
-// รายการทักษะทั้งหมด
-const skillsList = [
-  'Knowledge', 'Professional Skill', 'Thinking Skill', 'Learning Skill',
-  'Communication Skill', 'Management Skill', 'Leadership', 'KMUTT’s Citizenship'
-];
 
 // ฟังก์ชันจำกัดจำนวนหลักของตัวเลข
 const limitExpensesLength = () => {
@@ -141,10 +173,6 @@ const selectedSkills = ref([]);
 // เปอร์เซ็นต์สำหรับแต่ละทักษะ
 const percentages = reactive({});
 
-// ตรวจสอบว่าทักษะถูกเลือกครบ 3 รายการ
-const isValidSelection = computed(() => selectedSkills.length === 3);
-
-// ตรวจสอบว่าเปอร์เซ็นต์รวมเป็น 100%
 const isPercentageValid = computed(() => {
   const total = selectedSkills.reduce((sum, skill) => {
     return sum + (percentages[skill] ? parseFloat(percentages[skill]) : 0);
@@ -152,68 +180,10 @@ const isPercentageValid = computed(() => {
   return total === 100;
 });
 
-// ฟังก์ชันจัดการการเลือกทักษะ
-function handleSkillSelection(skill) {
-  if (!selectedSkills.includes(skill)) {
-    percentages[skill] = 0; // ตั้งค่าเปอร์เซ็นต์เริ่มต้นเป็น 0
-  } else {
-    delete percentages[skill]; // ลบค่าทักษะที่ไม่ได้เลือกออกจาก percentages
-  }
-}
-
-// รายการหัวข้อของ Entrepreneurial
-const entrepreneurialOptions = [
-  'Entrepreneurial Mindset',
-  'Knowledge Sharing Society',
-  'Research and Innovation Impact',
-  'Financial Literacy'
-];
-
 // รายการที่ผู้ใช้เลือก
 const selectedEntrepreneurialOptions = ref([]);
-
-const sustainabilityOptions = [
-  'SDGs Culture',
-  'Sustainability Change Agents',
-  'Green University and Smart Campus',
-  'Carbon Neutrality'
-];
-
-// รายการ Goals สำหรับ SDGs Culture
-const sdgsGoals = [
-  { id: 'Goal 1', name: 'No Poverty' },
-  { id: 'Goal 2', name: 'Zero Hunger' },
-  { id: 'Goal 3', name: 'Good Health and Well-Being' },
-  { id: 'Goal 4', name: 'Quality Education' },
-  { id: 'Goal 5', name: 'Gender Equality' },
-  { id: 'Goal 6', name: 'Clean Water and Sanitation' },
-  { id: 'Goal 7', name: 'Affordable and Clean Energy' },
-  { id: 'Goal 8', name: 'Decent Work and Economic Growth' },
-  { id: 'Goal 9', name: 'Industry, Innovation, and Infrastructure' },
-  { id: 'Goal 10', name: 'Reduced Inequalities' },
-  { id: 'Goal 11', name: 'Sustainable Cities and Communities' },
-  { id: 'Goal 12', name: 'Responsible Consumption and Production' },
-  { id: 'Goal 13', name: 'Climate Action' },
-  { id: 'Goal 14', name: 'Life Below Water' },
-  { id: 'Goal 15', name: 'Life on Land' },
-  { id: 'Goal 16', name: 'Peace, Justice and Strong Institutions' },
-  { id: 'Goal 17', name: 'Partnerships' }
-];
-
-// เก็บค่าที่เลือก
 const selectedSustainabilityOptions = ref([]);
 const selectedGoals = ref([]);
-
-const participants = reactive({
-  students: 0, // จำนวนผู้เข้าร่วมนักศึกษา
-  teachers: 0, // จำนวนผู้เข้าร่วมอาจารย์
-  staff: 0, // จำนวนผู้เข้าร่วมเจ้าหน้าที่
-  community: 0, // จำนวนผู้เข้าร่วมบุคคลในชุมชน/นักเรียน
-});
-
-const operationFile = ref(null);
-
-
 
 // เพิ่มชื่อเข้าในคณะกรรมการ
 const addCommitteeMember = () => {
@@ -231,22 +201,14 @@ const removeCommitteeMember = (index) => {
   committee.value.splice(index, 1); // ลบสมาชิกจากคณะกรรมการ
 };
 
-// const evaluationOptions = {
-//   observation: { label: 'การสังเกต (Observation)' },
-//   interview: { label: 'การสัมภาษณ์ (Interview)' },
-//   questionnaires: { label: 'การใช้แบบสอบถาม (Questionnaires)' },
-//   test: { label: 'การใช้แบบทดสอบ (Test)' },
-//   other: { label: 'อื่นๆ โปรดระบุ' },
-// };
-
 // ติดตามตัวเลือกที่ถูกติ้ก
-const selectedOptions = reactive({
-  observation: false,
-  interview: false,
-  questionnaires: false,
-  test: false,
-  other: false,
-});
+// const selectedOptions = reactive({
+//   observation: false,
+//   interview: false,
+//   questionnaires: false,
+//   test: false,
+//   other: false,
+// });
 
 // เก็บรายละเอียดของ "อื่นๆ"
 const otherDescription = ref('');
@@ -255,22 +217,47 @@ const otherDescription = ref('');
 const uploadedFiles = reactive({});
 
 // จัดการอัปโหลดไฟล์
-const handleFileUpload = (key, event) => {
-  const file = event.target.files[0];
-  if (file) {
-    uploadedFiles[key] = file;
-  }
-};
+// const handleFileUpload = (key, event) => {
+//   const file = event.target.files[0];
+//   if (file) {
+//     uploadedFiles[key] = file;
+//   }
+// };
 
-const handleFileChange = async (e) => {
-  console.log("Input changed:", e.target.files)
+// ฟังก์ชันจัดการการอัพโหลดไฟล์
+const handleFileChange = async (e, fileType) => {
+  console.log("Input changed:", e.target.files);
   const file = e.target.files[0];
   if (file) {
     const base64 = await fileToBase64(file);
-    // console.log("Base64 file:", base64);
-    attachmentFile1.value = base64
-    // downloadPDF(base64, 'base64topdf.pdf');
+    // เก็บ base64 ไฟล์ที่เลือกไว้ในตัวแปรที่กำหนดตาม fileType
+    switch (fileType) {
+      case 'prepareFile':
+        prepareFile.value = base64;
+        break;
+      case 'evaluationFile':
+        evaluationFile.value = base64;
+        break;
+      case 'budgetDetails':
+        budgetDetails.value = base64;
+        break;
+      case 'scheduleDetails':
+        scheduleDetails.value = base64;
+        break;
+      default:
+        console.error('Unknown file type');
+    }
   }
+}
+
+// ฟังก์ชันแปลงไฟล์เป็น Base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);  // เก็บเฉพาะ base64 string
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
 }
 
 const expectedResults = reactive([
@@ -300,18 +287,19 @@ const expenses = ref(0);
 const advisor = ref(""); // StaffID
 const sustainabilityDetail = ref("")
 const sustainabilityPropose = ref("")
-sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`)
 const activityCharacteristic = ref("");
 const codeOfHonor = ref("");
 const prepareStart = ref("");
 const prepareEnd = ref("");
-
+const prepareFile = ref(null)
+const evaluationFile = ref(null);
 const budgetDetails = ref(null);
 const scheduleDetails= ref(null);
-
+const sustainability = ref([]);
 const studentQF = ref([]);
-
+const activity = ref([]);
 const president = ref(""); // StaffIDProgress2
+const departmentPresident = ref(""); //staffIDProgress3
 
 const selectAdvisor = () => {
   const selectedAdvisor = advisorList.value.find(a => a.staffId === advisor.value);
@@ -329,6 +317,24 @@ const addDoc = async () => {
   try {
     const studentID = parseInt(localStorage.getItem("studentID"))
     const departmentName = localStorage.getItem("department")
+
+    sustainability.value = sustainabilityData.value
+      .filter(item => selectedSustainabilityOptions.value.includes(item.sustainabilityID))
+      .flatMap(item => {
+        if (item.sustainabilityID === 1) {
+          return selectedGoals.value.map(goalID => [item.sustainabilityID, goalID]);
+        } else {
+          return [[item.sustainabilityID, null]];
+        }
+      });
+
+    activity.value = activityData.value.map(activity => {
+        const hour = hoursCount.value[activity.activityID] || 0;
+        return hour > 0 ? [activity.activityID, hour] : null;
+      }).filter(Boolean);
+
+    sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`).join('');
+
     const dataToSend = {
       studentID: studentID,
       type: type.value,
@@ -338,7 +344,7 @@ const addDoc = async () => {
       departmentName: departmentName,
       title: projectName.value,
       location: location.value,
-      propose: purpose.value, // อู๋เขียน purpose ผิด
+      propose: purpose.value,
       payment: expenses.value,
       staffID: advisor.value,
       sustainabilityDetail: sustainabilityDetail.value,
@@ -347,21 +353,21 @@ const addDoc = async () => {
       codeOfHonor: codeOfHonor.value,
       prepareStart: prepareStart.value,
       prepareEnd: prepareEnd.value,
-
-
+      prepareFile: prepareFile.value,
+      evaluationFile: evaluationFile.value,
       budgetDetails: budgetDetails.value,
       scheduleDetails: scheduleDetails.value,
-
-
+      participant: participant.value,
+      activity: activity.value,
       problem: pastEvaluations.map(item => [item.problem, item.solution]),
       studentQF: studentQF.value,
-
+      entrepreneurial: selectedEntrepreneurialOptions.value,
       evaluation: selectedEvaluation.value.map(id => [id, null]),
       result: expectedResults.map(item => [item.kpi, item.result, item.target]),
-
+      sustainability: sustainability.value,
       committee: committee.value.map(member => [member.id, member.position]),
       staffIDProgress2: president.value,
-
+      staffIDProgress3: departmentPresident.value,
     }
     console.log("Data to send:", dataToSend);
     const res = await addActivityDocument(dataToSend);
@@ -533,53 +539,37 @@ const addDoc = async () => {
             </span>
           </div>
 
-
-
-          <!-- ชั่วโมงกิจกรรม -->
+          <!-- เลือกชั่วโมงกิจกรรม -->
           <div class="mb-3">
             <label for="activityHours" class="block text-gray-700 mb-1">ชั่วโมงกิจกรรม</label>
-            <select 
-              id="activityHours" 
-              v-model="activityHours" 
+            <select
+              id="activityHours"
+              v-model="isHourCount"
               class="form-input"
               @change="handleActivityHoursChange"
               required
             >
-              <option value="">เลือกชั่วโมงกิจกรรม</option>
-              <option value="noCount">ไม่นับชั่วโมง</option>
-              <option value="count">นับชั่วโมง</option>
+              <option :value="false">ไม่นับชั่วโมง</option>
+              <option :value="true">นับชั่วโมง</option>
             </select>
           </div>
 
-          <!-- ถ้านับชั่วโมง -->
-          <div v-if="activityHours === 'count'" class="mb-3">
-            <label for="activityCategory" class="block text-gray-700 mb-1">เลือกด้านกิจกรรม</label>
-            <select 
-              id="activityCategory" 
-              v-model="activityCategory" 
-              class="form-input" 
-              required
-            >
-              <option value="">เลือกด้าน</option>
-              <option value="academic">ด้านพัฒนาทักษะทางวิชาการและวิชาชีพ</option>
-              <option value="sports">ด้านกีฬาและการส่งเสริมสุขภาพ</option>
-              <option value="volunteer">ด้านกิจกรรมจิตอาสาและบำเพ็ญประโยชน์</option>
-              <option value="arts">ด้านทำนุบำรุงศิลปะและวัฒนธรรม</option>
-              <option value="character">ด้านการพัฒนาคุณลักษณะ</option>
-              <option value="pride">ด้านความภูมิใจ ความรัก ความผูกพันหาวิทยาลัย</option>
-            </select>
-          </div>    
-          <div v-if="activityHours === 'count'" class="mb-3"></div> <!-- เอาไว้ให้ field จำนวนชั่วโมงอยู่ทางขวา -->
-          <div v-if="activityHours === 'count'" class="mb-3">
-            <label for="hoursCount" class="block text-gray-700 mb-1 ">จำนวนชั่วโมง</label>
-            <input 
-              type="number" 
-              id="hoursCount" 
-              v-model="hoursCount" 
-              class="form-input" 
-              required
-            />
+          <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
+          <div v-if="isHourCount === true">
+            <div v-for="activity in activityData" :key="activity.activityID" class="mb-3 flex items-center gap-3">
+              <label :for="'hours-' + activity.activityID" class="text-gray-700 w-60" style="width: 200%;">
+                {{ activity.activityName }}
+              </label>
+              <input
+                type="number"
+                :id="'hours-' + activity.activityID"
+                v-model="hoursCount[activity.activityID]"
+                class="form-input w-24"
+              />
+            </div>
           </div>
+
+
         </div>
 
         <div class="grid grid-cols-3 gap-4 items-center mb-4">
@@ -619,15 +609,32 @@ const addDoc = async () => {
 
             <!-- นักศึกษาผู้รับผิดชอบ -->
             <div>
-            <label for="responsibleStudent" class="block text-gray-700 mb-1">นักศึกษาผู้รับผิดชอบ</label>
-            <input 
-                type="text" 
-                id="responsibleStudent" 
-                :value="responsibleStudent" 
-                class="form-input" 
-                disabled
-            />
+              <label for="responsibleStudent" class="block text-gray-700 mb-1">นักศึกษาผู้รับผิดชอบ</label>
+              <input 
+                  type="text" 
+                  id="responsibleStudent" 
+                  :value="responsibleStudent" 
+                  class="form-input" 
+                  disabled
+              />
             </div>
+
+            <!-- ประธานฝ่าย -->
+            <div>
+              <label for="departmentPresident" class="block text-gray-700 mb-1">ประธานฝ่าย</label>
+              <select 
+                  id="departmentPresident" 
+                  v-model="departmentPresident" 
+                  class="form-input" 
+                  required
+              >
+                  <option value="" disabled>เลือกประธานฝ่าย</option>
+                  <option v-for="departmentPresident in departmentPresidentList" :key="departmentPresident.staffId" :value="departmentPresident.staffId">
+                  {{ departmentPresident.fullName }}
+                  </option>
+              </select>
+            </div>
+
         </div>
 
         <!-- เลือกทักษะ StudentQF (checkbox) -->
@@ -686,60 +693,62 @@ const addDoc = async () => {
           <h1>Entrepreneurial</h1>
           <div>
             <label class="block mb-2 text-red">เลือกอย่างน้อย 1 ด้าน</label>
-            <div v-for="option in entrepreneurialOptions" :key="option" class="mb-2">
+            <div v-for="option in entrepreneurialData" :key="option.entrepreneurialID" class="mb-2">
               <input 
                 type="checkbox" 
-                :id="option" 
-                :value="option" 
+                :id="'entrepreneurial-' + option.entrepreneurialID"
+                :value="option.entrepreneurialID"
                 v-model="selectedEntrepreneurialOptions" 
               />
-              <label :for="option">{{ option }}</label>
+              <label :for="'entrepreneurial-' + option.entrepreneurialID">
+                {{ option.entrepreneurialName }}
+              </label>
             </div>
           </div>
-      </div>
+        </div>
+
 
       <!-- Sustainability -->
       <div>
         <h1>Sustainability</h1>
         <div>
           <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
-          <div v-for="option in sustainabilityOptions" :key="option" class="mb-2">
+          <div v-for="option in sustainabilityData" :key="option.sustainabilityID" class="mb-2">
             <input 
               type="checkbox" 
-              :id="option" 
-              :value="option" 
+              :id="'sustainability-' + option.sustainabilityID"
+              :value="option.sustainabilityID"
               v-model="selectedSustainabilityOptions" 
             />
-            <label :for="option">{{ option }}</label>
+            <label :for="'sustainability-' + option.sustainabilityID">
+              {{ option.sustainabilityName }}
+            </label>
           </div>
         </div>
 
         <!-- แสดงผลตัวเลือก Goal เมื่อเลือก SDGs Culture -->
-        <div v-if="selectedSustainabilityOptions.includes('SDGs Culture')" class="mt-4">
-          <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง (สูงสุด 3 Goals):</label>
-          <div v-for="goal in sdgsGoals" :key="goal.id" class="mb-2">
+        <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-4">
+          <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง</label>
+          <div v-for="goal in goalData" :key="goal.goalID" class="mb-2">
             <input 
               type="checkbox" 
-              :id="goal.id" 
-              :value="goal" 
-              v-model="selectedGoals" 
-              :disabled="selectedGoals.length >= 3 && !selectedGoals.includes(goal)"/>
-            <label :for="goal.id">{{ goal.id }}: {{ goal.name }}</label>
+              :id="'goal-' + goal.goalID" 
+              :value="goal.goalID" 
+              v-model="selectedGoals"
+            />
+            <label :for="'goal-' + goal.goalID">{{ goal.goalID }}: {{ goal.goalName }}</label>
           </div>
-          <!-- <p v-if="selectedGoals.length >= 3" class="text-red-500 mt-2">
-            คุณเลือก Goals ครบแล้ว (สูงสุด 3 Goals)
-          </p> -->
         </div>
 
         <!-- แสดงผลรายการที่เลือก -->
-        <div v-if="selectedGoals.length > 0" class="mt-4">
+        <!-- <div v-if="selectedGoals.length > 0" class="mt-4">
           <h3>คุณเลือก Goals:</h3>
           <ul>
             <li v-for="goal in selectedGoals" :key="goal.id">
               {{ goal.id }}: {{ goal.name }}
             </li>
           </ul>
-        </div> 
+        </div>  -->
       </div>
 
       <!-- หลักการและเหตุผล -->
@@ -770,40 +779,14 @@ const addDoc = async () => {
     <!-- ผู้เข้าร่วมโครงการ -->
     <div class="mb-6">
       <label class="block text-gray-700 mb-2">ผู้เข้าร่วมโครงการ</label>
-      <div class="flex items-center mb-2">
-        <label class="w-48">นักศึกษา จำนวน:</label>
+
+      <div v-for="participant in participantData" :key="participant.participantID" class="flex items-center mb-2">
+        <label class="w-48">{{ participant.participantName }} จำนวน:</label>
         <input 
           type="number" 
-          v-model="participants.students" 
+          v-model="participant.count"
           class="form-input w-20 mr-2"
-        /> 
-        <span>คน</span>
-      </div>
-      <div class="flex items-center mb-2">
-        <label class="w-48">อาจารย์ จำนวน:</label>
-        <input 
-          type="number" 
-          v-model="participants.teachers" 
-          class="form-input w-20 mr-2"
-        /> 
-        <span>คน</span>
-      </div>
-      <div class="flex items-center mb-2">
-        <label class="w-48">เจ้าหน้าที่ จำนวน:</label>
-        <input 
-          type="number" 
-          v-model="participants.staff" 
-          class="form-input w-20 mr-2"
-        /> 
-        <span>คน</span>
-      </div>
-      <div class="flex items-center mb-2">
-        <label class="w-48">บุคคลในชุมชน/นักเรียน จำนวน:</label>
-        <input 
-          type="number" 
-          v-model="participants.community" 
-          class="form-input w-20 mr-2"
-        /> 
+        />
         <span>คน</span>
       </div>
     </div>
@@ -853,39 +836,17 @@ const addDoc = async () => {
           />
         </div>
       </div>
-
-      <!-- ระยะเวลาปฏิบัติงาน -->
-      <!-- <div>
-        <label class="block text-gray-700 mb-2">ระยะเวลาปฏิบัติงาน:</label>
-        <div class="flex items-center">
-          <label class="mr-2">เริ่มต้น:</label>
-          <input 
-            type="date" 
-            v-model="timeframes.implementation.start" 
-            class="form-input w-40 mr-4"
-            style="width: 80%;"
-          />
-          <label class="mr-2">สิ้นสุด:</label>
-          <input 
-            type="date" 
-            v-model="timeframes.implementation.end" 
-            class="form-input w-40"
-            style="width: 80%;"
-          />
-        </div>
-      </div> -->
     </div>
 
     <!-- ขั้นตอนการดำเนินงาน -->
     <div class="mb-6">
       <label for="scheduleDetails" class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน</label>
-      
       <div class="mb-2">
         <label for="scheduleDetails">อัพโหลดไฟล์ขั้นตอนการดำเนินงาน:</label>
         <input 
           id="scheduleDetails" 
           type="file" 
-          @change="handleFileChange" 
+          @change="handleFileChange($event, 'scheduleDetails')" 
           class="form-input mt-2"
         />
       </div>
@@ -952,27 +913,25 @@ const addDoc = async () => {
 
     <!-- รายการตัวเลือก -->
     <div v-for="(option, key) in evaluationData" :key="key" class="mb-4">
-    <input 
-      type="checkbox" 
-      :id="option.evaluationID" 
-      :value="option.evaluationID" 
-      v-model="selectedEvaluation" 
-      class="mr-2"
-    />
-    <label :for="option.evaluationID">{{ option.evaluationName }}</label>
+      <input 
+        type="checkbox" 
+        :id="option.evaluationID" 
+        :value="option.evaluationID" 
+        v-model="selectedEvaluation" 
+        class="mr-2"
+      />
+      <label :for="option.evaluationID">{{ option.evaluationName }}</label>
+    </div>
 
-      <!-- ช่องอัพโหลดไฟล์ -->
-      <div v-if="selectedOptions[key]" class="mt-2 ml-6">
-        <label :for="'upload-' + key" class="block mb-1">
-          อัพโหลดไฟล์สำหรับ {{ option.label }}
-        </label>
-        <input 
-          :id="'upload-' + key" 
-          type="file" 
-          @change="handleFileUpload(key, $event)" 
-          class="form-input"
-        />
-      </div>
+    <!-- ช่องอัพโหลดไฟล์รูปแบบการประเมินผล -->
+    <div class="mb-6">
+      <label for="evaluationFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์สำหรับรูปแบบการประเมินผล</label>
+      <input 
+        id="evaluationFile" 
+        type="file" 
+        @change="handleFileChange($event, 'evaluationFile')" 
+        class="form-input"
+      />
     </div>
 
   <!-- ผลที่คาดว่าจะได้รับ -->
@@ -1057,11 +1016,21 @@ const addDoc = async () => {
     <input 
       id="budgetDetails" 
       type="file" 
-      @change="handleFileChange"
+      @change="handleFileChange($event, 'budgetDetails')" 
       class="form-input"
     />
   </div>
 
+  <!-- อัพโหลดไฟล์เพิ่มเติม -->
+  <div class="mb-6">
+    <label for="prepareFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์เพิ่มเติม</label>
+    <input 
+      id="prepareFile" 
+      type="file" 
+      @change="handleFileChange($event, 'prepareFile')" 
+      class="form-input"
+    />
+  </div>
     
   </div>
   </div>

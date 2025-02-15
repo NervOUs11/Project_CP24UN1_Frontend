@@ -1,6 +1,7 @@
 const URL = import.meta.env.VITE_API_ROOT;
 
 const addActivityDocument = async (dataToSend) => {
+    console.log(dataToSend)
     try {
         const res = await fetch(`${URL}/document/activity/add`, {
             method: "POST",
