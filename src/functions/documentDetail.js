@@ -1,7 +1,5 @@
-import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 const URL = import.meta.env.VITE_API_ROOT;
-// const documentDetail = ref(null);
 
 const fetchDocumentDetail = async (userid, role) => {
   const route = useRoute();

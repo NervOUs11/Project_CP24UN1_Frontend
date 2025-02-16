@@ -9,6 +9,7 @@ import DocumentEdit from '../views/DocumentEdit.vue'
 import StampText from '../views/stamptext.vue'
 import AddActivityDocument from '../views/AddActivityDocument.vue'
 import AllUser from '../views/AllUser.vue'
+import ActivityDocumentDetail from '@/views/ActivityDocumentDetail.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -65,6 +66,11 @@ const router = createRouter({
       path: "/allUser",
       name: "AllUser",
       component: AllUser
+    },
+    {
+      path: "/activityDocumentDetail/:id",
+      name: "ActivityDocumentDetail",
+      component: ActivityDocumentDetail
     }
   ]
 })

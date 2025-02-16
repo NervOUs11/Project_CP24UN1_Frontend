@@ -5,11 +5,22 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const role = localStorage.getItem("role")
 const firstName = ref(localStorage.getItem('firstName'));
+const showLogoutPopup = ref(false);
 
-const logout = () => {
-  localStorage.clear();
-  router.push('/login');
+const openLogoutPopup = () => {
+  showLogoutPopup.value = true;
 };
+
+const closeLogoutPopup = () => {
+  showLogoutPopup.value = false;
+};
+
+const handleLogout = () => {
+  localStorage.clear();
+  showLogoutPopup.value = false;
+  router.push("/login");
+};
+
 
 const navigateTo = (path) => {
   router.push(path);
@@ -27,7 +38,7 @@ const navigateTo = (path) => {
       <li>
         <button @click="navigateTo('/tracking')" class="nav-button">Status</button>
       </li>
-      <li v-if="role !== 'Student'">
+      <li v-if="role == 'Administrator'">
         <button @click="navigateTo('/allUser')" class="nav-button">Users</button>
       </li>
       <li>
@@ -38,11 +49,30 @@ const navigateTo = (path) => {
         <span class="welcome-message">Welcome, {{ firstName }}!</span>
       </li>
       <li>
-        <button @click="logout()" class="nav-button logout-button">Logout</button>
+        <button @click="openLogoutPopup()" class="nav-button logout-button">Logout</button>
       </li>
     </ul>
-    
+
+    <!-- Modal สำหรับ Logout -->
+    <div 
+      v-if="showLogoutPopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-center text-black">Are you sure you want to logout?</h2>
+        <div class="flex justify-center gap-2">
+          <button class="bg-gray-500 text-white px-4 py-2 rounded-3xl" @click="closeLogoutPopup">
+            Cancel
+          </button>
+          <button class="bg-red-500 text-white px-4 py-2 rounded-3xl" @click="handleLogout">
+            Logout
+          </button>
+        </div>    
+      </div>
+    </div>
+
   </nav>
+
+
 </template>
   
 <style scoped>

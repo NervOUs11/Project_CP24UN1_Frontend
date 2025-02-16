@@ -10,8 +10,8 @@ import { fetchAllParticipant } from '../functions/fetchAllParticipant';
 import { fetchAllActivity } from '../functions/fetchAllActivity';
 import { fetchAllEntrepreneurial } from '../functions/fetchAllEntrepreneurial';
 import { fetchAllSustainability } from '../functions/fetchAllSustainability';
-
-
+import { useRouter } from "vue-router";
+const router = useRouter()
 
 const writtenDate = ref('');
 const agencyName = ref('');
@@ -69,14 +69,11 @@ onMounted(async() => {
       fullName: `${staff[2]} ${staff[3]}`,
     }));
     departmentPresidentList.value = rawStaffData.value
-      .filter((staff) => staff[10].includes('ประธานฝ่าย')) // กรองเฉพาะที่ตำแหน่งมีคำว่า 'ประธานฝ่าย'
+      .filter((staff) => staff[10].includes('ประธานฝ่าย'))
       .map((staff) => ({
         staffId: staff[0],
         fullName: `${staff[2]} ${staff[3]}`,
     }));
-    // console.log("departmentPresidentList:", departmentPresidentList.value);
-    // console.log("rawStaffData:", rawStaffData.value);
-    // console.log("advisorList:", advisorList.value);
 
     const studentData = await fetchAllStudent();
     students.value = studentData.map(([id, name, department, year, phone]) => ({
@@ -116,11 +113,11 @@ onMounted(async() => {
 
 
 const handleActivityHoursChange = () => {
-  console.log(isHourCount.value); // จะได้เป็น "true" หรือ "false"
+  // console.log(isHourCount.value); // จะได้เป็น "true" หรือ "false"
   if (isHourCount.value) {
-    console.log('เลือกนับชั่วโมง');
+    // console.log('เลือกนับชั่วโมง');
   } else {
-    console.log('เลือกไม่นับชั่วโมง');
+    // console.log('เลือกไม่นับชั่วโมง');
   }
 };
 
@@ -226,7 +223,7 @@ const uploadedFiles = reactive({});
 
 // ฟังก์ชันจัดการการอัพโหลดไฟล์
 const handleFileChange = async (e, fileType) => {
-  console.log("Input changed:", e.target.files);
+  // console.log("Input changed:", e.target.files);
   const file = e.target.files[0];
   if (file) {
     const base64 = await fileToBase64(file);
@@ -304,13 +301,13 @@ const departmentPresident = ref(""); //staffIDProgress3
 const selectAdvisor = () => {
   const selectedAdvisor = advisorList.value.find(a => a.staffId === advisor.value);
   if (selectedAdvisor) {
-    console.log(`Advisor ที่เลือก: ${selectedAdvisor.fullName} (ID: ${selectedAdvisor.staffId})`);
+    // console.log(`Advisor ที่เลือก: ${selectedAdvisor.fullName} (ID: ${selectedAdvisor.staffId})`);
   }
 };
 const selectPresident = () => {
   const selectPresident = presidentList.value.find(a => a.staffId === president.value);
   if (selectPresident) {
-    console.log(`President ที่เลือก: ${selectPresident.fullName} (ID: ${selectPresident.staffId})`);
+    // console.log(`President ที่เลือก: ${selectPresident.fullName} (ID: ${selectPresident.staffId})`);
   }
 };
 const addDoc = async () => {
@@ -369,9 +366,18 @@ const addDoc = async () => {
       staffIDProgress2: president.value,
       staffIDProgress3: departmentPresident.value,
     }
-    console.log("Data to send:", dataToSend);
+    // console.log("Data to send:", dataToSend);
     const res = await addActivityDocument(dataToSend);
-    console.log("API response:", res[1]);
+    // console.log("API response:", res[1]);
+
+    if (res[1] === 201) {
+      alert("Add New Document Successfully!");
+      try {
+        router.push("/tracking");
+      } catch (error) {
+        console.error(error);
+      }
+    }
   } catch (error) {
     console.error("Failed to add activity document:", error.message);
   }

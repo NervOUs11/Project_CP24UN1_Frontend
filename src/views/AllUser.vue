@@ -9,7 +9,6 @@ const selectedRole = ref("");
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 
-// ฟังก์ชันเพื่อโหลดข้อมูลผู้ใช้งานและเพิ่ม Role เป็น Student
 const fetchUsers = async () => {
   const data = await getAllUser();
   if (data) {

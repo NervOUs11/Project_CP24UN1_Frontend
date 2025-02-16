@@ -27,8 +27,11 @@ onMounted(async () => {
     else if (role !== "Student") {
       id = localStorage.getItem("staffID");
     }
-
     documents.value = await tracking(id);
+    console.log(documents.value)
+
+    
+
   } catch (error) {
     console.error("Error fetching documents:", error);
   }
@@ -56,9 +59,22 @@ const goHome = () => {
   router.push({ name: 'home' });
 }
 
+const goToDocument = (documentType, documentID) => {
+  if (documentType === 'ลากิจ' || documentType === 'ลาป่วย') {
+    goToDocumentDetail(documentID);
+  } else if (documentType === 'Workshop' || documentType === 'Volunteer' || documentType === 'Seminar') {
+    goToActivityDocument(documentID);
+  }
+};
+
+
 const goToDocumentDetail = (documentID) => {
   router.push({ name: 'DocumentDetail', params: { id: documentID } }); 
 };
+
+const goToActivityDocument = (documentID) => {
+  router.push({ name: 'ActivityDocumentDetail', params: { id: documentID } }); 
+}
 
 const filteredDocuments = computed(() =>
   documents.value.filter(
@@ -93,7 +109,7 @@ const filteredDocuments = computed(() =>
             v-for="(doc, index) in paginatedDocuments"
             :key="doc.documentID"
             class="hover:bg-orange-100 border-b border-gray-200"
-            @click="goToDocumentDetail(doc.documentID)"
+            @click="goToDocument(doc.documentType, doc.documentID)"
           >
             <td class="px-4 py-2">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
             <td class="px-4 py-2">{{ doc.documentType }}</td>
