@@ -45,7 +45,7 @@ const userData = ref({
 });
 
 const documentID = ref(null);
-
+const file1 = ref("");
 onMounted(async () => {
   userData.value = {
     name: localStorage.getItem("firstName") + " " + localStorage.getItem("lastName"),
@@ -66,13 +66,13 @@ onMounted(async () => {
     const studentID = localStorage.getItem("studentID");
     const role = "Student";
     const documentData = await fetchDocumentDetail(studentID, role);
-
+    console.log(documentData)
     if (documentData) {
         type.value = documentData.DocumentType || '';
         detail.value = documentData.detail || '';
 
-        attachmentFile1.value = documentData.attachmentFile1 || null;
-        attachmentFile2.value = documentData.attachmentFile2 || null;
+        attachmentFile1.value = documentData.file1 || null;
+        attachmentFile2.value = documentData.file2 || null;
 
         starttime.value = documentData.startTime || '';
         endtime.value = documentData.endTime || '';
@@ -89,13 +89,13 @@ onMounted(async () => {
             const endTimeHour = new Date(endtime.value).getHours();
             
             // เช็คช่วงเวลา
-            if (startTimeHour === 9 && endTimeHour === 12) {
+            if (startTimeHour === 2 && endTimeHour === 5) {
                 oneDaySession.morning = true;
                 oneDaySession.afternoon = false;
-            } else if (startTimeHour === 13 && endTimeHour === 17) {
+            } else if (startTimeHour === 6 && endTimeHour === 10) {
                 oneDaySession.morning = false;
                 oneDaySession.afternoon = true;
-            } else if (startTimeHour === 9 && endTimeHour === 17) {
+            } else if (startTimeHour === 2 && endTimeHour === 10) {
                 oneDaySession.morning = true;
                 oneDaySession.afternoon = true;
             } else {
@@ -134,6 +134,69 @@ function convertToISOWithTimezone(dateString, time) {
   return date.toISOString();
 }
 
+const handleFileChange = async (e) => {
+  console.log("Input changed:", e.target.files)
+  const file = e.target.files[0];
+  if (file) {
+    const base64 = await fileToBase64(file);
+    console.log("Base64 file:", base64);
+    attachmentFile1.value = base64
+    // downloadPDF(base64, 'base64topdf.pdf');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+const isBase64 = (str) => {
+  // ใช้ regex เพื่อตรวจสอบรูปแบบ base64 ที่ถูกต้อง
+  return /^[A-Za-z0-9+/=]+$/.test(str);
+};
+
+const openFileInNewTab = async (base64String, mimeType) => {
+  if (!base64String) {
+    popupMessage.value = 'No file available.';
+    showPopup.value = true;
+    return;
+  }
+
+  let base64Data = base64String;
+  if (base64String.startsWith('data:')) {
+    base64Data = base64String.split(',')[1];
+  }
+
+  if (!isBase64(base64Data)) {
+    popupMessage.value = 'Invalid Base64 string.';
+    showPopup.value = true;
+    return;
+  }
+
+  try {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteNumbers], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (error) {
+    popupMessage.value = 'Error opening the file.';
+    showPopup.value = true;
+    console.error('Error decoding Base64:', error);
+  }
+};
 
 // ฟังก์ชันสำหรับการอัพเดตเอกสาร
 const handleEditDocument = async () => {
@@ -392,7 +455,20 @@ const handleEditDocument = async () => {
           </div>
 
           <div class="mb-3">
-            <label for="attachmentFile1" class="block text-gray-700 mb-1">หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์</label>
+            <label for="attachmentFile1" class="block text-gray-700 mb-1">
+              หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
+            </label>
+
+            <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
+            <div v-if="attachmentFile1">
+              <p class="text-sm text-gray-600">ไฟล์ที่อัปโหลดแล้ว: 
+                <a target="_blank" class="text-blue-500 underline" @click="openFileInNewTab(attachmentFile1, 'application/pdf')" >
+                  ดูไฟล์เดิม
+                </a>
+              </p>
+            </div>
+
+            <!-- Input อัปโหลดไฟล์ -->
             <input 
               type="file" 
               id="attachmentFile1" 
@@ -407,6 +483,7 @@ const handleEditDocument = async () => {
               type="file" 
               id="attachmentFile2" 
               @change="e => attachmentFile2.value = e.target.files[0]"
+              style="margin-top: 30px;"
               class="form-input"
             />
           </div>

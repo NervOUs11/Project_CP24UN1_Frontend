@@ -122,17 +122,32 @@ const handleEdit = () => {
 
 const formatDateTime = (isoString) => {
   if (!isoString) return '';
+
+  // Create a Date object from the ISO string (which is in UTC)
   const date = new Date(isoString);
+
+  // Get the current local time zone offset in minutes and convert to milliseconds
+  const localOffset = date.getTimezoneOffset() * 60000;
+
+  // Adjust the date for the local time zone by adding the offset
+  const localDate = new Date(date.getTime() - localOffset);
+
+  // Get the current time zone for formatting
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  // Format the date and time according to the local time zone
   return {
-    date: date.toLocaleDateString('th-TH', {
+    date: localDate.toLocaleDateString('th-TH', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone
     }),
-    time: date.toLocaleTimeString('th-TH', {
+    time: localDate.toLocaleTimeString('th-TH', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
+      timeZone
     }) + ' น.'
   };
 };
@@ -181,6 +196,7 @@ onMounted(async () => {
       file1: `data:image/jpeg;base64,${rawData.file1}`,
     };
   }
+  console.log(rawData)
   documentID.value = rawData.DocumentID;
   progressID.value = rawData.progressID;
 });

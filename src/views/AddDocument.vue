@@ -98,6 +98,7 @@ function downloadPDF(base64String, filename) {
 function convertToISOWithTimezone(dateString, time) {
   try {
     let date;
+
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       date = new Date(`${dateString}T${time}`);
     } else {
@@ -117,14 +118,12 @@ function convertToISOWithTimezone(dateString, time) {
       throw new Error("Invalid date or time value.");
     }
 
-    const timezoneOffset = date.getTimezoneOffset();
-    date.setMinutes(date.getMinutes() - timezoneOffset);
-
     return date.toISOString();
   } catch (error) {
     return `Error: ${error.message}`;
   }
 }
+
 
 const addDoc = async () => {
   try {
@@ -193,8 +192,8 @@ const addDoc = async () => {
     const dataToSend = {
       studentID: studentID,
       type: type.value,
-      createDate: new Date().toISOString(), // เวลาที่สร้าง
-      editDate: new Date().toISOString(), // เวลาที่แก้ไขล่าสุด
+      // createDate: new Date().toISOString(), // เวลาที่สร้าง
+      // editDate: new Date().toISOString(), // เวลาที่แก้ไขล่าสุด
       startTime: startTime,
       endTime: endTime,
       detail: detail.value,

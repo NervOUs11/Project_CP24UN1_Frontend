@@ -10,11 +10,24 @@ const itemsPerPage = 5;
 const documents = ref([]);
 const router = useRouter();
 const firstName = ref(localStorage.getItem('firstName'));
+
 const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+  const options = { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  };
+
   const date = new Date(dateString);
-  return date.toLocaleString('th-TH', options);
-}
+
+  const localOffset = date.getTimezoneOffset() / 60;
+  const localDate = new Date(date.getTime() - (localOffset * 60 * 60 * 1000));
+
+  return localDate.toLocaleString('th-TH', options);
+};
 
 onMounted(async () => {
   try {

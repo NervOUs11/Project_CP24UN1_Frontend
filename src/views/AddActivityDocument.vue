@@ -304,12 +304,49 @@ const selectAdvisor = () => {
     // console.log(`Advisor ที่เลือก: ${selectedAdvisor.fullName} (ID: ${selectedAdvisor.staffId})`);
   }
 };
+
 const selectPresident = () => {
   const selectPresident = presidentList.value.find(a => a.staffId === president.value);
   if (selectPresident) {
     // console.log(`President ที่เลือก: ${selectPresident.fullName} (ID: ${selectPresident.staffId})`);
   }
 };
+
+function convertToISOWithTimezone(dateString, time = "00:00:00") {
+  try {
+    let date;
+
+    // Check if dateString is in the correct format (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      // If the dateString only contains the date, add the specified time
+      date = new Date(`${dateString}T${time}`);
+    } else {
+      // Otherwise, parse the full date string and time
+      date = new Date(dateString);
+      if (isNaN(date)) {
+        throw new Error(`Invalid dateString: "${dateString}".`);
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      dateString = `${year}-${month}-${day}`;
+      // Add the default time (09:00:00) to the date
+      date = new Date(`${dateString}T${time}`);
+    }
+
+    if (isNaN(date)) {
+      throw new Error("Invalid date or time value.");
+    }
+
+    // Return ISO string and manually remove milliseconds
+    const isoString = date.toISOString();
+    return isoString.replace(/\.\d{3}Z$/, ''); // Remove milliseconds and 'Z'
+  } catch (error) {
+    return `Error: ${error.message}`;
+  }
+}
+
 const addDoc = async () => {
   try {
     const studentID = parseInt(localStorage.getItem("studentID"))
@@ -331,12 +368,16 @@ const addDoc = async () => {
       }).filter(Boolean);
 
     sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`).join('');
+    const startTime = convertToISOWithTimezone(startDate.value)
+    const endTime = convertToISOWithTimezone(endDate.value)
+    const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
+    const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
 
     const dataToSend = {
       studentID: studentID,
       type: type.value,
-      startTime: startDate.value,
-      endTime: endDate.value,
+      startTime: startTime,
+      endTime: endTime,
       code: agencyCode.value,
       departmentName: departmentName,
       title: projectName.value,
@@ -348,8 +389,8 @@ const addDoc = async () => {
       sustainabilityPropose: sustainabilityPropose.value,
       activityCharacteristic: activityCharacteristic.value,
       codeOfHonor: codeOfHonor.value,
-      prepareStart: prepareStart.value,
-      prepareEnd: prepareEnd.value,
+      prepareStart: prepareStart1,
+      prepareEnd: prepareEnd1,
       prepareFile: prepareFile.value,
       evaluationFile: evaluationFile.value,
       budgetDetails: budgetDetails.value,
@@ -366,7 +407,7 @@ const addDoc = async () => {
       staffIDProgress2: president.value,
       staffIDProgress3: departmentPresident.value,
     }
-    // console.log("Data to send:", dataToSend);
+    console.log("Data to send:", dataToSend);
     const res = await addActivityDocument(dataToSend);
     // console.log("API response:", res[1]);
 

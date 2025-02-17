@@ -22,12 +22,21 @@ const pendingBlobUrl = ref(null); // เก็บ blob URL ไว้เปิด
 
 const formatDateTime = (isoString) => {
   const date = new Date(isoString);
-  const options = { day: '2-digit', month: 'long', year: 'numeric' };
-  const formattedDate = date.toLocaleDateString('en-GB', options);
-  const formattedTime = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }).replace(':', '.');
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const localOffset = date.getTimezoneOffset() * 60000;
+  const localDate = new Date(date.getTime() - localOffset); 
+
+  const options = { day: '2-digit', month: 'long', year: 'numeric', timeZone };
+
+  const formattedDate = localDate.toLocaleDateString('en-GB', options);
+
+  const formattedTime = localDate
+    .toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone })
+    .replace(':', '.');
 
   return `${formattedDate} ${formattedTime}`;
 };
+
 
 const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -182,8 +191,8 @@ onMounted(async () => {
       if (activityData.value) {
           documentId.value = activityData.value.DocumentID;
           progressID.value = activityData.value.progressID;
-          activityData.value.startTime = activityData.value.startTime ? formatDate(activityData.value.startTime) : "N/A";
-          activityData.value.endTime = activityData.value.endTime ? formatDate(activityData.value.endTime) : "N/A";
+          activityData.value.startTime = activityData.value.startTime ? formatDateTime(activityData.value.startTime) : "N/A";
+          activityData.value.endTime = activityData.value.endTime ? formatDateTime(activityData.value.endTime) : "N/A";
           activityData.value.prepareStart = activityData.value.prepareStart ? formatDate(activityData.value.prepareStart) : "N/A";
           activityData.value.prepareEnd = activityData.value.prepareEnd ? formatDate(activityData.value.prepareEnd) : "N/A";
           activityData.value.createDate = activityData.value.createDate ? formatDateTime(activityData.value.createDate) : "N/A";
