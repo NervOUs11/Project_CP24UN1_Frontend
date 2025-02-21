@@ -21,6 +21,7 @@ const login = async (username, password) => {
       localStorage.setItem("alterEmail", data.alterEmail);
       localStorage.setItem("faculty", data.faculty);
       localStorage.setItem("department", data.department);
+      localStorage.setItem("email", data.email);
 
       // เงื่อนไขแยกสำหรับ Student และ Staff
       if (data.studentID !== undefined) {
@@ -33,6 +34,8 @@ const login = async (username, password) => {
         localStorage.setItem("signature", data.signature);
         localStorage.setItem("advisor", data.advisor);
         localStorage.setItem("year", data.year);
+        localStorage.setItem("clubID", data.clubID);
+        localStorage.setItem("club", data.club);
       } else if (data.studentID === undefined) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("staffID", data.staffID);

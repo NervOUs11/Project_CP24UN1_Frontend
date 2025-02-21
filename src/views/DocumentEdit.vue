@@ -17,6 +17,14 @@ const updateRemainingCharacters = () => {
 const attachmentFile1 = ref('');
 const attachmentFile2 = ref('');
 
+const today = ref(new Date().toISOString().split("T")[0]);
+const getNextDay = (date) => {
+  if (!date) return today.value; // ถ้ายังไม่มี starttime ให้ใช้ today
+  const nextDay = new Date(date);
+  nextDay.setDate(nextDay.getDate() + 1);
+  return nextDay.toISOString().split("T")[0];
+};
+
 // ตัวแปรการเลือกประเภทการลาและช่วงเวลา
 const leaveType = ref('');
 const oneDayDate = ref('');
@@ -259,6 +267,11 @@ const handleEditDocument = async () => {
       throw new Error("กรุณาเลือกประเภทการลา");
     }
 
+    if(detail.value.trim().length === 0){
+      alert('กรุณากรอกเหตุผลและรายละเอียดการลา')
+      throw new Error("กรุณากรอกเหตุผลและรายละเอียดการลา");
+    }
+
     // อัปเดตข้อมูล
     const dataToUpdate = {
       type: type.value,
@@ -344,7 +357,7 @@ const handleEditDocument = async () => {
         <!-- ฟอร์มการกรอกข้อมูลการลา -->
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div class="mb-3">
-            <label for="type" class="block text-gray-700 mb-1">เรื่อง</label>
+            <label for="type" class="block text-gray-700 mb-1">เรื่อง<span class="text-red-500 ml-1">*</span></label>
             <select 
               id="type" 
               v-model="type"
@@ -362,7 +375,7 @@ const handleEditDocument = async () => {
           </div>
 
           <div class="mb-3">
-            <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา</label>
+            <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา<span class="text-red-500 ml-1">*</span></label>
             <select 
               id="leaveType" 
               v-model="leaveType"
@@ -378,18 +391,19 @@ const handleEditDocument = async () => {
           <!-- ถ้าเลือกลา 1 วัน -->
           <div v-if="leaveType === 'oneDay'">
             <div class="mb-3">
-              <label for="oneDayDate" class="block text-gray-700 mb-1">เลือกวันที่</label>
+              <label for="oneDayDate" class="block text-gray-700 mb-1">เลือกวันที่<span class="text-red-500 ml-1">*</span></label>
               <input 
                 type="date" 
                 id="oneDayDate" 
                 v-model="oneDayDate"
                 class="form-input"
+                :min="today"
                 required
               />
             </div>
 
             <div class="mb-3">
-              <label for="oneDaySession" class="block text-gray-700 mb-1">ช่วงเวลา</label>
+              <label for="oneDaySession" class="block text-gray-700 mb-1">ช่วงเวลา<span class="text-red-500 ml-1">*</span></label>
               
               <div class="flex items-center space-x-4">
                 <label class="flex items-center">
@@ -416,31 +430,33 @@ const handleEditDocument = async () => {
           <div v-if="leaveType === 'multipleDays'" class="grid grid-cols-2 gap-4 mb-4">
             <!-- วันที่เริ่มต้น -->
             <div class="mb-3">
-              <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่</label>
+              <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่<span class="text-red-500 ml-1">*</span></label>
               <input 
                 type="date" 
                 id="starttime" 
                 v-model="starttime"
                 class="form-input"
+                :min="today"
                 required
               />
             </div>
 
             <!-- วันที่สิ้นสุด -->
             <div class="mb-3">
-              <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่</label>
+              <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่<span class="text-red-500 ml-1">*</span></label>
               <input 
                 type="date" 
                 id="endtime" 
                 v-model="endtime"
                 class="form-input"
+                :min="getNextDay(starttime)"
                 required
               />
             </div>
           </div>
 
           <div class="mb-3 col-span-2">
-            <label for="detail" class="block text-gray-700 mb-1">โดยมีเหตุผลและรายละเอียด</label>
+            <label for="detail" class="block text-gray-700 mb-1">โดยมีเหตุผลและรายละเอียด<span class="text-red-500 ml-1">*</span></label>
             <textarea 
               id="detail" 
               v-model="detail"

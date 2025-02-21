@@ -275,7 +275,7 @@ onMounted(async () => {
         <span class="font-bold">KMUTT Student QF:</span>
         <ul class="list-disc pl-6 text-gray-700">
           <li v-for="(studentQF, index) in activityData.studentQF" :key="index">
-            {{ studentQF.join(', ') }} 
+            {{ studentQF.join(', ') }}
           </li>
         </ul>
       </div>

@@ -7,7 +7,6 @@ import { approveDocument } from '../functions/approve.js';
 import { rejectDocument } from '../functions/reject.js';
 import { deleteDocument } from '../functions/deleteDocument.js'
 
-const data = ref(null);
 const router = useRouter();
 
 // ดึง role และข้อมูล Document
@@ -17,6 +16,9 @@ const role = localStorage.getItem('role');
 // สร้างตัวแปร ref สำหรับเก็บ documentID และ progressID
 const documentID = ref(null);
 const progressID = ref(null);
+
+const data = ref([]);
+const rawData = ref(null)
 
 const comment = ref('');
 const showCommentPopup = ref(false);
@@ -176,6 +178,14 @@ const openFileInNewTab = (base64String, mimeType) => {
   }, 1000);
 };
 
+const allApproved = () =>{
+  const allProgress = data.value?.allProgress;
+  if (Array.isArray(allProgress)) {
+    return allProgress.every(progress => progress.status === "Approve");
+  }
+  return false;
+}
+
 onMounted(async () => {
   let userid = null
   const role = localStorage.getItem("role")
@@ -185,6 +195,7 @@ onMounted(async () => {
   else if (role === "Student"){
     userid = localStorage.getItem("studentID")
   }
+
   const rawData = await fetchDocumentDetail(userid, role);
   if (rawData) {
     data.value = {
@@ -196,7 +207,7 @@ onMounted(async () => {
       file1: `data:image/jpeg;base64,${rawData.file1}`,
     };
   }
-  console.log(rawData)
+  console.log(data.value)
   documentID.value = rawData.DocumentID;
   progressID.value = rawData.progressID;
 });
@@ -230,16 +241,16 @@ onMounted(async () => {
           </div>
 
           <div>
-            <span class="font-bold">วันที่เริ่มลา:</span> {{ data.startTime.date }} เวลา {{ data.startTime.time }}
+            <span class="font-bold">วันที่เริ่มลา:</span> {{ data.startTime?.date }} เวลา {{ data.startTime?.time }}
           </div>
           <div>
-            <span class="font-bold">ลาถึงวันที่:</span> {{ data.endTime.date }} เวลา {{ data.endTime.time }}
+            <span class="font-bold">ลาถึงวันที่:</span> {{ data.endTime?.date }} เวลา {{ data.endTime?.time }}
           </div>
           <div>
-            <span class="font-bold">วันที่สร้างแบบฟอร์ม:</span> {{ data.createDate.date }} เวลา {{ data.createDate.time }}
+            <span class="font-bold">วันที่สร้างแบบฟอร์ม:</span> {{ data.createDate?.date }} เวลา {{ data.createDate?.time }}
           </div>
           <div>
-            <span class="font-bold">วันที่แก้ไขแบบฟอร์ม:</span> {{ data.editDate.date }} เวลา {{ data.editDate.time }}
+            <span class="font-bold">วันที่แก้ไขแบบฟอร์ม:</span> {{ data.editDate?.date }} เวลา {{ data.editDate?.time }}
           </div>
 
         </div>
@@ -290,8 +301,8 @@ onMounted(async () => {
           </button>
         </template>
         
-        <!-- ถ้าเป็น student จะมีปุ่ม edit และ delete -->
-        <template v-else>
+        <!-- ถ้าเป็น student และ allProgress เป็น Approve ทั้งหมด ให้ซ่อนปุ่ม Edit และ Delete -->
+        <template v-else-if="!allApproved()">
           <button class="button bg-blue-500 text-white mx-2" @click="handleEdit">
             Edit
           </button>

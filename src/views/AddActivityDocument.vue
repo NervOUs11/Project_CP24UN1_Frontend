@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue';
+import { ref, reactive, computed, onMounted, watchEffect } from 'vue';
 import { addActivityDocument } from '../functions/addActivityDocument'
 import { fetchAllStaff } from '../functions/fetchAllStaff';
 import { fetchAllStudent } from '../functions/fetchAllStudent';
@@ -10,6 +10,8 @@ import { fetchAllParticipant } from '../functions/fetchAllParticipant';
 import { fetchAllActivity } from '../functions/fetchAllActivity';
 import { fetchAllEntrepreneurial } from '../functions/fetchAllEntrepreneurial';
 import { fetchAllSustainability } from '../functions/fetchAllSustainability';
+import { fetchAllFaculty } from '../functions/fetchAllFaculty';
+
 import { useRouter } from "vue-router";
 const router = useRouter()
 
@@ -53,12 +55,23 @@ const isHourCount = ref(false);
 const entrepreneurialData = ref([]);
 const sustainabilityData = ref([]);
 
-// กำหนดค่าตั้งต้นเป็นวันที่ปัจจุบันเมื่อโหลด
+const facultyData = ref([]);
+
+const filteredAgencies = computed(() => {
+  const facultyFromAPI = facultyData.value
+    .filter(fac => fac.facultyID === 6 || fac.facultyID === 5) // เลือกเฉพาะที่ facultyID = 6 หรือ 5
+    .map(fac => fac.facultyName); // เอาเฉพาะ facultyName
+  const facultyFromLocal = localStorage.getItem("faculty") || "";
+  const clubFromLocal = localStorage.getItem("club") || "";
+
+  return [...facultyFromAPI, facultyFromLocal, clubFromLocal].filter(Boolean);
+});
+
+
 onMounted(async() => {
   writtenDate.value = new Date().toISOString().split('T')[0];
   try {
     studentQFList.value = await fetchAllStudentQF();
-    // console.log("StudentQF:", studentQFList.value);
     rawStaffData.value = await fetchAllStaff();
     advisorList.value = rawStaffData.value.map((staff) => ({
       staffId: staff[0],
@@ -83,34 +96,22 @@ onMounted(async() => {
       phone,
       position: "",
     }));
-    // console.log(students.value)
-
     goalData.value = await fetchAllGoal();
-    // console.log(goalData.value)
-
     evaluationData.value = await fetchAllEvaluation();
-    // console.log(evaluationData.value)
-
     participantData.value = await fetchAllParticipant();
-    // console.log(participantData.value)
-
     activityData.value = await fetchAllActivity();
-    // console.log(activityData.value)
     activityData.value.forEach(activity => { 
       hoursCount.value[activity.activityID] = 0;  
     });
-
     entrepreneurialData.value = await fetchAllEntrepreneurial();
-    // console.log(entrepreneurialData.value)
-
     sustainabilityData.value = await fetchAllSustainability();
-    // console.log(sustainabilityData.value)
+    facultyData.value = await fetchAllFaculty();
+
 
   } catch (error) {
     console.error('Error fetching staff:', error);
   }
 });
-
 
 const handleActivityHoursChange = () => {
   // console.log(isHourCount.value); // จะได้เป็น "true" หรือ "false"
@@ -166,16 +167,6 @@ const expensesThaiText = computed(() => {
 
 // ทักษะที่เลือก
 const selectedSkills = ref([]);
-
-// เปอร์เซ็นต์สำหรับแต่ละทักษะ
-const percentages = reactive({});
-
-const isPercentageValid = computed(() => {
-  const total = selectedSkills.reduce((sum, skill) => {
-    return sum + (percentages[skill] ? parseFloat(percentages[skill]) : 0);
-  }, 0);
-  return total === 100;
-});
 
 // รายการที่ผู้ใช้เลือก
 const selectedEntrepreneurialOptions = ref([]);
@@ -347,10 +338,41 @@ function convertToISOWithTimezone(dateString, time = "00:00:00") {
   }
 }
 
+const percentages = ref({}); // เก็บเปอร์เซ็นต์ของแต่ละทักษะ
+
+// ฟังก์ชันเพื่อดึงชื่อทักษะจาก ID
+const getSkillName = (id) => {
+  const skill = studentQFList.value.find((s) => s.studentQF_ID === id);
+  return skill ? skill.studentQF_Name : '';
+};
+
+// คำนวณว่าเปอร์เซ็นต์รวมกันได้ 100% หรือไม่
+const isPercentageValid = computed(() => {
+  const total = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
+  return total === 100;
+});
+
+// เมื่อเลือกทักษะ จะรีเซ็ตเปอร์เซ็นต์ที่เกี่ยวข้อง
+const handleSkillSelection = () => {
+  Object.keys(percentages.value).forEach((key) => {
+    if (!selectedSkills.value.includes(Number(key))) {
+      delete percentages.value[key];
+    }
+  });
+};
+
+// ตรวจสอบและปรับค่าของเปอร์เซ็นต์
+const validatePercentage = () => {
+  let total = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
+  if (total > 100) {
+    alert('เปอร์เซ็นต์รวมกันต้องไม่เกิน 100%');
+  }
+};
+
+
 const addDoc = async () => {
   try {
     const studentID = parseInt(localStorage.getItem("studentID"))
-    const departmentName = localStorage.getItem("department")
 
     sustainability.value = sustainabilityData.value
       .filter(item => selectedSustainabilityOptions.value.includes(item.sustainabilityID))
@@ -379,7 +401,7 @@ const addDoc = async () => {
       startTime: startTime,
       endTime: endTime,
       code: agencyCode.value,
-      departmentName: departmentName,
+      departmentName: agencyName.value,
       title: projectName.value,
       location: location.value,
       propose: purpose.value,
@@ -398,7 +420,8 @@ const addDoc = async () => {
       participant: participant.value,
       activity: activity.value,
       problem: pastEvaluations.map(item => [item.problem, item.solution]),
-      studentQF: studentQF.value,
+      // studentQF: studentQF.value,
+      studentQF: selectedSkills.value.map((id) => [id, percentages.value[id] || 0]),
       entrepreneurial: selectedEntrepreneurialOptions.value,
       evaluation: selectedEvaluation.value.map(id => [id, null]),
       result: expectedResults.map(item => [item.kpi, item.result, item.target]),
@@ -463,13 +486,11 @@ const addDoc = async () => {
           <!-- ชื่อหน่วยงาน -->
           <div class="mb-3">
             <label for="agencyName" class="block text-gray-700 mb-1">ชื่อหน่วยงาน</label>
-            <input 
-              type="text" 
-              id="agencyName" 
-              v-model="agencyName" 
-              class="form-input" 
-              required
-            />
+            <select id="agencyName" v-model="agencyName" class="form-input" required>
+              <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
+                {{ agency }}
+              </option>
+            </select>
           </div>
 
           <!-- ชื่อโครงการ -->
@@ -685,7 +706,7 @@ const addDoc = async () => {
         </div>
 
         <!-- เลือกทักษะ StudentQF (checkbox) -->
-        <div>
+        <!-- <div>
           <h1>KMUTT Student QF</h1>
           <label class="block mb-2">เลือกทักษะ (สูงสุด 3 ทักษะ):</label>
           <div v-for="skill in studentQFList" :key="skill.studentQF_ID" class="mb-2">
@@ -695,35 +716,82 @@ const addDoc = async () => {
               :value="skill.studentQF_ID" 
               v-model="studentQF"
               :disabled="studentQF.length >= 3 && !studentQF.includes(skill.studentQF_ID)"
+              @change="handleSkillSelection"
             />
             <label :for="'skill-' + skill.studentQF_ID">{{ skill.studentQF_Name }}</label>
           </div>
           <p v-if="studentQF.length >= 3" class="text-red-500 mt-2">
             คุณเลือกทักษะครบแล้ว (สูงสุด 3 ทักษะ)
           </p>
-        </div>
+        </div> -->
 
 
-        <!-- แสดงทักษะที่เลือก -->
-        <div v-if="selectedSkills.length > 0" class="mt-4">
+        <!-- แสดงทักษะที่เลือก และกำหนดเปอร์เซ็นต์ -->
+        <!-- <div v-if="selectedSkills.length > 0" class="mt-4">
           <h3>ทักษะที่เลือกและกำหนดเปอร์เซ็นต์:</h3>
           <ul class="inline-list">
             <li 
-              v-for="(skill, index) in selectedSkills" 
-              :key="skill" 
+              v-for="(skillID, index) in selectedSkills" 
+              :key="skillID" 
               class="flex items-center mb-2"
             >
-              <!-- แสดงชื่อทักษะ -->
-              <span>{{ skill }}<span v-if="index < selectedSkills.length - 1">,</span></span>
-
-              <!-- ช่องกรอกเปอร์เซ็นต์ -->
+              <span>{{ getSkillName(skillID) }}</span>
               <input 
                 type="number" 
-                v-model="percentages[skill]" 
+                v-model.number="percentages[skillID]" 
                 min="0" 
                 max="100" 
                 class="form-input ml-2 w-20"
                 placeholder="%"
+                @input="validatePercentage"
+              />
+            </li>
+          </ul>
+        </div> -->
+        
+        <!-- ข้อความเตือนถ้าเปอร์เซ็นต์รวมไม่เท่ากับ 100% -->
+        <!-- <p v-if="!isPercentageValid" class="text-red-500 mt-2"></p> -->
+
+        <!-- เลือกทักษะ StudentQF (checkbox) -->
+        <div>
+          <h1>KMUTT Student QF</h1>
+          <label class="block mb-2">เลือกทักษะ (สูงสุด 3 ทักษะ):</label>
+          <div v-for="skill in studentQFList" :key="skill.studentQF_ID" class="mb-2">
+            <input 
+              type="checkbox" 
+              :id="'skill-' + skill.studentQF_ID"
+              :value="skill.studentQF_ID" 
+              v-model="selectedSkills"
+              :disabled="selectedSkills.length >= 3 && !selectedSkills.includes(skill.studentQF_ID)"
+            />
+            <label :for="'skill-' + skill.studentQF_ID">{{ skill.studentQF_Name }}</label>
+          </div>
+          <p v-if="selectedSkills.length >= 3" class="text-red-500 mt-2">
+            คุณเลือกทักษะครบแล้ว (สูงสุด 3 ทักษะ)
+          </p>
+        </div>
+
+        <!-- แสดงทักษะที่เลือก และกำหนดเปอร์เซ็นต์ -->
+        <div v-if="selectedSkills.length > 0" class="mt-4">
+          <h3>ทักษะที่เลือกและกำหนดเปอร์เซ็นต์:</h3>
+          <ul class="inline-list">
+            <li 
+              v-for="(skillID, index) in selectedSkills" 
+              :key="skillID" 
+              class="flex items-center mb-2"
+            >
+              <!-- แสดงชื่อทักษะ -->
+              <span class="mr-2">{{ getSkillName(skillID) }}</span>
+
+              <!-- ช่องกรอกเปอร์เซ็นต์ -->
+              <input 
+                type="number" 
+                v-model.number="percentages[skillID]" 
+                min="0" 
+                max="100" 
+                class="form-input ml-2 w-20 border p-1 rounded"
+                placeholder="%"
+                @input="validatePercentage"
               />
             </li>
           </ul>
@@ -733,6 +801,7 @@ const addDoc = async () => {
             เปอร์เซ็นต์ทั้งหมดต้องรวมกันเป็น 100%
           </p>
         </div>
+
 
 
         <!-- Entrepreneurial -->
@@ -1160,4 +1229,4 @@ const addDoc = async () => {
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-</style>
+</style>../functions/fetchAllEntrepreneurial.js../functions/fetchAllSustainability.js
