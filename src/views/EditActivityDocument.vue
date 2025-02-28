@@ -1,6 +1,6 @@
 <script setup>
-import { ref, reactive, computed, onMounted, watchEffect } from 'vue';
-import { addActivityDocument } from '../functions/addActivityDocument'
+import { ref, reactive, computed, onMounted, toRaw, watchEffect } from 'vue';
+import { editActivityDocument } from '../functions/editActivityDocument'
 import { fetchAllStaff } from '../functions/fetchAllStaff';
 import { fetchAllStudent } from '../functions/fetchAllStudent';
 import { fetchAllGoal } from '../functions/fetchAllGoal';
@@ -11,10 +11,15 @@ import { fetchAllActivity } from '../functions/fetchAllActivity';
 import { fetchAllEntrepreneurial } from '../functions/fetchAllEntrepreneurial';
 import { fetchAllSustainability } from '../functions/fetchAllSustainability';
 import { fetchAllFaculty } from '../functions/fetchAllFaculty';
+import { fetchActivityDocument } from '../functions/fetchActivityDocument.js';
 
 import { useRouter } from "vue-router";
-const router = useRouter()
+const router = useRouter();
+import { useRoute } from "vue-router";
+const route = useRoute();
 
+const documentId = ref("")
+const docId = route.params.id;
 const writtenDate = ref('');
 const agencyName = ref('');
 const reason = computed(() => agencyName.value);
@@ -40,14 +45,12 @@ const evaluationData = ref([]);
 const selectedEvaluation = ref([]);
 
 const participantData = ref([]);
-// const participant = ref([]);
 const participant = computed(() => {
   return participantData.value
     .filter(item => item.count > 0)
     .map(item => [item.participantID, item.count]);
 });
 
-// กำหนดตัวแปรเพื่อเก็บข้อมูลกิจกรรมที่ดึงจาก backend
 const activityData = ref([]);
 const hoursCount = ref({});
 const isHourCount = ref(false);
@@ -59,63 +62,254 @@ const facultyData = ref([]);
 
 const filteredAgencies = computed(() => {
   const facultyFromAPI = facultyData.value
-    .filter(fac => fac.facultyID === 6 || fac.facultyID === 5) // เลือกเฉพาะที่ facultyID = 6 หรือ 5
-    .map(fac => fac.facultyName); // เอาเฉพาะ facultyName
+    .filter(fac => fac.facultyID === 6 || fac.facultyID === 5)
+    .map(fac => fac.facultyName);
   const facultyFromLocal = localStorage.getItem("faculty") || "";
   const clubFromLocal = localStorage.getItem("club") || "";
 
   return [...facultyFromAPI, facultyFromLocal, clubFromLocal].filter(Boolean);
 });
 
+const formatDate = (datetime) => {
+  return datetime ? new Date(datetime).toISOString().split("T")[0] : "";
+};
+
+const isBase64 = (str) => {
+  return /^[A-Za-z0-9+/=]+$/.test(str);
+};
+
+const openFileInNewTab = async (base64String, mimeType) => {
+  // ตรวจสอบว่า base64String เป็น Promise หรือไม่
+  if (base64String instanceof Promise) {
+    base64String = await base64String;  // รอให้ Promise เสร็จ
+  }
+  console.log(base64String);  // ตรวจสอบค่าหลังจาก await
+
+  if (!base64String) {
+    return;
+  }
+
+  let base64Data = base64String;
+  if (base64String.startsWith('data:')) {
+    base64Data = base64String.split(',')[1];
+  }
+
+  if (!isBase64(base64Data)) {
+    return;
+  }
+
+  try {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteNumbers], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (error) {
+    console.error('Error decoding Base64:', error);
+  }
+};
 
 onMounted(async() => {
-  writtenDate.value = new Date().toISOString().split('T')[0];
-  try {
-    studentQFList.value = await fetchAllStudentQF();
-    rawStaffData.value = await fetchAllStaff();
-    advisorList.value = rawStaffData.value.map((staff) => ({
-      staffId: staff[0],
-      fullName: `${staff[2]} ${staff[3]}`,
-    }));
-    presidentList.value = rawStaffData.value.map((staff) => ({
-      staffId: staff[0],
-      fullName: `${staff[2]} ${staff[3]}`,
-    }));
-    departmentPresidentList.value = rawStaffData.value
-      .filter((staff) => staff[10].includes('ประธานฝ่าย'))
-      .map((staff) => ({
+    let userid = null
+    const role = localStorage.getItem("role")
+    if(role != "Student"){
+        userid = localStorage.getItem("staffID")
+    } 
+    else if (role === "Student"){
+        userid = localStorage.getItem("studentID")
+    }
+
+    try{
+        studentQFList.value = await fetchAllStudentQF();
+        rawStaffData.value = await fetchAllStaff();
+        advisorList.value = rawStaffData.value.map((staff) => ({
         staffId: staff[0],
         fullName: `${staff[2]} ${staff[3]}`,
-    }));
+        }));
+        presidentList.value = rawStaffData.value.map((staff) => ({
+        staffId: staff[0],
+        fullName: `${staff[2]} ${staff[3]}`,
+        }));
+        departmentPresidentList.value = rawStaffData.value
+        .filter((staff) => staff[10].includes('ประธานฝ่าย'))
+        .map((staff) => ({
+            staffId: staff[0],
+            fullName: `${staff[2]} ${staff[3]}`,
+        }));
 
-    const studentData = await fetchAllStudent();
-    students.value = studentData.map(([id, name, department, year, phone]) => ({
-      id,
-      name,
-      department: `${department} ปี${year}`,
-      phone,
-      position: "",
-    }));
-    goalData.value = await fetchAllGoal();
-    evaluationData.value = await fetchAllEvaluation();
-    participantData.value = await fetchAllParticipant();
-    activityData.value = await fetchAllActivity();
-    activityData.value.forEach(activity => { 
-      hoursCount.value[activity.activityID] = 0;  
-    });
-    entrepreneurialData.value = await fetchAllEntrepreneurial();
-    sustainabilityData.value = await fetchAllSustainability();
-    facultyData.value = await fetchAllFaculty();
+        const studentData = await fetchAllStudent();
+        students.value = studentData.map(([id, name, department, year, phone]) => ({
+        id,
+        name,
+        department: `${department} ปี${year}`,
+        phone,
+        position: "",
+        }));
+        goalData.value = await fetchAllGoal();
+        evaluationData.value = await fetchAllEvaluation();
+
+        // participantData.value = await fetchAllParticipant();
+        const allParticipants = await fetchAllParticipant();
+        
+
+        activity.value = await fetchAllActivity();
+        // activityData.value.forEach(activity => { 
+        //   hoursCount.value[activity.activityID] = 0;  
+        // });
+
+        entrepreneurialData.value = await fetchAllEntrepreneurial();
+        sustainabilityData.value = await fetchAllSustainability();
+        facultyData.value = await fetchAllFaculty();
+        activityData.value = await fetchActivityDocument(docId, userid, role)
+        // console.log(activityData.value)
+        if (activityData.value) {
+            documentId.value = activityData.value.DocumentID;
+            agencyCode.value = activityData.value.code;
+            writtenDate.value = formatDate(activityData.value.createDate);
+            agencyName.value = activityData.value.departmentName;
+            projectName.value = activityData.value.title;
+            startDate.value = formatDate(activityData.value.startTime)
+            endDate.value = formatDate(activityData.value.endTime)
+            location.value = activityData.value.location;
+            type.value = activityData.value.type;
+            purpose.value = activityData.value.propose;
+            expenses.value = activityData.value.payment;
+            advisor.value = activityData.value.allProgress[0].staffID;
+            president.value = activityData.value.allProgress[1].staffID;
+            departmentPresident.value = activityData.value.allProgress[2].staffID;
+
+            // file base64
+            scheduleDetails.value = activityData.value.scheduleDetails;
+            budgetDetails.value = activityData.value.budgetDetails;
+            evaluationFile.value = activityData.value.evaluationFile;
+            prepareFile.value = activityData.value.prepareFile;
+
+            // activity ที่นับชั่วโมงกิจกรรม
+            if(activityData.value.activity.length > 0){
+              isHourCount.value = true;
+              hoursCount.value = activityData.value.activity.reduce((acc, activity) => {
+                acc[activity.activityName] = activity.countHour;
+                hoursCount.value = acc
+                return acc;
+              }, {});
+            }
+
+            // ผู้เข้าร่วมโครงการ
+            const activityParticipants = activityData.value.participant;
+            participantData.value = allParticipants.map((participant) => {
+            const matchedParticipant = activityParticipants.find(
+              (p) => p.participantName === participant.participantName
+            );
+              return {
+                ...participant,
+                count: matchedParticipant ? matchedParticipant.count : 0,
+              };
+            });
 
 
-  } catch (error) {
-    console.error('Error fetching staff:', error);
-  }
+            sustainabilityDetail.value = activityData.value.sustainabilityDetail;
+
+            // วัตถุประสงค์
+            const sustainabilityPropose = activityData.value.sustainabilityPropose;
+            const objectiveArray = sustainabilityPropose.split(/\d+/).filter(Boolean);
+            objectives.value = objectiveArray;
+
+            // problem ผลการดำเนินงานที่ผ่านมา
+            if (!pastEvaluations.value) {pastEvaluations.value = [];}
+            const problemData = activityData.value.problem;
+            if (problemData && problemData.length > 0) {
+              problemData.forEach((item, index) => {
+                pastEvaluations[index].problem = item.problemDetail;
+                pastEvaluations[index].solution = item.solution;
+              });
+            }
+
+            // ผลที่คาดว่าจะได้รับ, kpi, ค่าเป้าหมาย
+            expectedResults.splice(0, expectedResults.length, ...activityData.value.result.map(item => ({
+              result: item.detail,
+              kpi: item.kpi,
+              target: item.target
+            })));
+
+            // รูปแบบการประเมินผล
+            selectedEvaluation.value = evaluationData.value
+            .filter(opt => activityData.value.evaluation.some(e => e.evaluation === opt.evaluationName)) // เทียบชื่อ
+            .map(opt => opt.evaluationID);
+
+            // Entrepreneurial
+            selectedEntrepreneurialOptions.value = entrepreneurialData.value
+            .filter(opt => activityData.value.entrepreneurial[0].includes(opt.entrepreneurialName)) // เทียบชื่อ
+            .map(opt => opt.entrepreneurialID);
+
+            // StudentQF
+            if (activityData.value.studentQF) {
+              selectedSkills.value = studentQFList.value
+                .filter(opt => activityData.value.studentQF.some(sqf => sqf.name === opt.studentQF_Name)) // เทียบชื่อ
+                .map(opt => opt.studentQF_ID);
+
+              activityData.value.studentQF.forEach(sqf => {
+                const skill = studentQFList.value.find(opt => opt.studentQF_Name === sqf.name);
+                if (skill) {
+                  percentages.value[skill.studentQF_ID] = sqf.percentage;
+                }
+              });
+            }
+
+            // Committee
+            if (activityData.value.committee) {
+              committee.value = activityData.value.committee.map(actMember => {
+                const fullData = students.value.find(c => c.name === actMember.name);
+                return {
+                  id: fullData?.id || "-",  // ถ้าไม่มีให้ใส่ "-"
+                  name: actMember.name,
+                  department: fullData?.department || "-",
+                  phone: fullData?.phone || "-",
+                  position: actMember.position || "", // ใช้ตำแหน่งที่เลือกไว้
+                };
+              });
+            }
+
+            // Sustainability
+            if (activityData.value.sustainability) {
+              selectedSustainabilityOptions.value = sustainabilityData.value
+                .filter(opt => activityData.value.sustainability.some(act => act.sustainability === opt.sustainabilityName)) // เทียบชื่อ
+                .map(opt => opt.sustainabilityID);
+
+              activityData.value.sustainability.forEach(act => {
+                if (act.sustainability === "SDGs Culture" && act.goal) {
+                  const goal = goalData.value.find(g => g.goalName === act.goal);
+                  if (goal) {
+                    selectedGoals.value.push(goal.goalID);
+                  }
+                }
+              });
+            }
+
+            prepareStart.value = formatDate(activityData.value.prepareStart)
+            prepareEnd.value = formatDate(activityData.value.prepareEnd)
+            activityCharacteristic.value = activityData.value.activityCharacteristic
+            codeOfHonor.value = activityData.value.codeOfHonor;
+        }
+    }
+    catch(error){
+        console.log(error)
+    }
 });
 
 const handleActivityHoursChange = () => {
+  // console.log(isHourCount.value); // จะได้เป็น "true" หรือ "false"
   if (isHourCount.value) {
+    // console.log('เลือกนับชั่วโมง');
   } else {
+    // console.log('เลือกไม่นับชั่วโมง');
   }
 };
 
@@ -161,26 +355,30 @@ const expensesThaiText = computed(() => {
   return convertNumberToThaiText(expenses.value);
 });
 
+
+// ทักษะที่เลือก
 const selectedSkills = ref([]);
+
+// รายการที่ผู้ใช้เลือก
 const selectedEntrepreneurialOptions = ref([]);
 const selectedSustainabilityOptions = ref([]);
 const selectedGoals = ref([]);
 
+// เพิ่มชื่อเข้าในคณะกรรมการ
 const addCommitteeMember = () => {
+  // ค้นหานักเรียนที่เลือกจาก students
   const studentToAdd = students.value.find(student => student.id === selectedStudent.value);
   if (studentToAdd) {
+    // เพิ่มสมาชิกเข้าในคณะกรรมการ
     committee.value.push({ id: studentToAdd.id, name: studentToAdd.name, department: studentToAdd.department, phone: studentToAdd.phone, position: '' });
-    selectedStudent.value = '';
+    selectedStudent.value = ''; // รีเซ็ตค่า dropdown
   }
 };
 
+// ลบสมาชิกจากคณะกรรมการ
 const removeCommitteeMember = (index) => {
-  committee.value.splice(index, 1);
+  committee.value.splice(index, 1); // ลบสมาชิกจากคณะกรรมการ
 };
-
-const otherDescription = ref('');
-
-const uploadedFiles = reactive({});
 
 const handleFileChange = async (e, fileType) => {
   const file = e.target.files[0];
@@ -208,7 +406,7 @@ const handleFileChange = async (e, fileType) => {
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onload = () => resolve(reader.result.split(',')[1]);  // เก็บเฉพาะ base64 string
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
@@ -226,8 +424,6 @@ const pastEvaluations = reactive([
   { problem: '', solution: '' },
   { problem: '', solution: '' },
 ]);
-
-// const budgetFileName = ref('');
 
 const agencyCode = ref("");
 const type = ref("");
@@ -335,81 +531,76 @@ const validateTarget = (event, index) => {
     }
 };
 
-const addDoc = async () => {
-  try {
-    const studentID = parseInt(localStorage.getItem("studentID"))
+const handleEditDocument = async () => {
+    try {
+        const studentID = localStorage.getItem("studentID");
+        sustainability.value = sustainabilityData.value
+        .filter(item => selectedSustainabilityOptions.value.includes(item.sustainabilityID))
+        .flatMap(item => {
+            if (item.sustainabilityID === 1) {
+            return selectedGoals.value.map(goalID => [item.sustainabilityID, goalID]);
+            } else {
+            return [[item.sustainabilityID, null]];
+            }
+        });
 
-    sustainability.value = sustainabilityData.value
-      .filter(item => selectedSustainabilityOptions.value.includes(item.sustainabilityID))
-      .flatMap(item => {
-        if (item.sustainabilityID === 1) {
-          return selectedGoals.value.map(goalID => [item.sustainabilityID, goalID]);
-        } else {
-          return [[item.sustainabilityID, null]];
+        const formattedActivity = activity.value.map(a => {
+            const hour = hoursCount.value[a.activityName] || 0; // ดึงค่าตามชื่อ activity
+            return hour > 0 ? [a.activityID, hour] : null;
+        }).filter(Boolean);
+
+        sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`).join('');
+        const startTime = convertToISOWithTimezone(startDate.value)
+        const endTime = convertToISOWithTimezone(endDate.value)
+        const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
+        const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
+
+        const dataToSend = {
+          studentID: studentID,
+          type: type.value,
+          startTime: startTime,
+          endTime: endTime,
+          code: agencyCode.value,
+          departmentName: agencyName.value,
+          title: projectName.value,
+          location: location.value,
+          propose: purpose.value,
+          payment: expenses.value.toString(),
+          staffID: advisor.value,
+          sustainabilityDetail: sustainabilityDetail.value,
+          sustainabilityPropose: sustainabilityPropose.value,
+          activityCharacteristic: activityCharacteristic.value,
+          codeOfHonor: codeOfHonor.value,
+          prepareStart: prepareStart1,
+          prepareEnd: prepareEnd1,
+          prepareFile: prepareFile.value,
+          evaluationFile: evaluationFile.value,
+          budgetDetails: budgetDetails.value,
+          scheduleDetails: scheduleDetails.value,
+          participant: participant.value,
+          activity: formattedActivity,
+          problem: pastEvaluations.map(item => [item.problem, item.solution]),
+          studentQF: selectedSkills.value.map((id) => [id, percentages.value[id] || 0]),
+          entrepreneurial: selectedEntrepreneurialOptions.value,
+          evaluation: selectedEvaluation.value.map(id => [id, null]),
+          result: expectedResults.map(item => [item.kpi, item.result, String(item.target)]),
+          sustainability: sustainability.value,
+          committee: committee.value.map(member => [member.id, member.position]),
+          staffIDProgress2: president.value,
+          staffIDProgress3: departmentPresident.value,
         }
-      });
-
-    activity.value = activityData.value.map(activity => {
-        const hour = hoursCount.value[activity.activityID] || 0;
-        return hour > 0 ? [activity.activityID, hour] : null;
-      }).filter(Boolean);
-
-    sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`).join('');
-    const startTime = convertToISOWithTimezone(startDate.value)
-    const endTime = convertToISOWithTimezone(endDate.value)
-    const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
-    const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
-
-    const dataToSend = {
-      studentID: studentID,
-      type: type.value,
-      startTime: startTime,
-      endTime: endTime,
-      code: agencyCode.value,
-      departmentName: agencyName.value,
-      title: projectName.value,
-      location: location.value,
-      propose: purpose.value,
-      payment: expenses.value,
-      staffID: advisor.value,
-      sustainabilityDetail: sustainabilityDetail.value,
-      sustainabilityPropose: sustainabilityPropose.value,
-      activityCharacteristic: activityCharacteristic.value,
-      codeOfHonor: codeOfHonor.value,
-      prepareStart: prepareStart1,
-      prepareEnd: prepareEnd1,
-      prepareFile: prepareFile.value,
-      evaluationFile: evaluationFile.value,
-      budgetDetails: budgetDetails.value,
-      scheduleDetails: scheduleDetails.value,
-      participant: participant.value,
-      activity: activity.value,
-      problem: pastEvaluations.map(item => [item.problem, item.solution]),
-      studentQF: selectedSkills.value.map((id) => [id, percentages.value[id] || 0]),
-      entrepreneurial: selectedEntrepreneurialOptions.value,
-      evaluation: selectedEvaluation.value.map(id => [id, null]),
-      result: expectedResults.map(item => [item.kpi, item.result, String(item.target)]),
-      sustainability: sustainability.value,
-      committee: committee.value.map(member => [member.id, member.position]),
-      staffIDProgress2: president.value,
-      staffIDProgress3: departmentPresident.value,
+        console.log("Data to send:", dataToSend);
+        const result = await editActivityDocument(studentID, documentId.value.toString(), dataToSend);
+        if (result) {
+            alert("Document updated successfully");
+            router.push("/tracking");
+        }
+    } catch (error) {
+        console.error("Failed to update document:", error);
     }
-    console.log("Data to send:", dataToSend);
-    const res = await addActivityDocument(dataToSend);
-    if (res[1] === 201) {
-      alert("Add New Document Successfully!");
-      try {
-        router.push("/tracking");
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  } catch (error) {
-    console.error("Failed to add activity document:", error.message);
-  }
 };
-
 const today = new Date().toISOString().split('T')[0];
+
 const getNextDay = (date) => {
   if (!date) return today.value; // ถ้ายังไม่มี starttime ให้ใช้ today
   const nextDay = new Date(date);
@@ -425,7 +616,7 @@ const getNextDay = (date) => {
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-2xl font-bold mb-4 text-center text-blue-500">Add Activity Document</h1>
 
-      <form @submit.prevent="addDoc">
+      <form @submit.prevent="handleEditDocument">
         <div class="grid grid-cols-2 gap-4 mb-4">
           <!-- ที่ (รหัสหน่วยงาน) -->
           <div class="mb-3">
@@ -595,14 +786,14 @@ const getNextDay = (date) => {
 
           <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
           <div v-if="isHourCount === true">
-            <div v-for="activity in activityData" :key="activity.activityID" class="mb-3 flex items-center gap-3">
+            <div v-for="activity in activity" :key="activity.activityID" class="mb-3 flex items-center gap-3">
               <label :for="'hours-' + activity.activityID" class="text-gray-700 w-60" style="width: 200%;">
                 {{ activity.activityName }}
               </label>
               <input
                 type="number"
                 :id="'hours-' + activity.activityID"
-                v-model="hoursCount[activity.activityID]"
+                v-model="hoursCount[activity.activityName]"
                 class="form-input w-24"
               />
             </div>
@@ -695,15 +886,11 @@ const getNextDay = (date) => {
           </p>
         </div>
 
-        <!-- แสดงทักษะที่เลือก และกำหนดเปอร์เซ็นต์ -->
+        <!-- แสดงทักษะที่เลือก -->
         <div v-if="selectedSkills.length > 0" class="mt-4">
           <h3>ทักษะที่เลือกและกำหนดเปอร์เซ็นต์:<span class="text-red-500 ml-1">*</span></h3>
           <ul class="inline-list">
-            <li 
-              v-for="(skillID, index) in selectedSkills" 
-              :key="skillID" 
-              class="flex items-center mb-2"
-            >
+            <li v-for="(skillID, index) in selectedSkills" :key="skillID" class="flex items-center mb-2">
               <!-- แสดงชื่อทักษะ -->
               <span class="mr-2">{{ getSkillName(skillID) }}</span>
 
@@ -726,26 +913,24 @@ const getNextDay = (date) => {
           </p>
         </div>
 
-
-
-        <!-- Entrepreneurial -->
+      <!-- Entrepreneurial -->
+      <div>
+        <h1>Entrepreneurial<span class="text-red-500 ml-1">*</span></h1>
         <div>
-          <h1>Entrepreneurial<span class="text-red-500 ml-1">*</span></h1>
-          <div>
-            <label class="block mb-2 text-red">เลือกอย่างน้อย 1 ด้าน</label>
-            <div v-for="option in entrepreneurialData" :key="option.entrepreneurialID" class="mb-2">
-              <input 
-                type="checkbox" 
-                :id="'entrepreneurial-' + option.entrepreneurialID"
-                :value="option.entrepreneurialID"
-                v-model="selectedEntrepreneurialOptions" 
-              />
-              <label :for="'entrepreneurial-' + option.entrepreneurialID">
-                {{ option.entrepreneurialName }}
-              </label>
-            </div>
+          <label class="block mb-2 text-red">เลือกอย่างน้อย 1 ด้าน</label>
+          <div v-for="option in entrepreneurialData" :key="option.entrepreneurialID" class="mb-2">
+            <input 
+              type="checkbox" 
+              :id="'entrepreneurial-' + option.entrepreneurialID"
+              :value="option.entrepreneurialID"
+              v-model="selectedEntrepreneurialOptions" 
+            />
+            <label :for="'entrepreneurial-' + option.entrepreneurialID">
+              {{ option.entrepreneurialName }}
+            </label>
           </div>
         </div>
+      </div>
 
 
       <!-- Sustainability -->
@@ -808,18 +993,27 @@ const getNextDay = (date) => {
 
     <!-- ผู้เข้าร่วมโครงการ -->
     <div class="mb-6">
-      <label class="block text-gray-700 mb-2">ผู้เข้าร่วมโครงการ<span class="text-red-500 ml-1">*</span></label>
+      <label class="block text-gray-700 mb-2">
+        ผู้เข้าร่วมโครงการ<span class="text-red-500 ml-1">*</span>
+      </label>
 
-      <div v-for="participant in participantData" :key="participant.participantID" class="flex items-center mb-2">
+      <div 
+        v-for="(participant, index) in participantData" 
+        :key="participant.participantID || index" 
+        class="flex items-center mb-2"
+      >
         <label class="w-48">{{ participant.participantName }} จำนวน:</label>
         <input 
-          type="number" 
-          v-model="participant.count"
-          class="form-input w-20 mr-2"
+          type="number"
+          v-model.number="participant.count"
+          class="form-input w-20 mr-2 border rounded px-2 py-1"
+          min="0"
         />
         <span>คน</span>
       </div>
     </div>
+
+
     
     <!-- ลักษณะกิจกรรม (activityCharacteristic) -->
     <div class="mb-6">
@@ -870,16 +1064,19 @@ const getNextDay = (date) => {
 
     <!-- ขั้นตอนการดำเนินงาน -->
     <div class="mb-6">
-      <label for="scheduleDetails" class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน<span class="text-red-500 ml-1">*</span></label>
-      <div class="mb-2">
-        <label for="scheduleDetails">อัพโหลดไฟล์ขั้นตอนการดำเนินงาน:</label>
-        <input 
-          id="scheduleDetails" 
-          type="file" 
-          @change="handleFileChange($event, 'scheduleDetails')" 
-          class="form-input mt-2"
-        />
+      <label class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน<span class="text-red-500 ml-1">*</span></label>
+      
+      <div v-if="scheduleDetails" class="mb-2">
+        <a @click="openFileInNewTab(scheduleDetails, 'application/pdf')" target="_blank" class="text-blue-500 underline">
+          ดูไฟล์ที่อัปโหลด
+        </a>
       </div>
+
+      <input 
+        type="file" 
+        @change="handleFileChange($event, 'scheduleDetails')" 
+        class="form-input"
+      />
     </div>
 
     <!-- คณะกรรมการจัดโครงการ -->
@@ -936,7 +1133,6 @@ const getNextDay = (date) => {
       </button>
     </div>
 
-
     <!-- รูปแบบการประเมินผล -->
     <div class="mb-6">
     <label class="block text-gray-700 mb-2">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
@@ -955,7 +1151,14 @@ const getNextDay = (date) => {
 
     <!-- ช่องอัพโหลดไฟล์รูปแบบการประเมินผล -->
     <div class="mb-6">
-      <label for="evaluationFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์สำหรับรูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+      <label class="block text-gray-700 mb-2">อัพโหลดไฟล์สำหรับรูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+      
+      <div v-if="evaluationFile" class="mb-2">
+        <a @click="openFileInNewTab(evaluationFile, 'application/pdf')" target="_blank" class="text-blue-500 underline">
+          ดูไฟล์ที่อัปโหลด
+        </a>
+      </div>
+
       <input 
         id="evaluationFile" 
         type="file" 
@@ -975,7 +1178,7 @@ const getNextDay = (date) => {
         <input 
           type="text" 
           :id="'expected-' + index" 
-          v-model="expectedResults[index].result" 
+          v-model="expectedResult.result" 
           class="form-input w-full"
           placeholder="ผลที่คาดว่าจะได้รับ"
         />
@@ -987,7 +1190,7 @@ const getNextDay = (date) => {
         <input 
           type="text" 
           :id="'kpi-' + index" 
-          v-model="expectedResults[index].kpi" 
+          v-model="expectedResult.kpi" 
           class="form-input w-full"
           placeholder="KPI"
         />
@@ -1001,7 +1204,7 @@ const getNextDay = (date) => {
           min="0"
           max="100"
           :id="'target-' + index" 
-          v-model="expectedResults[index].target"
+          v-model="expectedResult.target"
           class="form-input w-full"
           placeholder="ค่าเป้าหมาย"
           @input="validateTarget($event, index)"
@@ -1011,59 +1214,71 @@ const getNextDay = (date) => {
   </div>
 
   <!-- ผลการดำเนินงานที่ผ่านมา -->
-  <div class="mb-6">
-    <label class="block text-gray-700 mb-2">
-      ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
-    </label>
+<div class="mb-6">
+  <label class="block text-gray-700 mb-2">
+    ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
+  </label>
 
-    <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 mb-4">
-      <!-- ปัญหาอุปสรรค -->
-      <div class="flex items-center gap-2">
-        <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:<span class="text-red-500 ml-1">*</span></label>
-        <input 
-          :id="'problem-' + index" 
-          v-model="item.problem" 
-          type="text" 
-          class="form-input w-90" 
-          placeholder="กรอกปัญหาอุปสรรค"
-        />
-      </div>
+  <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 mb-4">
+    <!-- ปัญหาอุปสรรค -->
+    <div class="flex items-center gap-2">
+      <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:<span class="text-red-500 ml-1">*</span></label>
+      <input 
+        :id="'problem-' + index" 
+        v-model="item.problem" 
+        type="text" 
+        class="form-input w-90" 
+        placeholder="กรอกปัญหาอุปสรรค"
+      />
+    </div>
 
-      <!-- แนวทางการแก้ไข -->
-      <div class="flex items-center gap-2">
-        <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:<span class="text-red-500 ml-1">*</span></label>
-        <input 
-          :id="'solution-' + index" 
-          v-model="item.solution" 
-          type="text" 
-          class="form-input w-90" 
-          placeholder="กรอกแนวทางการแก้ไข"
-        />
-      </div>
+    <!-- แนวทางการแก้ไข -->
+    <div class="flex items-center gap-2">
+      <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:<span class="text-red-500 ml-1">*</span></label>
+      <input 
+        :id="'solution-' + index" 
+        v-model="item.solution" 
+        type="text" 
+        class="form-input w-90" 
+        placeholder="กรอกแนวทางการแก้ไข"
+      />
     </div>
   </div>
+</div>
 
   <!-- รายละเอียดงบประมาณ -->
   <div class="mb-6">
-    <label for="budgetDetails" class="block text-gray-700 mb-2">รายละเอียดงบประมาณ<span class="text-red-500 ml-1">*</span></label>
-    <input 
-      id="budgetDetails" 
-      type="file" 
-      @change="handleFileChange($event, 'budgetDetails')" 
-      class="form-input"
-    />
-  </div>
+      <label class="block text-gray-700 mb-2">รายละเอียดงบประมาณ<span class="text-red-500 ml-1">*</span></label>
+      
+      <div v-if="budgetDetails" class="mb-2">
+        <a @click="openFileInNewTab(budgetDetails, 'application/pdf')" target="_blank" class="text-blue-500 underline">
+          ดูไฟล์ที่อัปโหลด
+        </a>
+      </div>
 
-  <!-- อัพโหลดไฟล์เพิ่มเติม -->
-  <div class="mb-6">
-    <label for="prepareFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์เพิ่มเติม<span class="text-red-500 ml-1">*</span></label>
-    <input 
-      id="prepareFile" 
-      type="file" 
-      @change="handleFileChange($event, 'prepareFile')" 
-      class="form-input"
-    />
-  </div>
+      <input 
+        type="file" 
+        @change="handleFileChange($event, 'budgetDetails')" 
+        class="form-input"
+      />
+    </div>
+
+    <!-- อัพโหลดไฟล์เพิ่มเติม -->
+    <div class="mb-6">
+      <label class="block text-gray-700 mb-2">อัพโหลดไฟล์เพิ่มเติม<span class="text-red-500 ml-1">*</span></label>
+      
+      <div v-if="prepareFile" class="mb-2">
+        <a @click="openFileInNewTab(prepareFile, 'application/pdf')" target="_blank" class="text-blue-500 underline">
+          ดูไฟล์ที่อัปโหลด
+        </a>
+      </div>
+
+      <input 
+        type="file" 
+        @change="handleFileChange($event, 'prepareFile')" 
+        class="form-input"
+      />
+    </div>
     
   </div>
   </div>
@@ -1072,7 +1287,7 @@ const getNextDay = (date) => {
     type="submit" 
     class="form-button"
   >
-    Add Activity Document
+    Edit Activity Document
   </button>
 </form>
 </div>

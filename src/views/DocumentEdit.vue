@@ -78,7 +78,7 @@ onMounted(async () => {
     if (documentData) {
         type.value = documentData.DocumentType || '';
         detail.value = documentData.detail || '';
-
+ 
         attachmentFile1.value = documentData.file1 || null;
         attachmentFile2.value = documentData.file2 || null;
 

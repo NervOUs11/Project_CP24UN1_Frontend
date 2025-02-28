@@ -2,12 +2,15 @@
 import { ref, onMounted, computed } from 'vue';
 import { fetchActivityDocument } from '../functions/fetchActivityDocument.js';
 import { deleteActivityDocument } from '../functions/deleteActivityDocument.js';
-import { useRouter } from "vue-router";
 import { approveActivity } from '../functions/approveActivity.js';
 import { rejectActivity } from '../functions/rejectActivity.js';
-
 import Navbar from '../components/Navbar.vue';
+import { useRouter } from "vue-router";
 const router = useRouter();
+import { useRoute } from "vue-router";
+const route = useRoute();
+const docId = route.params.id;
+
 const activityData = ref([])
 const showCommentPopup = ref(false);
 const showDeletePopup = ref(false);
@@ -18,7 +21,6 @@ const progressID = ref("");
 const comment = ref('');
 const showPopup = ref(false);
 const popupMessage = ref('');
-const pendingBlobUrl = ref(null); // เก็บ blob URL ไว้เปิดทีหลัง
 
 const formatDateTime = (isoString) => {
   const date = new Date(isoString);
@@ -36,7 +38,6 @@ const formatDateTime = (isoString) => {
 
   return `${formattedDate} ${formattedTime}`;
 };
-
 
 const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -174,6 +175,18 @@ const openFileInNewTab = async (base64String, mimeType) => {
   }
 };
 
+const allApproved = () =>{
+  const allProgress = activityData.value?.allProgress;
+  if (Array.isArray(allProgress)) {
+    return allProgress.every(progress => progress.status === "Approve");
+  }
+  return false;
+}
+
+const handleEdit = () => {
+  const documentId = activityData.value ? activityData.value.DocumentID : null;
+  router.push(`/editActivityDocument/${documentId}`);
+};
 
 onMounted(async () => {
   let userid = null
@@ -186,7 +199,7 @@ onMounted(async () => {
   }
 
   try{
-      activityData.value = await fetchActivityDocument(userid, role)
+      activityData.value = await fetchActivityDocument(docId, userid, role)
       console.log(activityData.value)
       if (activityData.value) {
           documentId.value = activityData.value.DocumentID;
@@ -275,7 +288,7 @@ onMounted(async () => {
         <span class="font-bold">KMUTT Student QF:</span>
         <ul class="list-disc pl-6 text-gray-700">
           <li v-for="(studentQF, index) in activityData.studentQF" :key="index">
-            {{ studentQF.join(', ') }}
+            {{ studentQF.name }} {{ studentQF.percentage }}%
           </li>
         </ul>
       </div>
@@ -455,7 +468,7 @@ onMounted(async () => {
           </button> 
         </template>
         
-        <template v-else>
+        <template v-else-if="!allApproved()">
           <button class="button bg-blue-500 text-white mx-2" @click="handleEdit">
             Edit
           </button>

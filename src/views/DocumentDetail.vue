@@ -116,7 +116,6 @@ const handleDelete = async () => {
   }
 };
 
-// ฟังก์ชัน handleEdit เมื่อคลิกปุ่ม Edit
 const handleEdit = () => {
   const documentId = data.value ? data.value.DocumentID : null; // ใช้ documentID จาก data.value
   router.push(`/documentEdit/${documentId}`);
@@ -124,20 +123,10 @@ const handleEdit = () => {
 
 const formatDateTime = (isoString) => {
   if (!isoString) return '';
-
-  // Create a Date object from the ISO string (which is in UTC)
   const date = new Date(isoString);
-
-  // Get the current local time zone offset in minutes and convert to milliseconds
   const localOffset = date.getTimezoneOffset() * 60000;
-
-  // Adjust the date for the local time zone by adding the offset
   const localDate = new Date(date.getTime() - localOffset);
-
-  // Get the current time zone for formatting
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  // Format the date and time according to the local time zone
   return {
     date: localDate.toLocaleDateString('th-TH', {
       year: 'numeric',

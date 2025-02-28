@@ -1,13 +1,14 @@
 import { useRoute } from 'vue-router';
 const URL = import.meta.env.VITE_API_ROOT;
 
-const fetchActivityDocument = async (userId, role) => {
-  const route = useRoute();
-  const documentID = route.params.id;
-  console.log(`Fetching data for User: ${userId}, Document: ${documentID}, Role: ${role}`);
+const fetchActivityDocument = async (docId, userid, role) => {
+  // const route = useRoute();
+  // const documentID = route.params.id;
+  const documentID = docId
+  // console.log(`Fetching data for User: ${userid}, Document: ${documentID}, Role: ${role}`);
 
   try {
-    const res = await fetch(`${URL}/userID/${userId}/document/activity/detail/${documentID}`, {
+    const res = await fetch(`${URL}/userID/${userid}/document/activity/detail/${documentID}`, {
       method: "GET",
     });
 
@@ -24,7 +25,7 @@ const fetchActivityDocument = async (userId, role) => {
 
       return {
         ...data,
-        progressID: progress.length > 0 ? progress[0].progressID : null, // ป้องกันกรณีไม่มี progress
+        progressID: progress.length > 0 ? progress[0].progressID : null,
       };
     }
   } catch (error) {
