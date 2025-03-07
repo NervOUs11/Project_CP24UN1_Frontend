@@ -13,9 +13,8 @@ const deleteDocument = async (studentID, documentID) => {
         const error = await res.json();
         throw new Error(error.detail || 'Failed to delete document');
       }
-
-      const data = await res.json();
-      alert(data.message);
+      console.log(res.status)
+      return res
     } catch (error) {
       console.error('Error:', error);
       alert(error.message);

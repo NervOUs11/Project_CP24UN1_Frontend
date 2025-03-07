@@ -4,11 +4,28 @@ import { getAllFaculty } from "../functions/getData"
 import { addDocument } from '../functions/adddocument'
 import { useRouter } from "vue-router";
 
-import ModalPopup from "../components/ModalPopup.vue"
-const showModal = ref(false);
-const alertMessage = ref("");
+// import ModalPopup from "../components/ModalPopup.vue"
+// const showModal = ref(false);
+// const alertMessage = ref("");
 const today = ref(new Date().toISOString().split("T")[0]);
 const router = useRouter()
+
+const showSuccessPopup = ref(false);
+const successMessage = ref("");
+const showSuccess = (type) => {
+  if (type === "add") {
+    successMessage.value = "New document added successfully!";
+  } else if (type === "edit") {
+    successMessage.value = "Document edited successfully!";
+  } else if (type === "delete") {
+    successMessage.value = "Document deleted successfully!";
+  }
+  showSuccessPopup.value = true;
+};
+const redirectToTracking = () => {
+  showSuccessPopup.value = false;
+  router.push("/tracking");
+};
 
 const type = ref('');
 const detail = ref('');
@@ -219,14 +236,13 @@ const addDoc = async () => {
 
 
     if (res[1] === 201) {
-      // alertMessage.value = "Add Document Successfully!";
-      // showModal.value = true;
-      alert("Add New Document Successfully!");
-      try {
-        router.push("/tracking");
-      } catch (error) {
-        console.error(error);
-      }
+      showSuccess("add")
+      // alert("Add New Document Successfully!");
+      // try {
+      //   router.push("/tracking");
+      // } catch (error) {
+      //   console.error(error);
+      // }
     }
   } catch (error) {
     // alertMessage.value = "Add Document Failed";
@@ -439,8 +455,20 @@ const addDoc = async () => {
         </button>
 
       </form>
-      <!-- Modal Popup -->
-      <ModalPopup :show="showModal" :message="alertMessage" @close="showModal = false" />
+      
+      <div 
+        v-if="showSuccessPopup"
+        class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+          <div class="flex justify-center">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
+              OK
+            </button>
+          </div>    
+        </div>
+      </div>
+
     </div>
   </div>
 </template>

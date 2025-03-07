@@ -21,7 +21,7 @@ const fetchActivityDocument = async (docId, userid, role) => {
     if (role === "Student") {
       return { ...data };
     } else {
-      const progress = data.allProgress?.filter((progress) => progress.staffID == userId) || [];
+      const progress = data.allProgress?.filter((progress) => progress.staffID == userid) || [];
 
       return {
         ...data,

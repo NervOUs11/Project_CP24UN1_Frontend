@@ -33,10 +33,11 @@ const canApprove = computed(() => {
   if (!staffID) return false;
 
   // ตรวจสอบว่า progress ที่มี staffID ตรงกันและ status เป็น "Waiting for approve"
-  const progressMatch = data.value.allProgress.find(
+  const progressMatch = data.value?.allProgress?.find(
     (progress) =>
       progress.staffID === parseInt(staffID) && progress.status === "Waiting for approve"
-  );
+  ) ?? null;
+
 
   return !!progressMatch; // ถ้ามี progress ที่ตรงตามเงื่อนไข จะคืนค่า true
 });
@@ -109,8 +110,11 @@ const handleDelete = async () => {
       return;
     }
 
-    await deleteDocument(studentID, documentID);
-    router.push('/tracking');
+    const res = await deleteDocument(studentID, documentID);
+    if (res.ok) {
+      showSuccess("delete")
+    }
+    // router.push('/tracking');
   } catch (error) {
     console.error('Delete failed:', error);
   }
@@ -167,13 +171,39 @@ const openFileInNewTab = (base64String, mimeType) => {
   }, 1000);
 };
 
-const allApproved = () =>{
+const allApproved = () => {
   const allProgress = data.value?.allProgress;
-  if (Array.isArray(allProgress)) {
-    return allProgress.every(progress => progress.status === "Approve");
+  if (Array.isArray(allProgress) && allProgress.length > 0) {
+    return allProgress[allProgress.length - 1].status === "Approve";
   }
   return false;
-}
+};
+
+const hasRejectedStatus = () => {
+  const allProgress = data.value?.allProgress;
+  if (Array.isArray(allProgress) && allProgress.length > 0) {
+    return allProgress.some(progress => progress.status === "Reject");
+  }
+  return false;
+};
+
+const showSuccessPopup = ref(false);
+const successMessage = ref("");
+const showSuccess = (type) => {
+  if (type === "add") {
+    successMessage.value = "New document added successfully!";
+  } else if (type === "edit") {
+    successMessage.value = "Document edited successfully!";
+  } else if (type === "delete") {
+    successMessage.value = "Document deleted successfully!";
+  }
+  showDeletePopup.value = false
+  showSuccessPopup.value = true;
+};
+const redirectToTracking = () => {
+  showSuccessPopup.value = false;
+  router.push("/tracking");
+};
 
 onMounted(async () => {
   let userid = null
@@ -292,7 +322,7 @@ onMounted(async () => {
         
         <!-- ถ้าเป็น student และ allProgress เป็น Approve ทั้งหมด ให้ซ่อนปุ่ม Edit และ Delete -->
         <template v-else-if="!allApproved()">
-          <button class="button bg-blue-500 text-white mx-2" @click="handleEdit">
+          <button v-if="hasRejectedStatus()" class="button bg-blue-500 text-white mx-2" @click="handleEdit">
             Edit
           </button>
           <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
@@ -347,6 +377,19 @@ onMounted(async () => {
               @click="handleDelete">
               Delete
             </button>
+        </div>    
+      </div>
+    </div>
+
+    <div 
+      v-if="showSuccessPopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+        <div class="flex justify-center">
+          <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
+            OK
+          </button>
         </div>    
       </div>
     </div>

@@ -45,6 +45,11 @@ const formatDate = (isoString) => {
   return date.toLocaleDateString('en-GB', options);
 };;
 
+const sortedProgress = computed(() => {
+  return [...(activityData.value?.allProgress || [])].sort((a, b) => a.step - b.step);
+});
+
+
 const goBack = () => {
   router.push("/tracking");
 };
@@ -182,6 +187,14 @@ const allApproved = () =>{
   }
   return false;
 }
+
+const hasRejectedStatus = () => {
+  const allProgress = activityData.value?.allProgress;
+  if (Array.isArray(allProgress) && allProgress.length > 0) {
+    return allProgress.some(progress => progress.status === "Reject");
+  }
+  return false;
+};
 
 const handleEdit = () => {
   const documentId = activityData.value ? activityData.value.DocumentID : null;
@@ -443,7 +456,7 @@ onMounted(async () => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(step, index) in activityData.allProgress" :key="index">
+                <tr v-for="(step, index) in sortedProgress" :key="index">
                     <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.staffName }}</td>
                     <td class="border border-gray-300 px-4 py-2 w-[40%]">{{ step.staffRole }}</td>
                     <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.status }}</td>
@@ -469,7 +482,7 @@ onMounted(async () => {
         </template>
         
         <template v-else-if="!allApproved()">
-          <button class="button bg-blue-500 text-white mx-2" @click="handleEdit">
+          <button v-if="hasRejectedStatus()" class="button bg-blue-500 text-white mx-2" @click="handleEdit">
             Edit
           </button>
           <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
