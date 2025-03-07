@@ -14,8 +14,7 @@ const deleteActivityDocument = async (studentID, documentID) => {
         throw new Error(error.detail || 'Failed to delete document');
       }
 
-      const data = await res.json();
-      alert(data.message);
+      return res
     } catch (error) {
       console.error('Error:', error);
       alert(error.message);

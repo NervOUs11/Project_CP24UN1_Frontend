@@ -49,6 +49,29 @@ const sortedProgress = computed(() => {
   return [...(activityData.value?.allProgress || [])].sort((a, b) => a.step - b.step);
 });
 
+const showSuccessPopup = ref(false);
+const successMessage = ref("");
+const showSuccess = (type) => {
+  if (type === "add") {
+    successMessage.value = "Added Document Successfully!";
+  } else if (type === "edit") {
+    successMessage.value = "Edited Successfully!";
+  } else if (type === "delete") {
+    showDeletePopup.value = false
+    successMessage.value = "Deleted Successfully!";
+  } else if (type === "approve") {
+    successMessage.value = "Approve Successfully!";
+  } else if (type === "reject") {
+    showCommentPopup.value = false
+    successMessage.value = "Reject Successfully!";
+  }
+  showDeletePopup.value = false
+  showSuccessPopup.value = true;
+};
+const redirectToTracking = () => {
+  showSuccessPopup.value = false;
+  router.push("/tracking");
+};
 
 const goBack = () => {
   router.push("/tracking");
@@ -66,15 +89,16 @@ const handleDelete = async () => {
   try {
     const documentID = documentId.value
     const studentID = localStorage.getItem("studentID");
-    console.log(documentID + " " + studentID)
+    // console.log(documentID + " " + studentID)
     if (!documentID || !studentID) {
       alert('Missing document ID or student ID');
       return;
     }
 
-    await deleteActivityDocument(studentID, documentID);
-
-    router.push('/tracking');
+    const res = await deleteActivityDocument(studentID, documentID);
+    if(res.ok){
+      showSuccess("delete")
+    }
   } catch (error) {
     console.error('Delete failed:', error);
   }
@@ -101,9 +125,10 @@ const handleApprove = async () => {
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentId.value}
     console.log(data)
-    const result = await approveActivity(data);
-    alert('Document approved successfully');
-    router.push('/tracking');
+    const res = await approveActivity(data);
+    if(res.ok){
+      showSuccess("approve")
+    }
   } catch (error) {
     alert('Failed to approve document');
   }
@@ -117,9 +142,10 @@ const handleReject = async () => {
   }
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentId.value, comment: comment.value}
-    const result = await rejectActivity(data);
-    alert('Document rejected successfully');
-    router.push('/tracking');
+    const res = await rejectActivity(data);
+    if(res.ok){
+      showSuccess("reject")
+    }
   } catch (error) {
     alert('Failed to reject document');
   }
@@ -213,7 +239,7 @@ onMounted(async () => {
 
   try{
       activityData.value = await fetchActivityDocument(docId, userid, role)
-      console.log(activityData.value)
+      // console.log(activityData.value)
       if (activityData.value) {
           documentId.value = activityData.value.DocumentID;
           progressID.value = activityData.value.progressID;
@@ -541,16 +567,16 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Popup no file -->
-    <div v-if="showPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white p-6 rounded shadow-md w-[300px]">
-        <h2 class="text-lg font-bold mb-4 text-center">Error</h2>
-        <p class="text-center">{{ popupMessage }}</p>
-        <div class="flex justify-center mt-4">
-          <button class="bg-blue-500 text-white px-4 py-2 rounded" @click="closePopup">
+    <div 
+      v-if="showSuccessPopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+        <div class="flex justify-center">
+          <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
             OK
           </button>
-        </div>
+        </div>    
       </div>
     </div>
 

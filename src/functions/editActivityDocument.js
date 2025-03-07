@@ -14,7 +14,7 @@ const editActivityDocument = async (studentID, documentID, dataToUpdate) => {
             throw new Error(`HTTP error! Status: ${res.status}`);
         }
 
-        return await res.json();
+        return res;
     } catch (error) {
         console.error('Error updating document:', error);
     }

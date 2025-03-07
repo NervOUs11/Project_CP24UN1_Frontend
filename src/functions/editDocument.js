@@ -14,7 +14,7 @@ const editDocument = async (studentID, documentID, dataToUpdate) => {
             throw new Error(`HTTP error! Status: ${res.status}`);
         }
 
-        return await res.json(); // คืนค่าผลลัพธ์ที่ได้รับจาก backend
+        return res
     } catch (error) {
         console.error('Error updating document:', error);
     }

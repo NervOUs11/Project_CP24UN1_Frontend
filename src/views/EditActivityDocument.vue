@@ -117,6 +117,28 @@ const openFileInNewTab = async (base64String, mimeType) => {
   }
 };
 
+const showSuccessPopup = ref(false);
+const successMessage = ref("");
+const showSuccess = (type) => {
+  if (type === "add") {
+    successMessage.value = "Added Document Successfully!";
+  } else if (type === "edit") {
+    successMessage.value = "Edited Successfully!";
+  } else if (type === "delete") {
+    successMessage.value = "Deleted Successfully!";
+  } else if (type === "approve") {
+    successMessage.value = "Approve Successfully!";
+  } else if (type === "reject") {
+    showCommentPopup.value = false
+    successMessage.value = "Reject Successfully!";
+  }
+  showSuccessPopup.value = true;
+};
+const redirectToTracking = () => {
+  showSuccessPopup.value = false;
+  router.push("/tracking");
+};
+
 onMounted(async() => {
     let userid = null
     const role = localStorage.getItem("role")
@@ -590,10 +612,9 @@ const handleEditDocument = async () => {
           staffIDProgress3: departmentPresident.value,
         }
         console.log("Data to send:", dataToSend);
-        const result = await editActivityDocument(studentID, documentId.value.toString(), dataToSend);
-        if (result) {
-            alert("Document updated successfully");
-            router.push("/tracking");
+        const res = await editActivityDocument(studentID, documentId.value.toString(), dataToSend);
+        if (res.ok) {
+          showSuccess("edit")
         }
     } catch (error) {
         console.error("Failed to update document:", error);
@@ -1290,6 +1311,20 @@ const getNextDay = (date) => {
     Edit Activity Document
   </button>
 </form>
+
+<div 
+  v-if="showSuccessPopup"
+  class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+  <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+    <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+    <div class="flex justify-center">
+      <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
+        OK
+      </button>
+    </div>    
+  </div>
+</div>
+
 </div>
 </div>
 </template>

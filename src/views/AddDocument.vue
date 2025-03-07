@@ -417,6 +417,7 @@ const addDoc = async () => {
               id="detail" 
               v-model="detail"
               class="form-input detail-input"
+              minlength="5"
               maxlength="500"
               required
               @input="updateRemainingCharacters"

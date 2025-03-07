@@ -52,6 +52,23 @@ const userData = ref({
   email: ''
 });
 
+const showSuccessPopup = ref(false);
+const successMessage = ref("");
+const showSuccess = (type) => {
+  if (type === "add") {
+    successMessage.value = "New document added successfully!";
+  } else if (type === "edit") {
+    successMessage.value = "Document edited successfully!";
+  } else if (type === "delete") {
+    successMessage.value = "Document deleted successfully!";
+  }
+  showSuccessPopup.value = true;
+};
+const redirectToTracking = () => {
+  showSuccessPopup.value = false;
+  router.push("/tracking");
+};
+
 const documentID = ref(null);
 const file1 = ref("");
 onMounted(async () => {
@@ -284,11 +301,12 @@ const handleEditDocument = async () => {
 
     };
 
-    const result = await editDocument(studentID, documentID.value, dataToUpdate);
+    const res = await editDocument(studentID, documentID.value, dataToUpdate);
 
-    if (result) {
-      alert("Document updated successfully");
-      router.push("/tracking"); // ไปยังหน้า tracking เมื่ออัพเดตสำเร็จ
+    if (res.ok) {
+      showSuccess("edit")
+      // alert("Document updated successfully");
+      // router.push("/tracking"); // ไปยังหน้า tracking เมื่ออัพเดตสำเร็จ
     }
   } catch (error) {
     console.error("Failed to update document:", error);
@@ -511,6 +529,20 @@ const handleEditDocument = async () => {
           Update Document
         </button>
       </form>
+
+    <div 
+      v-if="showSuccessPopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+        <div class="flex justify-center">
+          <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
+            OK
+          </button>
+        </div>    
+      </div>
+    </div>
+
     </div>
   </div>
 </template>

@@ -41,9 +41,6 @@ onMounted(async () => {
       id = localStorage.getItem("staffID");
     }
     documents.value = await tracking(id);
-    console.log(documents.value)
-
-    
 
   } catch (error) {
     console.error("Error fetching documents:", error);

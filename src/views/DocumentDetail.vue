@@ -53,9 +53,12 @@ const canShowButtons = computed(() => {
 const handleApprove = async () => {
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value}
-    const result = await approveDocument(data);
-    alert('Document approved successfully');
-    router.push('/tracking');
+    const res = await approveDocument(data);
+    if (res.ok) {
+      showSuccess("approve")
+    }
+    // alert('Document approved successfully');
+    // router.push('/tracking');
   } catch (error) {
     alert('Failed to approve document');
   }
@@ -69,9 +72,12 @@ const handleReject = async () => {
   }
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value, comment: comment.value}
-    const result = await rejectDocument(data);
-    alert('Document rejected successfully');
-    router.push('/tracking');
+    const res = await rejectDocument(data);
+    if (res.ok) {
+      showSuccess("reject")
+    }
+    // alert('Document rejected successfully');
+    // router.push('/tracking');
   } catch (error) {
     alert('Failed to reject document');
   }
@@ -147,13 +153,6 @@ const formatDateTime = (isoString) => {
   };
 };
 
-const preview = ref({
-  visible: false,
-  title: '',
-  data: '',
-  type: ''
-});
-
 const openFileInNewTab = (base64String, mimeType) => {
   const byteCharacters = atob(base64String.split(',')[1]);
   const byteNumbers = new Uint8Array(byteCharacters.length);
@@ -191,11 +190,16 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
-    successMessage.value = "New document added successfully!";
+    successMessage.value = "Added Document Successfully!";
   } else if (type === "edit") {
-    successMessage.value = "Document edited successfully!";
+    successMessage.value = "Edited Successfully!";
   } else if (type === "delete") {
-    successMessage.value = "Document deleted successfully!";
+    successMessage.value = "Deleted Successfully!";
+  } else if (type === "approve") {
+    successMessage.value = "Approve Successfully!";
+  } else if (type === "reject") {
+    showCommentPopup.value = false
+    successMessage.value = "Reject Successfully!";
   }
   showDeletePopup.value = false
   showSuccessPopup.value = true;
@@ -204,6 +208,14 @@ const redirectToTracking = () => {
   showSuccessPopup.value = false;
   router.push("/tracking");
 };
+
+const sortedProgress = computed(() => {
+  return data.value?.allProgress
+    ? [...data.value.allProgress]
+        .filter((step) => step.status !== 'Other advisor approve') // กรองออก
+        .sort((a, b) => a.step - b.step) // เรียงตาม step
+    : [];
+});
 
 onMounted(async () => {
   let userid = null
@@ -298,15 +310,29 @@ onMounted(async () => {
 
       <div class="mb-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-2">Progress</h2>
-        <ul class="list-disc pl-6 text-gray-700">
-          <li v-for="(step, index) in data.allProgress" :key="index">
-            {{ step.staffName }} - {{ step.staffRole }} - {{ step.status }}
-            <span v-if="step.comment != null" class="text-red-600 mt-1">
-              &nbsp; สาเหตุที่ยกเลิก: {{ step.comment }}
-            </span>
-          </li>
-        </ul>
+        <table class="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">ชื่อเจ้าหน้าที่</th>
+              <th class="border border-gray-300 px-4 py-2 text-left w-[40%]">ตำแหน่ง</th>
+              <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">สถานะ</th>
+              <th class="border border-gray-300 px-4 py-2 text-left w-[10%]">หมายเหตุ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(step, index) in sortedProgress" :key="index">
+              <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.staffName }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[40%]">{{ step.staffRole }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.status }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-red-600 w-[10%]" v-if="step.comment">
+                {{ step.comment }}
+              </td>
+              <td class="border border-gray-300 px-4 py-2" v-else>-</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
 
     <div class="text-center">
       <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
