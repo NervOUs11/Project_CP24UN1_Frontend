@@ -126,12 +126,51 @@ onMounted(async() => {
     });
     entrepreneurialData.value = await fetchAllEntrepreneurial();
     sustainabilityData.value = await fetchAllSustainability();
+    console.log(sustainabilityData.value)
     facultyData.value = await fetchAllFaculty();
 
 
   } catch (error) {
     console.error('Error fetching staff:', error);
   }
+});
+
+const entrepreneurialDescriptions = {
+  "Entrepreneurial Mindset":
+    "ส่งเสริมให้นักศึกษามีจิตสำนักของความเป็นผู้ประกอบการ ได้แก่ คิด สร้างสรรค์ ลงมือทำจริง สู้จนสำเร็จ และสร้างผลกระทบที่มีความหมาย",
+  "Knowledge Sharing Society":
+    "ส่งเสริมให้เกิดสังคมแห่งการสร้างสรรค์ความรู้ ทั้งด้านการจัดกิจกรรมเสริมสร้างความรู้ และการสร้างสภาพแวดล้อมให้เอื้อต่อการเรียนรู้",
+  "Research and Innovation Impact":
+    "สร้างงานวิจัยและนวัตกรรมที่ทรงคุณค่า และเกิดประโยชน์กับสังคมอย่างกว้างขวาง",
+  "Financial Literacy":
+    "กิจกรรมการส่งเสริมให้มีความเข้าใจที่เกี่ยวข้องกับการเงิน เพื่อความยั่งยืน การสร้างสภาพแวดล้อมที่จะเอื้อให้นักศึกษาสามารถใช้ประโยชน์จากเครื่องมือทางการเงินที่ตอบโจทย์ด้านความยั่งยืน สร้างนักศึกษาให้มีองค์ความรู้ในการผลักดันงานด้านการเงินเพื่อความยั่งยืนให้เห็นผลเป็นรูปธรรม",
+};
+
+// ใช้ computed เพื่อเพิ่มคำอธิบายให้ entrepreneurialData
+const entrepreneurialWithDescriptions = computed(() => {
+  return entrepreneurialData.value.map((item) => ({
+    ...item,
+    description: entrepreneurialDescriptions[item.entrepreneurialName] || "",
+  }));
+});
+
+const sustainabilityDescriptions = {
+  "SDGs Culture":
+    "ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17 อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน",
+  "Sustainability Change Agents":
+    "ส่งเสริมให้เกิดผู้นำการเปลี่ยนแปลงที่ยั่งยืน สามารถนำความรู้ แนวทางปฏิบัติไปเผยแพร่และขยายผลต่อชุมชนและสังคมรอบข้างเพื่อให้เกิดความยั่งยืน และก่อให้เกิดผลดีต่อประเทศชาติสืบต่อไป",
+  "Green University and Smart Campus":
+    "ส่งเสริมให้เป็นมหาวิทยาลัยสีเขียว ปลูกจิตสำนึก สร้างความเข้าใจด้านการรักษาสิ่งแวดล้อม การอนุรักษ์พลังงาน และส่งเสริมให้เป็นมหาวิทยาลัยอัจฉริยะ มีการจัดการโดยใช้เทคโนโลยีที่ทันสมัย",
+  "Carbon Neutrality ":
+    "สนับสนุนให้มหาวิทยาลัยขับเคลื่อนเจตนารมณ์ลดการปล่อยคาร์บอนสุทธิเป็นศูนย์ และการลดการปล่อยคาร์บอนในกิจกรรมต่างๆ",
+};
+
+// ใช้ computed เพื่อเพิ่มคำอธิบายให้ sustainabilityData
+const sustainabilityWithDescriptions = computed(() => {
+  return sustainabilityData.value.map((item) => ({
+    ...item,
+    description: sustainabilityDescriptions[item.sustainabilityName] || "",
+  }));
 });
 
 const handleActivityHoursChange = () => {
@@ -627,7 +666,7 @@ const getNextDay = (date) => {
 
         </div>
 
-        <div class="grid grid-cols-3 gap-4 items-center mb-4">
+        <div class="grid grid-cols-3 gap-4 items-center mb-10">
             <!-- อาจารย์ที่ปรึกษา/รองคณบดี -->
             <div>
               <label for="advisor" class="block text-gray-700 mb-1">อาจารย์ที่ปรึกษา/รองคณบดี<span class="text-red-500 ml-1">*</span></label>
@@ -693,7 +732,7 @@ const getNextDay = (date) => {
         </div>
 
         <!-- เลือกทักษะ StudentQF (checkbox) -->
-        <div>
+        <div  class="mb-10">
           <h1>KMUTT Student QF<span class="text-red-500 ml-1">*</span></h1>
           <label class="block mb-2">เลือกทักษะ (สูงสุด 3 ทักษะ):</label>
           <div v-for="skill in studentQFList" :key="skill.studentQF_ID" class="mb-2">
@@ -745,11 +784,11 @@ const getNextDay = (date) => {
 
 
         <!-- Entrepreneurial -->
-        <div>
+        <div class="mb-10">
           <h1>Entrepreneurial<span class="text-red-500 ml-1">*</span></h1>
           <div>
             <label class="block mb-2 text-red">เลือกอย่างน้อย 1 ด้าน</label>
-            <div v-for="option in entrepreneurialData" :key="option.entrepreneurialID" class="mb-2">
+            <div v-for="option in entrepreneurialWithDescriptions" :key="option.entrepreneurialID" class="mb-2">
               <input 
                 type="checkbox" 
                 :id="'entrepreneurial-' + option.entrepreneurialID"
@@ -759,17 +798,18 @@ const getNextDay = (date) => {
               <label :for="'entrepreneurial-' + option.entrepreneurialID">
                 {{ option.entrepreneurialName }}
               </label>
+              <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
             </div>
           </div>
         </div>
 
 
       <!-- Sustainability -->
-      <div>
+      <!-- <div class="mb-10">
         <h1>Sustainability<span class="text-red-500 ml-1">*</span></h1>
         <div>
           <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
-          <div v-for="option in sustainabilityData" :key="option.sustainabilityID" class="mb-2">
+          <div v-for="option in sustainabilityWithDescriptions" :key="option.sustainabilityID" class="mb-2">
             <input 
               type="checkbox" 
               :id="'sustainability-' + option.sustainabilityID"
@@ -779,11 +819,12 @@ const getNextDay = (date) => {
             <label :for="'sustainability-' + option.sustainabilityID">
               {{ option.sustainabilityName }}
             </label>
+            <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
           </div>
-        </div>
+        </div> -->
 
         <!-- แสดงผลตัวเลือก Goal เมื่อเลือก SDGs Culture -->
-        <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-4">
+        <!-- <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-4">
           <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง<span class="text-red-500 ml-1">*</span></label>
           <div v-for="goal in goalData" :key="goal.goalID" class="mb-2">
             <input 
@@ -795,7 +836,102 @@ const getNextDay = (date) => {
             <label :for="'goal-' + goal.goalID">{{ goal.goalID }}: {{ goal.goalName }}</label>
           </div>
         </div>
+      </div> -->
+
+      <!-- Sustainability -->
+      <!-- <div class="mb-10">
+        <h1>Sustainability<span class="text-red-500 ml-1">*</span></h1>
+        <div>
+          <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
+          <div v-for="option in sustainabilityWithDescriptions" :key="option.sustainabilityID" class="mb-2">
+            <input 
+              type="checkbox" 
+              :id="'sustainability-' + option.sustainabilityID"
+              :value="option.sustainabilityID"
+              v-model="selectedSustainabilityOptions" 
+            />
+            <label :for="'sustainability-' + option.sustainabilityID">
+              {{ option.sustainabilityName }}
+            </label>
+            <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
+          </div>
+        </div> -->
+
+        <!-- แสดง Goals ที่เกี่ยวข้อง -->
+        <!-- <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-4">
+          <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง<span class="text-red-500 ml-1">*</span></label> -->
+          
+          <!-- Grid 4 คอลัมน์ -->
+          <!-- <div class="grid grid-cols-4 gap-4">
+            <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
+              <input 
+                type="checkbox" 
+                :id="'goal-' + goal.goalID" 
+                :value="goal.goalID" 
+                v-model="selectedGoals"
+                class="mr-2"
+              />
+              <p class="text-sm">{{ goal.goalID }}: {{ goal.goalName }}</p>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- Sustainability -->
+      <div class="mb-10">
+        <h1>Sustainability<span class="text-red-500 ml-1">*</span></h1>
+        <div>
+          <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
+
+          <!-- SDGs Culture (ตัวเลือกที่ 1) -->
+          <div class="mb-2">
+            <input 
+              type="checkbox" 
+              id="sustainability-1"
+              :value="1"
+              v-model="selectedSustainabilityOptions" 
+            />
+            <label for="sustainability-1">SDGs Culture</label>
+            <p class="text-gray-600 text-sm mt-1">
+              ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17 อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน
+            </p>
+            
+            <!-- แสดง Goals ที่เกี่ยวข้อง ถ้าเลือก SDGs Culture -->
+            <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-2">
+              <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง<span class="text-red-500 ml-1">*</span></label>
+              
+              <!-- Grid 4 คอลัมน์ -->
+              <div class="grid grid-cols-4 gap-4">
+                <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    :id="'goal-' + goal.goalID" 
+                    :value="goal.goalID" 
+                    v-model="selectedGoals"
+                    class="mr-2"
+                  />
+                  <p class="text-sm">{{ goal.goalID }}: {{ goal.goalName }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ตัวเลือกที่ 2-4 -->
+          <div v-for="option in sustainabilityWithDescriptions.filter(opt => opt.sustainabilityID !== 1)" :key="option.sustainabilityID" class="mb-2">
+            <input 
+              type="checkbox" 
+              :id="'sustainability-' + option.sustainabilityID"
+              :value="option.sustainabilityID"
+              v-model="selectedSustainabilityOptions" 
+            />
+            <label :for="'sustainability-' + option.sustainabilityID">
+              {{ option.sustainabilityName }}
+            </label>
+            <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
+          </div>
+        </div>
       </div>
+
 
       <!-- หลักการและเหตุผล -->
     <div class="mb-6">
