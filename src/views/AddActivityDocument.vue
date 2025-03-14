@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted, watchEffect } from 'vue';
+import { ref, reactive, computed, onMounted, watch } from 'vue';
 import { addActivityDocument } from '../functions/addActivityDocument'
 import { fetchAllStaff } from '../functions/fetchAllStaff';
 import { fetchAllStudent } from '../functions/fetchAllStudent';
@@ -18,8 +18,7 @@ const router = useRouter()
 const writtenDate = ref('');
 const agencyName = ref('');
 const reason = computed(() => agencyName.value);
-
-const organizeProject = computed(() => projectName.value);
+// const organizeProject = computed(() => projectName.value);
 const responsibleStudent = localStorage.getItem("firstName") + " " + localStorage.getItem("lastName")
 
 const rawStaffData = ref([]);
@@ -40,7 +39,6 @@ const evaluationData = ref([]);
 const selectedEvaluation = ref([]);
 
 const participantData = ref([]);
-// const participant = ref([]);
 const participant = computed(() => {
   return participantData.value
     .filter(item => item.count > 0)
@@ -120,13 +118,13 @@ onMounted(async() => {
     goalData.value = await fetchAllGoal();
     evaluationData.value = await fetchAllEvaluation();
     participantData.value = await fetchAllParticipant();
+    participantData.value.map(item => ({...item, count: 0 }));
     activityData.value = await fetchAllActivity();
     activityData.value.forEach(activity => { 
       hoursCount.value[activity.activityID] = 0;  
     });
     entrepreneurialData.value = await fetchAllEntrepreneurial();
     sustainabilityData.value = await fetchAllSustainability();
-    console.log(sustainabilityData.value)
     facultyData.value = await fetchAllFaculty();
 
 
@@ -395,10 +393,14 @@ const validateTarget = (event, index) => {
     }
 };
 
+const projectNameThai = ref("");
+const projectNameEng = ref("");
+const getProjectName = computed(() => `${projectNameThai.value}  (${projectNameEng.value})`);
+
 const addDoc = async () => {
   try {
     const studentID = parseInt(localStorage.getItem("studentID"))
-
+    projectName.value = `${projectNameThai.value} (${projectNameEng.value})`;
     sustainability.value = sustainabilityData.value
       .filter(item => selectedSustainabilityOptions.value.includes(item.sustainabilityID))
       .flatMap(item => {
@@ -456,7 +458,7 @@ const addDoc = async () => {
     }
     console.log("Data to send:", dataToSend);
     const res = await addActivityDocument(dataToSend);
-    if (res.ok) {
+    if (res.status === 201) {
       showSuccess("add")
     }
   } catch (error) {
@@ -465,12 +467,21 @@ const addDoc = async () => {
 };
 
 const today = new Date().toISOString().split('T')[0];
-const getNextDay = (date) => {
-  if (!date) return today.value; // ถ้ายังไม่มี starttime ให้ใช้ today
-  const nextDay = new Date(date);
-  nextDay.setDate(nextDay.getDate() + 1);
-  return nextDay.toISOString().split("T")[0];
-};
+// ป้องกัน endDate < startDate
+watch(startDate, (newStart) => {
+  if (endDate.value && newStart > endDate.value) {
+    endDate.value > newStart;
+  }
+});
+
+const positions = ref([
+  "ประธานโครงการ",
+  "รองประธานโครงการ",
+  "เลขา",
+  "เหรัญญิก",
+  "ประชาสัมพันธ์",
+  "คณะกรรมการ"
+]);
 
 </script>
 
@@ -482,36 +493,39 @@ const getNextDay = (date) => {
 
       <form @submit.prevent="addDoc">
         <div class="grid grid-cols-2 gap-4 mb-4">
-          <!-- ที่ (รหัสหน่วยงาน) -->
-          <div class="mb-3">
-            <label for="agencyCode" class="block text-gray-700 mb-1">ที่<span class="text-red-500 ml-1">*</span></label>
-            <input 
-              type="text" 
-              id="agencyCode" 
-              v-model="agencyCode" 
-              class="form-input" 
-              placeholder="รหัสหน่วยงาน"
-              required
-            />
+          <!-- ที่ (รหัสหน่วยงาน) และ วันที่เขียน -->
+          <div class="mb-3 flex items-center gap-4 mt-7">
+            <!-- ที่ (รหัสหน่วยงาน) -->
+            <div class="flex items-center">
+              <label for="agencyCode" class="text-gray-700 mr-2">ที่<span class="text-red-500 ml-1">*</span></label>
+              <input 
+                type="text" 
+                id="agencyCode" 
+                v-model="agencyCode" 
+                class="form-input w-40" 
+                placeholder="รหัสหน่วยงาน"
+                required
+              />
+            </div>
+
+            <!-- วันที่เขียน -->
+            <div class="flex items-center">
+              <label for="writtenDate" class="text-gray-700 mr-2" style="width: 100%;">วันที่</label>
+              <input 
+                type="date" 
+                id="writtenDate" 
+                v-model="writtenDate" 
+                class="form-input w-40" 
+                disabled
+              />
+            </div>
           </div>
-          
-          <!-- วันที่เขียน -->
-          <div class="mb-3">
-            <label for="writtenDate" class="block text-gray-700 mb-1">วันที่เขียน</label>
-            <input 
-              type="date" 
-              value="currentDate" 
-              id="writtenDate" 
-              v-model="writtenDate" 
-              class="form-input" 
-              disabled
-            />
-          </div>
+
 
           <!-- ชื่อหน่วยงาน -->
           <div class="mb-3">
             <label for="agencyName" class="block text-gray-700 mb-1">ชื่อหน่วยงาน<span class="text-red-500 ml-1">*</span></label>
-            <select id="agencyName" v-model="agencyName" class="form-input" required>
+            <select id="agencyName" v-model="agencyName" class="form-input mt-3" required>
               <option value="">-- เลือกหน่วยงาน --</option>
               <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
                 {{ agency }}
@@ -521,13 +535,24 @@ const getNextDay = (date) => {
 
           <!-- ชื่อโครงการ -->
           <div class="mb-3">
-            <label for="projectName" class="block text-gray-700 mb-1">ชื่อโครงการ<span class="text-red-500 ml-1">*</span></label>
+            <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
             <input 
               type="text" 
-              id="projectName" 
-              v-model="projectName" 
-              class="form-input" 
+              v-model="projectNameThai" 
+              class="form-input w-full" 
               required
+              minlength="5"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
+            <input 
+              type="text" 
+              v-model="projectNameEng" 
+              class="form-input w-full" 
+              required
+              minlength="5"
             />
           </div>
 
@@ -549,31 +574,33 @@ const getNextDay = (date) => {
             <input 
               type="text" 
               id="organizeProject" 
-              :value="organizeProject"  
+              :value="getProjectName"  
               class="form-input" 
               disabled
             />
           </div>
 
           <!-- วันที่จัดกิจกรรม -->
-          <div class="mb-3">
-            <label for="startDate" class="block text-gray-700 mb-1">ระหว่างวันที่<span class="text-red-500 ml-1">*</span></label>
+          <div class="mb-3 flex items-center">
+            <label for="startDate" class="text-gray-700 mr-2">ระหว่างวันที่<span class="text-red-500 ml-1">*</span></label>
             <input 
               type="date" 
               id="startDate" 
               v-model="startDate" 
               class="form-input" 
+              :min="today" 
               required
             />
           </div>
 
-          <div class="mb-3">
-            <label for="endDate" class="block text-gray-700 mb-1">ถึงวันที่<span class="text-red-500 ml-1">*</span></label>
+          <div class="mb-3 flex items-center">
+            <label for="endDate" class="text-gray-700 mr-2">ถึงวันที่<span class="text-red-500 ml-1">*</span></label>
             <input 
               type="date" 
               id="endDate" 
               v-model="endDate" 
               class="form-input" 
+              :min="startDate" 
               required
             />
           </div>
@@ -586,51 +613,58 @@ const getNextDay = (date) => {
               id="location" 
               v-model="location" 
               class="form-input" 
+              minlength="10"
               required
               />
           </div>
 
           <!-- ประเภทกิจกรรม -->
           <div class="mb-3">
-            <label for="type" class="block text-gray-700 mb-1">ประเภทกิจกรรม<span class="text-red-500 ml-1">*</span></label>
+            <label for="type" class="block text-gray-700 mb-1">ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span></label>
             <select id="type" v-model="type" class="form-input" style="margin-top: 10px;" required>
-              <option value="">-- เลือกประเภท --</option>
+              <option value="">เลือกประเภทที่ตรงกับกิจกรรม</option>
               <option v-for="option in typeOptions" :key="option" :value="option">
                 {{ option }}
               </option>
             </select>
           </div>
 
-            <!-- วัตถุประสงค์ -->
-            <div class="col-span-2">
-                <label for="purpose" class="block text-gray-700 mb-1">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
-                <textarea 
-                id="purpose" 
-                v-model="purpose"
-                class="form-input detail-input w-full" 
-                rows="4" 
-                required
-                ></textarea>
-            </div>
+          <!-- วัตถุประสงค์ -->
+          <div class="col-span-2">
+              <label for="purpose" class="block text-gray-700 mb-1">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
+              <textarea 
+              id="purpose" 
+              v-model="purpose"
+              class="form-input detail-input w-full" 
+              rows="4" 
+              required
+              minlength="20"
+              ></textarea>
+          </div>
 
           <!-- ค่าใช้จ่าย -->
           <div class="mb-3 flex items-center">
             <label for="expenses" class="text-gray-700 mr-2" style="width: 85px;">ค่าใช้จ่าย<span class="text-red-500">*</span></label>
-            <input 
-              type="number" 
-              id="expenses" 
-              v-model.number="expenses" 
-              class="form-input w-40 mr-2" 
-              required
-              :max="9999999" 
-              maxlength="7"
-              @input="limitExpensesLength"
-            />
+            
+            <div class="flex items-center">
+              <input 
+                type="number" 
+                id="expenses" 
+                v-model.number="expenses" 
+                class="form-input w-40 mr-2 text-right" 
+                required
+                :max="9999999" 
+                maxlength="7"
+                @input="limitExpensesLength"
+                style="width: 30%;"
+              />
+              <span class="text-gray-700 ml-2">บาท</span>
+              <span class="text-gray-500">( {{ expensesThaiText }} )</span>
+            </div>
           </div>
+
           <div class="mb-3 mt-4">
-            <span class="text-gray-500">
-              ( {{ expensesThaiText }} )
-            </span>
+            
           </div>
 
           <!-- เลือกชั่วโมงกิจกรรม -->
@@ -653,13 +687,16 @@ const getNextDay = (date) => {
             <div v-for="activity in activityData" :key="activity.activityID" class="mb-3 flex items-center gap-3">
               <label :for="'hours-' + activity.activityID" class="text-gray-700 w-60" style="width: 200%;">
                 {{ activity.activityName }}
-              </label>
+              </label> 
+              <label class="text-gray-700">จำนวน</label>
               <input
                 type="number"
                 :id="'hours-' + activity.activityID"
                 v-model="hoursCount[activity.activityID]"
-                class="form-input w-24"
-              />
+                class="form-input w-24 text-right"
+                style="width: 30%;"
+              /> 
+              <label class="text-gray-700">ชั่วโมง</label>
             </div>
           </div>
 
@@ -803,85 +840,11 @@ const getNextDay = (date) => {
           </div>
         </div>
 
-
-      <!-- Sustainability -->
-      <!-- <div class="mb-10">
-        <h1>Sustainability<span class="text-red-500 ml-1">*</span></h1>
-        <div>
-          <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
-          <div v-for="option in sustainabilityWithDescriptions" :key="option.sustainabilityID" class="mb-2">
-            <input 
-              type="checkbox" 
-              :id="'sustainability-' + option.sustainabilityID"
-              :value="option.sustainabilityID"
-              v-model="selectedSustainabilityOptions" 
-            />
-            <label :for="'sustainability-' + option.sustainabilityID">
-              {{ option.sustainabilityName }}
-            </label>
-            <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
-          </div>
-        </div> -->
-
-        <!-- แสดงผลตัวเลือก Goal เมื่อเลือก SDGs Culture -->
-        <!-- <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-4">
-          <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง<span class="text-red-500 ml-1">*</span></label>
-          <div v-for="goal in goalData" :key="goal.goalID" class="mb-2">
-            <input 
-              type="checkbox" 
-              :id="'goal-' + goal.goalID" 
-              :value="goal.goalID" 
-              v-model="selectedGoals"
-            />
-            <label :for="'goal-' + goal.goalID">{{ goal.goalID }}: {{ goal.goalName }}</label>
-          </div>
-        </div>
-      </div> -->
-
-      <!-- Sustainability -->
-      <!-- <div class="mb-10">
-        <h1>Sustainability<span class="text-red-500 ml-1">*</span></h1>
-        <div>
-          <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
-          <div v-for="option in sustainabilityWithDescriptions" :key="option.sustainabilityID" class="mb-2">
-            <input 
-              type="checkbox" 
-              :id="'sustainability-' + option.sustainabilityID"
-              :value="option.sustainabilityID"
-              v-model="selectedSustainabilityOptions" 
-            />
-            <label :for="'sustainability-' + option.sustainabilityID">
-              {{ option.sustainabilityName }}
-            </label>
-            <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
-          </div>
-        </div> -->
-
-        <!-- แสดง Goals ที่เกี่ยวข้อง -->
-        <!-- <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-4">
-          <label class="block mb-2">เลือก Goals ที่เกี่ยวข้อง<span class="text-red-500 ml-1">*</span></label> -->
-          
-          <!-- Grid 4 คอลัมน์ -->
-          <!-- <div class="grid grid-cols-4 gap-4">
-            <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
-              <input 
-                type="checkbox" 
-                :id="'goal-' + goal.goalID" 
-                :value="goal.goalID" 
-                v-model="selectedGoals"
-                class="mr-2"
-              />
-              <p class="text-sm">{{ goal.goalID }}: {{ goal.goalName }}</p>
-            </div>
-          </div>
-        </div>
-      </div> -->
-
       <!-- Sustainability -->
       <div class="mb-10">
         <h1>Sustainability<span class="text-red-500 ml-1">*</span></h1>
         <div>
-          <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้อง:</label>
+          <label class="block mb-2">กรุณาเลือกหัวข้อที่เกี่ยวข้องกับกิจกรรม:</label>
 
           <!-- SDGs Culture (ตัวเลือกที่ 1) -->
           <div class="mb-2">
@@ -910,7 +873,7 @@ const getNextDay = (date) => {
                     v-model="selectedGoals"
                     class="mr-2"
                   />
-                  <p class="text-sm">{{ goal.goalID }}: {{ goal.goalName }}</p>
+                  <p class="text-sm">{{ goal.goalID }}. {{ goal.goalName }}</p>
                 </div>
               </div>
             </div>
@@ -941,6 +904,7 @@ const getNextDay = (date) => {
         v-model="sustainabilityDetail" 
         class="form-textarea w-full h-32" 
         placeholder="กรอกหลักการและเหตุผล"
+        :minlength="10"
       ></textarea>
     </div>
 
@@ -967,7 +931,10 @@ const getNextDay = (date) => {
         <input 
           type="number" 
           v-model="participant.count"
-          class="form-input w-20 mr-2"
+          class="form-input w-20 mr-2 text-right"
+          style="width: 10%;"
+          min="0"
+          :value="participant.count || 0"
         />
         <span>คน</span>
       </div>
@@ -981,6 +948,7 @@ const getNextDay = (date) => {
         v-model="activityCharacteristic" 
         class="form-textarea w-full h-32" 
         placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม ให้เห็นภาพการจัดกิจกรรม"
+        :minlength="10"
       ></textarea>
     </div>
 
@@ -992,12 +960,12 @@ const getNextDay = (date) => {
         v-model="codeOfHonor" 
         class="form-textarea w-full h-22" 
         placeholder="อธิบายความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor"
+        :minlength="10"
       ></textarea>
     </div>
 
     <!-- ระยะเวลาดำเนินงาน -->
     <div class="mb-6">
-      <!-- <label class="block text-gray-700 mb-2">ระยะเวลาดำเนินงาน</label> -->
       <!-- ระยะเวลาเตรียมงาน -->
       <div class="mb-4">
         <label class="block text-gray-700 mb-2">ระยะเวลาเตรียมงาน:</label>
@@ -1068,14 +1036,15 @@ const getNextDay = (date) => {
         <span class="w-48">{{ member.name }}</span>
         <span class="w-48">{{ member.department }}</span>
         <span class="w-40">{{ member.phone }}</span>
+  
+        <!-- Dropdown ตำแหน่ง -->
+        <select v-model="member.position" class="form-input w-36" style="width: 30%;">
+          <option value="" disabled selected>เลือกตำแหน่ง</option>
+          <option v-for="position in positions" :key="position" :value="position">
+            {{ position }}
+          </option>
+        </select>
         
-        <!-- ช่องกรอกตำแหน่ง -->
-        <input 
-          type="text" 
-          v-model="member.position" 
-          placeholder="กรอกตำแหน่ง" 
-          class="form-input w-36"
-        />
       </div>
 
       <!-- ปุ่มลบ -->
@@ -1105,9 +1074,9 @@ const getNextDay = (date) => {
       <label :for="option.evaluationID">{{ option.evaluationName }}</label>
     </div>
 
-    <!-- ช่องอัพโหลดไฟล์รูปแบบการประเมินผล -->
+    <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
     <div class="mb-6">
-      <label for="evaluationFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์สำหรับรูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+      <label for="evaluationFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์ตัวอย่างการประเมินผล<span class="text-red-500 ml-1">*</span></label>
       <input 
         id="evaluationFile" 
         type="file" 
@@ -1118,7 +1087,7 @@ const getNextDay = (date) => {
 
   <!-- ผลที่คาดว่าจะได้รับ -->
   <div class="mb-6">
-    <label class="block text-gray-700 mb-2">ผลที่คาดว่าจะได้รับ</label>
+    <label class="block text-gray-700 mb-2">ผลที่คาดว่าจะได้รับที่สอดคล้องกับวัตถุประสงค์</label>
 
     <div v-for="(expectedResult, index) in expectedResults" :key="index" class="flex items-center gap-4 mb-4">
       <!-- ผลที่คาดว่าจะได้รับ -->
@@ -1130,6 +1099,7 @@ const getNextDay = (date) => {
           v-model="expectedResults[index].result" 
           class="form-input w-full"
           placeholder="ผลที่คาดว่าจะได้รับ"
+          :minlength="10"
         />
       </div>
 
@@ -1142,6 +1112,7 @@ const getNextDay = (date) => {
           v-model="expectedResults[index].kpi" 
           class="form-input w-full"
           placeholder="KPI"
+          :minlength="10"
         />
       </div>
 
@@ -1171,7 +1142,7 @@ const getNextDay = (date) => {
     <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 mb-4">
       <!-- ปัญหาอุปสรรค -->
       <div class="flex items-center gap-2">
-        <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:<span class="text-red-500 ml-1">*</span></label>
+        <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
         <input 
           :id="'problem-' + index" 
           v-model="item.problem" 
@@ -1183,7 +1154,7 @@ const getNextDay = (date) => {
 
       <!-- แนวทางการแก้ไข -->
       <div class="flex items-center gap-2">
-        <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:<span class="text-red-500 ml-1">*</span></label>
+        <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:</label>
         <input 
           :id="'solution-' + index" 
           v-model="item.solution" 
@@ -1208,7 +1179,7 @@ const getNextDay = (date) => {
 
   <!-- อัพโหลดไฟล์เพิ่มเติม -->
   <div class="mb-6">
-    <label for="prepareFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์เพิ่มเติม<span class="text-red-500 ml-1">*</span></label>
+    <label for="prepareFile" class="block text-gray-700 mb-2">อัปโหลดไฟล์เพิ่มเติม (เช่น ตารางกำหนดการจัดกิจกรรม ฯลฯ)<span class="text-red-500 ml-1">*</span></label>
     <input 
       id="prepareFile" 
       type="file" 

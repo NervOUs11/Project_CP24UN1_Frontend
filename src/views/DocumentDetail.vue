@@ -220,6 +220,7 @@ const sortedProgress = computed(() => {
 onMounted(async () => {
   let userid = null
   const role = localStorage.getItem("role")
+
   if(role != "Student"){
     userid = localStorage.getItem("staffID")
   } 
@@ -260,13 +261,48 @@ onMounted(async () => {
       <div class="mb-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-2">Document Information</h2>
         <div class="grid grid-cols-2 gap-4">
-          <!-- <div>
-            <span class="font-bold">Document ID:</span> {{ data.DocumentID }}
-          </div> -->
+          <div>
+            <span class="font-bold">ชื่อนักศึกษา:</span> {{ data.Owner?.name }}
+          </div>
+          <div>
+            <span class="font-bold">รหัสประจำตัวนักศึกษา:</span> {{ data.Owner?.studentID }}
+          </div>
+          <div>
+            <span class="font-bold">คณะ:</span> {{ data.Owner?.faculty }}
+          </div>
+          <div>
+            <span class="font-bold">ภาควิชา/สาขาวิชา:</span> {{ data.Owner?.department }}
+          </div>
+          <div>
+            <span class="font-bold">ชั้นปีที่:</span> {{ data.Owner?.year }}
+          </div>
+          <div>
+            <span class="font-bold">ระดับการศึกษา:</span>  ปริญญาตรี
+          </div>
+          <div>
+            <span class="font-bold">ประเภทหลักสูตร:</span> ปกติ
+          </div>
+          <div>
+            <span class="font-bold">สถานะนักศึกษา:</span>  ปกติ
+          </div>
+          <div>
+            <span class="font-bold">คะแนนเฉลี่ยประจำภาค:</span> 
+            {{ (data.Owner?.currentGPA % 1 === 0) ? data.Owner?.currentGPA.toFixed(1) : data.Owner?.currentGPA }}
+          </div>
+          <div>
+            <span class="font-bold">คะแนนเฉลี่ยสะสม:</span> 
+            {{ (data.Owner?.cumulativeGPA % 1 === 0) ? data.Owner?.cumulativeGPA.toFixed(1) : data.Owner?.cumulativeGPA }}
+          </div>
+          <div>
+            <span class="font-bold">ข้อมูลการติดต่อนักศึกษา:</span> {{ data.Owner?.tel }}
+          </div>
+          <div>
+            <span class="font-bold">อีเมล:</span> {{ data.Owner?.email }}
+          </div>
+
           <div>
             <span class="font-bold">ประเภทการลา:</span> {{ data.DocumentType }}
           </div>
-          <!-- <div class="col-span-2"> -->
           <div>  
             <span class="font-bold">เหตุผลและรายละเอียด:</span> {{ data.detail }}
           </div>

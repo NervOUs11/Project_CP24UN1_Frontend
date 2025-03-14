@@ -12,7 +12,7 @@ const addDocument = async (dataToSend) => {
         if (!res.ok) {
             throw new Error(`HTTP error! Status: ${res.status}`);
         }
-        return await res.json();
+        return res
     } 
     catch (error) {
       console.error(error)

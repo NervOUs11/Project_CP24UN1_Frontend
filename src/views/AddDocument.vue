@@ -230,23 +230,11 @@ const addDoc = async () => {
       studentFacultyID: studentFacultyID,
       studentDepartmentID: studentDepartmentID,
     };
-    console.log("Data to send:", dataToSend);
     const res = await addDocument(dataToSend);
-    console.log("API response:", res[1]);
-
-
-    if (res[1] === 201) {
+    if (res.status === 201) {
       showSuccess("add")
-      // alert("Add New Document Successfully!");
-      // try {
-      //   router.push("/tracking");
-      // } catch (error) {
-      //   console.error(error);
-      // }
     }
   } catch (error) {
-    // alertMessage.value = "Add Document Failed";
-    // showModal.value = true;
     console.error("Failed to add absence document:", error.message);
   }
 };
