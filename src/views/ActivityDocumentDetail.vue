@@ -89,7 +89,6 @@ const handleDelete = async () => {
   try {
     const documentID = documentId.value
     const studentID = localStorage.getItem("studentID");
-    // console.log(documentID + " " + studentID)
     if (!documentID || !studentID) {
       alert('Missing document ID or student ID');
       return;
@@ -227,6 +226,8 @@ const handleEdit = () => {
   router.push(`/editActivityDocument/${documentId}`);
 };
 
+const sustainabilityProposeArray = ref([]);
+
 onMounted(async () => {
   let userid = null
   const role = localStorage.getItem("role")
@@ -239,10 +240,14 @@ onMounted(async () => {
 
   try{
       activityData.value = await fetchActivityDocument(docId, userid, role)
-      // console.log(activityData.value)
       if (activityData.value) {
           documentId.value = activityData.value.DocumentID;
           progressID.value = activityData.value.progressID;
+          // console.log(activityData.value)
+          console.log(activityData.value.sustainability)
+          // console.log(activityData.value.sustainabilityPropose)
+          sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
+          // console.log(sustainabilityProposeArray.value);
           activityData.value.startTime = activityData.value.startTime ? formatDateTime(activityData.value.startTime) : "N/A";
           activityData.value.endTime = activityData.value.endTime ? formatDateTime(activityData.value.endTime) : "N/A";
           activityData.value.prepareStart = activityData.value.prepareStart ? formatDate(activityData.value.prepareStart) : "N/A";
@@ -255,6 +260,7 @@ onMounted(async () => {
   }
 
 })
+
 </script>
 
 <template>
@@ -341,14 +347,46 @@ onMounted(async () => {
         </ul>
       </div>
 
-      <!-- Sustainability และ Goal ยังไม่ได้ทำ -->
+      <!-- Sustainability and Goals -->
+      <div class="mb-6">
+        <span class="font-bold">Sustainability:</span>
+        <ul class="list-disc pl-6 text-gray-700">
+          <!-- SDGs Culture -->
+          <li v-if="(activityData.sustainability || []).some(item => item.sustainability === 'SDGs Culture')">
+            SDGs Culture
+            <ul class="list-disc pl-6 text-gray-700">
+              <li v-for="(goal, index) in (activityData.sustainability || [])
+                .filter(item => item.sustainability === 'SDGs Culture')
+                .map(item => item.goal)" 
+                :key="index">
+                {{ goal }}
+              </li>
+            </ul>
+          </li>
+          <!-- Other Sustainability Items -->
+          <li v-for="(item, index) in (activityData.sustainability || []).filter(item => item.sustainability !== 'SDGs Culture')" 
+              :key="index">
+            {{ item.sustainability }}
+          </li>
+        </ul>
+      </div>
+
 
       <div class="mb-6">
         <span class="font-bold">หลักการและเหตุผล:</span> {{ activityData.sustainabilityDetail }}
       </div>
 
-      <div class="mb-6">
+      <!-- <div class="mb-6">
         <span class="font-bold">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
+      </div> -->
+
+      <div class="mb-6">
+        <span class="font-bold">วัตถุประสงค์:</span>
+        <ul class="list-disc pl-6 text-gray-700">
+          <li v-for="(item, index) in sustainabilityProposeArray" :key="index">
+            {{ item }}
+          </li>
+        </ul>
       </div>
       
       <div class="mb-6">
@@ -429,7 +467,7 @@ onMounted(async () => {
         </ul>
       </div>
 
-      <div class="mb-6">
+      <div v-if="activityData.problem?.some(p => p.problemDetail || p.solution)" class="mb-6">
         <span class="font-bold">ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้:</span>
         <ul class="list-disc pl-6 text-gray-700">
           <li class="mb-3" v-for="(problem, index) in activityData.problem" :key="index">

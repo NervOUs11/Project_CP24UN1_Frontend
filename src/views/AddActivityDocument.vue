@@ -381,6 +381,9 @@ const validatePercentage = () => {
   let total = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
   if (total > 100) {
     alert('เปอร์เซ็นต์รวมกันต้องไม่เกิน 100%');
+    Object.keys(percentages.value).forEach(skillID => {
+      percentages.value[skillID] = 0;
+    });
   }
 };
 
@@ -796,10 +799,8 @@ const positions = ref([
               :key="skillID" 
               class="flex items-center mb-2"
             >
-              <!-- แสดงชื่อทักษะ -->
               <span class="mr-2">{{ getSkillName(skillID) }}</span>
 
-              <!-- ช่องกรอกเปอร์เซ็นต์ -->
               <input 
                 type="number" 
                 v-model.number="percentages[skillID]" 
@@ -811,14 +812,10 @@ const positions = ref([
               />
             </li>
           </ul>
-
-          <!-- ข้อความเตือนถ้าเปอร์เซ็นต์รวมไม่เท่ากับ 100% -->
           <p v-if="!isPercentageValid" class="text-red-500 mt-2">
             เปอร์เซ็นต์ทั้งหมดต้องรวมกันเป็น 100%
           </p>
         </div>
-
-
 
         <!-- Entrepreneurial -->
         <div class="mb-10">
