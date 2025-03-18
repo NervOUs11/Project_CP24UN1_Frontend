@@ -92,14 +92,20 @@ onMounted(async() => {
   try {
     studentQFList.value = await fetchAllStudentQF();
     rawStaffData.value = await fetchAllStaff();
-    advisorList.value = rawStaffData.value.map((staff) => ({
-      staffId: staff[0],
-      fullName: `${staff[2]} ${staff[3]}`,
+    advisorList.value = rawStaffData.value
+      .filter(staff => ['Advisor', 'Deputy Dean'].includes(staff[10])) // กรองเฉพาะ Advisor และ Deputy Dean
+      .map(staff => ({
+        staffId: staff[0],
+        fullName: `${staff[2]} ${staff[3]}`,
     }));
-    presidentList.value = rawStaffData.value.map((staff) => ({
-      staffId: staff[0],
-      fullName: `${staff[2]} ${staff[3]}`,
+
+    presidentList.value = rawStaffData.value
+      .filter(staff => staff[10] === 'Prime Minister') // กรองเฉพาะ Prime Minister
+      .map(staff => ({
+        staffId: staff[0],
+        fullName: `${staff[2]} ${staff[3]}`,
     }));
+
     departmentPresidentList.value = rawStaffData.value
       .filter((staff) => staff[10].includes('ประธานฝ่าย'))
       .map((staff) => ({
@@ -424,6 +430,39 @@ const addDoc = async () => {
     const endTime = convertToISOWithTimezone(endDate.value)
     const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
     const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
+
+    if (agencyCode.value.trim().length === 0){
+      alert("กรุณากรอกรหัสหน่วยงาน");
+      throw new Error("กรุณากรอกรหัสหน่วยงาน");
+    } 
+    else if (projectNameThai.value.trim().length === 0) {
+      alert("กรุณากรอกชื่อโครงการภาษาไทย");
+      throw new Error("กรุณากรอกชื่อโครงการภาษาไทย");
+    } 
+    else if (projectNameEng.value.trim().length === 0) {
+      alert("กรุณากรอกชื่อโครงการภาษาอังกฤษ");
+      throw new Error("กรุณากรอกชื่อโครงการภาษาอังกฤษ");
+    }
+    else if (location.value.trim().length === 0) {
+      alert("กรุณากรอกสถานที่");
+      throw new Error("กรุณากรอกสถานที่");
+    }
+    else if (purpose.value.trim().length === 0) {
+      alert("กรุณากรอกวัตถุประสงค์");
+      throw new Error("กรุณากรอกวัตถุประสงค์");
+    }
+    else if (sustainabilityDetail.value.trim().length === 0) {
+      alert("กรุณากรอกหลักการและเหตุผล");
+      throw new Error("กรุณากรอกหลักการและเหตุผล");
+    }
+    else if (activityCharacteristic.value.trim().length === 0) {
+      alert("กรุณาเขียนบรรยายรูปแบบการจัดกิจกรรม");
+      throw new Error("กรุณาเขียนบรรยายรูปแบบการจัดกิจกรรม");
+    }
+    else if (codeOfHonor.value.trim().length === 0) {
+      alert("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
+      throw new Error("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
+    }
 
     const dataToSend = {
       studentID: studentID,
