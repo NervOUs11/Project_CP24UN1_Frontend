@@ -140,6 +140,8 @@ const redirectToTracking = () => {
 };
 const projectNameThai = ref("");
 const projectNameEng = ref("");
+const prefix = ref("");
+const suffix = ref("");
 onMounted(async() => {
     let userid = null
     const role = localStorage.getItem("role")
@@ -202,6 +204,11 @@ onMounted(async() => {
         if (activityData.value) {
             documentId.value = activityData.value.DocumentID;
             agencyCode.value = activityData.value.code;
+            const parts = agencyCode.value.split(".");
+            if (parts.length === 3) {
+              prefix.value = parts[0] + ".";
+              suffix.value = parts[2];
+            }
             writtenDate.value = formatDate(activityData.value.createDate);
             agencyName.value = activityData.value.departmentName;
             projectName.value = activityData.value.title;
@@ -214,8 +221,7 @@ onMounted(async() => {
             advisor.value = activityData.value.allProgress[0].staffID;
             president.value = activityData.value.allProgress[1].staffID;
             departmentPresident.value = activityData.value.allProgress[2].staffID;
-            
-            console.log(activityData.value.title)
+
             projectNameThai.value = activityData.value.title.replace(/\(.*?\)/g, "").trim();
             const match = activityData.value.title.match(/\((.*?)\)/);
             projectNameEng.value = match ? match[1] : "";
@@ -721,6 +727,10 @@ const getNextDay = (date) => {
   return nextDay.toISOString().split("T")[0];
 };
 
+const getProjectName = computed(() => 
+  projectNameEng.value ? `${projectNameThai.value} (${projectNameEng.value})` : projectNameThai.value
+);
+
 </script>
 
 
@@ -730,55 +740,63 @@ const getNextDay = (date) => {
       <h1 class="text-2xl font-bold mb-4 text-center text-blue-500">Add Activity Document</h1>
 
       <form @submit.prevent="handleEditDocument">
-          <!-- ที่ (รหัสหน่วยงาน) -->
           <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="mb-3 flex items-center gap-4 mt-7">
-              <div class="flex items-center">
-                <label for="agencyCode" class="text-gray-700 mr-2">ที่<span class="text-red-500 ml-1">*</span></label>
-                <input 
-                  type="text" 
-                  id="agencyCode" 
-                  v-model="agencyCode" 
-                  class="form-input w-40" 
-                  placeholder="รหัสหน่วยงาน"
-                  required
-                />
+          <!-- ที่ (รหัสหน่วยงาน) -->
+          <div class="mb-3 flex items-center gap-4 mt-7">
+            <div class="flex items-center gap-2">
+              <label for="agencyCode" class="text-gray-700">ที่<span class="text-red-500 ml-1">*</span></label>
+              <input 
+                type="text" 
+                v-model="prefix" 
+                class="form-input w-24 text-left" 
+                placeholder="รหัสหน่วยงาน"
+              />
+              <span class="text-gray-700 font-bold">มจธ.</span>
+              <input 
+                type="text" 
+                v-model="suffix" 
+                class="form-input w-24 text-left" 
+                placeholder="ปีที่เบิกงบ"
+              />
+            </div>
+            <p class="text-gray-500 text-sm mt-1">ตัวอย่าง: สนทศ.มจธ.1/2567</p>
+            </div>
+
+            <!-- กลุ่ม ชื่อหน่วยงาน + วันที่เขียน -->
+            <div class="mb-3 flex items-center justify-between gap-4">
+              <div class="flex-1">
+                <label for="agencyName" class="block text-gray-700 mb-1">ชื่อหน่วยงาน<span class="text-red-500 ml-1">*</span></label>
+                <select id="agencyName" v-model="agencyName" class="form-input w-full" required>
+                  <option value="">-- เลือกหน่วยงาน --</option>
+                  <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
+                    {{ agency }}
+                  </option>
+                </select>
               </div>
+
+              <!-- วันที่เขียน -->
               <div class="flex items-center">
-                <label for="writtenDate" class="text-gray-700 mr-2">วันที่</label>
                 <input 
                   type="date" 
                   id="writtenDate" 
                   v-model="writtenDate" 
-                  class="form-input w-40" 
+                  class="form-input w-40 mt-9"
                   disabled
                 />
               </div>
             </div>
-          
 
-          <!-- ชื่อหน่วยงาน -->
-          <div class="mb-3">
-            <label for="agencyName" class="block text-gray-700 mb-1">ชื่อหน่วยงาน<span class="text-red-500 ml-1">*</span></label>
-            <select id="agencyName" v-model="agencyName" class="form-input mt-3" required>
-              <option value="">-- เลือกหน่วยงาน --</option>
-              <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
-                {{ agency }}
-              </option>
-            </select>
-          </div>
-
-          <!-- ชื่อโครงการ -->
-          <div class="mb-3">
-            <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
-            <input 
-              type="text" 
-              v-model="projectNameThai" 
-              class="form-input w-full" 
-              required
-              minlength="5"
-            />
-          </div>
+            <!-- ชื่อโครงการ -->
+            <div class="mb-3">
+              <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
+              <input 
+                type="text" 
+                v-model="projectNameThai" 
+                class="form-input w-full" 
+                required
+                minlength="5"
+              />
+            </div>
 
           <div class="mb-3">
             <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
@@ -809,7 +827,7 @@ const getNextDay = (date) => {
             <input 
               type="text" 
               id="organizeProject" 
-              :value="organizeProject"  
+              :value="getProjectName"  
               class="form-input" 
               disabled
             />
@@ -852,7 +870,7 @@ const getNextDay = (date) => {
 
           <!-- ประเภทกิจกรรม -->
           <div class="mb-3">
-            <label for="type" class="block text-gray-700 mb-1">ประเภทกิจกรรม<span class="text-red-500 ml-1">*</span></label>
+            <label for="type" class="block text-gray-700 mb-1">ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span></label>
             <select id="type" v-model="type" class="form-input" style="margin-top: 10px;" required>
               <option value="">-- เลือกประเภท --</option>
               <option v-for="option in typeOptions" :key="option" :value="option">
@@ -876,21 +894,26 @@ const getNextDay = (date) => {
           <!-- ค่าใช้จ่าย -->
           <div class="mb-3 flex items-center">
             <label for="expenses" class="text-gray-700 mr-2" style="width: 85px;">ค่าใช้จ่าย<span class="text-red-500">*</span></label>
-            <input 
-              type="number" 
-              id="expenses" 
-              v-model.number="expenses" 
-              class="form-input w-40 mr-2" 
-              required
-              :max="9999999" 
-              maxlength="7"
-              @input="limitExpensesLength"
-            />
+
+            <div class="flex items-center">
+              <input 
+                type="number" 
+                id="expenses" 
+                v-model.number="expenses" 
+                class="form-input w-40 mr-2 text-right" 
+                required
+                :max="9999999" 
+                maxlength="7"
+                @input="limitExpensesLength"
+                style="width: 30%;"
+              />
+              <span class="text-gray-700 ml-2">บาท</span>
+              <span class="text-gray-500">( {{ expensesThaiText }} )</span>
+            </div>
           </div>
+
           <div class="mb-3 mt-4">
-            <span class="text-gray-500">
-              ( {{ expensesThaiText }} )
-            </span>
+
           </div>
 
           <!-- เลือกชั่วโมงกิจกรรม -->
@@ -1054,11 +1077,11 @@ const getNextDay = (date) => {
         </div>
 
       <!-- Entrepreneurial -->
-      <div>
+      <div class="mb-10">
         <h1>Entrepreneurial<span class="text-red-500 ml-1">*</span></h1>
         <div>
           <label class="block mb-2 text-red">เลือกอย่างน้อย 1 ด้าน</label>
-          <div v-for="option in entrepreneurialData" :key="option.entrepreneurialID" class="mb-2">
+          <div v-for="option in entrepreneurialWithDescriptions" :key="option.entrepreneurialID" class="mb-2">
             <input 
               type="checkbox" 
               :id="'entrepreneurial-' + option.entrepreneurialID"
@@ -1068,10 +1091,10 @@ const getNextDay = (date) => {
             <label :for="'entrepreneurial-' + option.entrepreneurialID">
               {{ option.entrepreneurialName }}
             </label>
+            <p class="text-gray-600 text-sm mt-1">{{ option.description }}</p>
           </div>
         </div>
       </div>
-
 
       <!-- Sustainability (Edit Mode) -->
       <div class="mb-10">

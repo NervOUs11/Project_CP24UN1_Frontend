@@ -404,7 +404,11 @@ const validateTarget = (event, index) => {
 
 const projectNameThai = ref("");
 const projectNameEng = ref("");
-const getProjectName = computed(() => `${projectNameThai.value}  (${projectNameEng.value})`);
+const getProjectName = computed(() => 
+  projectNameEng.value ? `${projectNameThai.value} (${projectNameEng.value})` : projectNameThai.value
+);
+const prefix = ref("");
+const suffix = ref("");
 
 const addDoc = async () => {
   try {
@@ -430,6 +434,7 @@ const addDoc = async () => {
     const endTime = convertToISOWithTimezone(endDate.value)
     const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
     const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
+    agencyCode.value = `[${prefix.value}]มจธ.[${suffix.value}]`;
 
     if (agencyCode.value.trim().length === 0){
       alert("กรุณากรอกรหัสหน่วยงาน");
@@ -463,6 +468,8 @@ const addDoc = async () => {
       alert("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
       throw new Error("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
     }
+
+
 
     const dataToSend = {
       studentID: studentID,
@@ -535,45 +542,51 @@ const positions = ref([
 
       <form @submit.prevent="addDoc">
         <div class="grid grid-cols-2 gap-4 mb-4">
-          <!-- ที่ (รหัสหน่วยงาน) และ วันที่เขียน -->
           <div class="mb-3 flex items-center gap-4 mt-7">
-            <!-- ที่ (รหัสหน่วยงาน) -->
-            <div class="flex items-center">
-              <label for="agencyCode" class="text-gray-700 mr-2">ที่<span class="text-red-500 ml-1">*</span></label>
+            <div class="flex items-center gap-2">
+              <label for="agencyCode" class="text-gray-700">ที่<span class="text-red-500 ml-1">*</span></label>
               <input 
                 type="text" 
-                id="agencyCode" 
-                v-model="agencyCode" 
-                class="form-input w-40" 
+                v-model="prefix" 
+                class="form-input w-24 text-left" 
                 placeholder="รหัสหน่วยงาน"
-                required
               />
+              <span class="text-gray-700 font-bold">มจธ.</span>
+              <input 
+                type="text" 
+                v-model="suffix" 
+                class="form-input w-24 text-left" 
+                placeholder="ปีที่เบิกงบ"
+              />
+            </div>
+            <p class="text-gray-500 text-sm mt-1">ตัวอย่าง: สนทศ.มจธ.1/2567</p>
+          </div>
+
+          <!-- กลุ่ม ชื่อหน่วยงาน + วันที่เขียน -->
+          <div class="mb-3 flex items-center justify-between gap-4">
+            <div class="flex-1">
+              <label for="agencyName" class="block text-gray-700 mb-1">ชื่อหน่วยงาน<span class="text-red-500 ml-1">*</span></label>
+              <select id="agencyName" v-model="agencyName" class="form-input w-full" required>
+                <option value="">-- เลือกหน่วยงาน --</option>
+                <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
+                  {{ agency }}
+                </option>
+              </select>
             </div>
 
             <!-- วันที่เขียน -->
             <div class="flex items-center">
-              <label for="writtenDate" class="text-gray-700 mr-2" style="width: 100%;">วันที่</label>
               <input 
                 type="date" 
                 id="writtenDate" 
                 v-model="writtenDate" 
-                class="form-input w-40" 
+                class="form-input w-40 mt-9"
+                width="100%"
                 disabled
               />
             </div>
           </div>
 
-
-          <!-- ชื่อหน่วยงาน -->
-          <div class="mb-3">
-            <label for="agencyName" class="block text-gray-700 mb-1">ชื่อหน่วยงาน<span class="text-red-500 ml-1">*</span></label>
-            <select id="agencyName" v-model="agencyName" class="form-input mt-3" required>
-              <option value="">-- เลือกหน่วยงาน --</option>
-              <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
-                {{ agency }}
-              </option>
-            </select>
-          </div>
 
           <!-- ชื่อโครงการ -->
           <div class="mb-3">
