@@ -8,10 +8,11 @@ const login = async (username, password) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            username: username,
-            password: password
+          username: username,
+          password: password
         })
-      })
+      });
+
       const data = await res.json()
       
       localStorage.setItem("firstName", data.firstName);

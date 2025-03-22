@@ -237,6 +237,7 @@ onMounted(async () => {
       createDate: formatDateTime(rawData.createDate),
       editDate: formatDateTime(rawData.editDate),
       file1: `data:image/jpeg;base64,${rawData.file1}`,
+      file2: `data:image/jpeg;base64,${rawData.file2}`,
     };
   }
   console.log(data.value)
@@ -337,8 +338,11 @@ onMounted(async () => {
           </div>
           <div v-if="data.file2">
             <span class="font-bold">File 2:</span>
-            <a :href="data.file2" target="_blank" class="text-orange-500 underline">
-              {{ data.file2Name || "View File" }}
+            <a 
+              href="javascript:void(0);" 
+              @click="openFileInNewTab(data.file2, 'application/pdf')" 
+              class="text-orange-500 underline">
+              View File
             </a>
           </div>
         </div>

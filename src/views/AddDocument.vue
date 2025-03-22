@@ -84,14 +84,21 @@ onMounted(() => {
   }
 })
 
-const handleFileChange = async (e) => {
+const handleFile1Change = async (e) => {
   console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
     const base64 = await fileToBase64(file);
-    // console.log("Base64 file:", base64);
     attachmentFile1.value = base64
-    // downloadPDF(base64, 'base64topdf.pdf');
+  }
+}
+
+const handleFile2Change = async (e) => {
+  console.log("Input changed:", e.target.files)
+  const file = e.target.files[0];
+  if (file) {
+    const base64 = await fileToBase64(file);
+    attachmentFile2.value = base64
   }
 }
 
@@ -225,7 +232,7 @@ const addDoc = async () => {
       endTime: endTime,
       detail: detail.value,
       attachmentFile1: attachmentFile1.value,
-      attachmentFile2: "",
+      attachmentFile2: attachmentFile2.value,
       attachmentFile2Name: "File 2 name", // ชื่อไฟล์แนบ 2 (ถ้าต้องการแยกต่างหาก)
       studentFacultyID: studentFacultyID,
       studentDepartmentID: studentDepartmentID,
@@ -420,7 +427,7 @@ const addDoc = async () => {
             <input 
               type="file" 
               id="attachmentFile1" 
-              @change="handleFileChange" 
+              @change="handleFile1Change" 
               class="form-input"
             />
           </div>
@@ -430,7 +437,7 @@ const addDoc = async () => {
             <input 
               type="file" 
               id="attachmentFile2" 
-              @change="e => attachmentFile2.value = e.target.files[0]"
+              @change="handleFile2Change" 
               class="form-input"
             />
           </div>

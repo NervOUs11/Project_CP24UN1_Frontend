@@ -85,14 +85,15 @@ onMounted(async () => {
     cumulativeGPA: localStorage.getItem("cumulativeGPA"),
     advisor: localStorage.getItem("advisor"),
     tel: localStorage.getItem("tel"),
-    email: localStorage.getItem("username")
+    email: localStorage.getItem("email")
   }
 
     const studentID = localStorage.getItem("studentID");
     const role = "Student";
     const documentData = await fetchDocumentDetail(studentID, role);
-    console.log(documentData)
+    
     if (documentData) {
+        console.log(documentData)
         type.value = documentData.DocumentType || '';
         detail.value = documentData.detail || '';
  
@@ -114,20 +115,19 @@ onMounted(async () => {
             const endTimeHour = new Date(endtime.value).getHours();
             
             // เช็คช่วงเวลา
-            if (startTimeHour === 2 && endTimeHour === 5) {
+            if ((startTimeHour === 2 && endTimeHour === 5) || (startTimeHour === 9 && endTimeHour === 12)) {
                 oneDaySession.morning = true;
                 oneDaySession.afternoon = false;
-            } else if (startTimeHour === 6 && endTimeHour === 10) {
+            } else if ((startTimeHour === 6 && endTimeHour === 10) || (startTimeHour === 13 && endTimeHour === 17)) {
                 oneDaySession.morning = false;
                 oneDaySession.afternoon = true;
-            } else if (startTimeHour === 2 && endTimeHour === 10) {
+            } else if ((startTimeHour === 2 && endTimeHour === 10) || (startTimeHour === 9 && endTimeHour === 17)) {
                 oneDaySession.morning = true;
                 oneDaySession.afternoon = true;
             } else {
                 oneDaySession.morning = false;
                 oneDaySession.afternoon = false;
             }
-
         } else {
             leaveType.value = 'multipleDays';
             starttime.value = documentData.startTime.split('T')[0]; // ตั้งค่า starttime เป็นวันที่ของ startTime
@@ -139,34 +139,70 @@ onMounted(async () => {
     documentID.value = documentData.DocumentID
 });
 
+// function convertToISOWithTimezone(dateString, time) {
+//   if (!dateString || typeof dateString !== "string" || !dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+//     throw new Error(`Invalid dateString: ${dateString}`);
+//   }
+
+//   if (!time || typeof time !== "string" || !time.match(/^\d{2}:\d{2}:\d{2}$/)) {
+//     throw new Error(`Invalid time: ${time}`);
+//   }
+
+//   const date = new Date(`${dateString}T${time}`);
+
+//   if (isNaN(date.getTime())) {
+//     throw new Error(`Invalid combined date/time: ${dateString}T${time}`);
+//   }
+
+//   const timezoneOffset = date.getTimezoneOffset(); // offset เป็นนาที
+//   date.setMinutes(date.getMinutes() - timezoneOffset); // ปรับเวลาให้ตรงกับ timezone ของระบบ
+//   return date.toISOString();
+// }
+
 function convertToISOWithTimezone(dateString, time) {
-  if (!dateString || typeof dateString !== "string" || !dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    throw new Error(`Invalid dateString: ${dateString}`);
+  try {
+    let date;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      date = new Date(`${dateString}T${time}`);
+    } else {
+      date = new Date(dateString);
+      if (isNaN(date)) {
+        throw new Error(`Invalid dateString: "${dateString}".`);
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      dateString = `${year}-${month}-${day}`;
+      date = new Date(`${dateString}T${time}`);
+    }
+
+    if (isNaN(date)) {
+      throw new Error("Invalid date or time value.");
+    }
+
+    return date.toISOString();
+  } catch (error) {
+    return `Error: ${error.message}`;
   }
-
-  if (!time || typeof time !== "string" || !time.match(/^\d{2}:\d{2}:\d{2}$/)) {
-    throw new Error(`Invalid time: ${time}`);
-  }
-
-  const date = new Date(`${dateString}T${time}`);
-
-  if (isNaN(date.getTime())) {
-    throw new Error(`Invalid combined date/time: ${dateString}T${time}`);
-  }
-
-  const timezoneOffset = date.getTimezoneOffset(); // offset เป็นนาที
-  date.setMinutes(date.getMinutes() - timezoneOffset); // ปรับเวลาให้ตรงกับ timezone ของระบบ
-  return date.toISOString();
 }
 
-const handleFileChange = async (e) => {
+const handleFile1Change = async (e) => {
   console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
     const base64 = await fileToBase64(file);
-    console.log("Base64 file:", base64);
     attachmentFile1.value = base64
-    // downloadPDF(base64, 'base64topdf.pdf');
+  }
+}
+
+const handleFile2Change = async (e) => {
+  console.log("Input changed:", e.target.files)
+  const file = e.target.files[0];
+  if (file) {
+    const base64 = await fileToBase64(file);
+    attachmentFile2.value = base64
   }
 }
 
@@ -300,7 +336,6 @@ const handleEditDocument = async () => {
       attachmentFile2Name: "File2Name",
 
     };
-
     const res = await editDocument(studentID, documentID.value, dataToUpdate);
 
     if (res.ok) {
@@ -495,7 +530,7 @@ const handleEditDocument = async () => {
 
             <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
             <div v-if="attachmentFile1">
-              <p class="text-sm text-gray-600">ไฟล์ที่อัปโหลดแล้ว: 
+              <p class="text-sm text-gray-600">ไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์ที่อัปโหลดแล้ว: 
                 <a target="_blank" class="text-blue-500 underline" @click="openFileInNewTab(attachmentFile1, 'application/pdf')" >
                   ดูไฟล์เดิม
                 </a>
@@ -506,18 +541,27 @@ const handleEditDocument = async () => {
             <input 
               type="file" 
               id="attachmentFile1" 
-              @change="handleFileChange" 
+              @change="handleFile1Change" 
               class="form-input"
             />
           </div>
 
           <div class="mb-3">
             <label for="attachmentFile2" class="block text-gray-700 mb-1">หลักฐานอื่นๆ</label>
+
+            <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
+            <div v-if="attachmentFile2">
+              <p class="text-sm text-gray-600">ไฟล์หลักฐานอื่นๆที่อัปโหลดแล้ว: 
+                <a target="_blank" class="text-blue-500 underline" @click="openFileInNewTab(attachmentFile2, 'application/pdf')" >
+                  ดูไฟล์เดิม
+                </a>
+              </p>
+            </div>
+
             <input 
               type="file" 
               id="attachmentFile2" 
-              @change="e => attachmentFile2.value = e.target.files[0]"
-              style="margin-top: 30px;"
+              @change="handleFile2Change"
               class="form-input"
             />
           </div>
