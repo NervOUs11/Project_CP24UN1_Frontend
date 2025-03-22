@@ -297,6 +297,7 @@ const handleEditDocument = async () => {
         startTime = convertToISOWithTimezone(dateString, "13:00:00");
         endTime = convertToISOWithTimezone(dateString, "17:00:00");
       } else {
+        alert("กรุณาเลือกช่วงเวลาการลาวันเดียว")
         throw new Error("กรุณาเลือกช่วงเวลาการลาวันเดียว");
       }
     } else if (leaveType.value === "multipleDays") {
