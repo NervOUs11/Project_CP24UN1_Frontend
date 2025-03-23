@@ -104,6 +104,14 @@ const closeDeletePopup = () => {
   showDeletePopup.value = false;
 };
 
+const showApprovePopup = ref(false);
+const openApprovePopup = () => {
+  showApprovePopup.value = true;
+};
+const closeApprovePopup = () => {
+  showApprovePopup.value = false;
+};
+
 // เรียกฟังก์ชันลบเอกสาร
 const handleDelete = async () => {
   try {
@@ -329,21 +337,23 @@ onMounted(async () => {
         <div class="grid grid-cols-2 gap-4">
           <div v-if="data.file1">
             <span class="font-bold">File 1:</span>
-            <a 
+            <a v-if="data.file1.length>30"
               href="javascript:void(0);" 
               @click="openFileInNewTab(data.file1, 'application/pdf')" 
               class="text-orange-500 underline">
-              View File
+              View Attachment File 1
             </a>
+            <span v-else> No Attachment File 1</span>
           </div>
           <div v-if="data.file2">
             <span class="font-bold">File 2:</span>
-            <a 
+            <a v-if="data.file2.length>30"
               href="javascript:void(0);" 
               @click="openFileInNewTab(data.file2, 'application/pdf')" 
               class="text-orange-500 underline">
-              View File
+              View Attachment File 2
             </a>
+            <span v-else> No Attachment File 2</span>
           </div>
         </div>
       </div>
@@ -378,7 +388,7 @@ onMounted(async () => {
       <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
         <!-- ถ้าเป็น staff และสามารถ approve ได้ จะมีปุ่ม approve และ reject -->
         <template v-if="canApprove">
-          <button class="button bg-green-500 text-white mx-2" @click="handleApprove">
+          <button class="button bg-green-500 text-white mx-2" @click="openApprovePopup()">
             Approve
           </button>
           <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
@@ -442,6 +452,27 @@ onMounted(async () => {
               class="button bg-red-500 text-white"
               @click="handleDelete">
               Delete
+            </button>
+        </div>    
+      </div>
+    </div>
+
+    <!-- Popup สำหรับ confirm การ approve document -->
+    <div 
+      v-if="showApprovePopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to approve?</h2>
+          <div class="flex justify-end gap-2">
+            <button 
+              class="button bg-gray-500 text-white"
+              @click="closeApprovePopup">
+              Cancel
+            </button>
+            <button 
+              class="button bg-green-500 text-white"
+              @click="handleApprove">
+              Approve
             </button>
         </div>    
       </div>

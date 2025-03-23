@@ -434,7 +434,7 @@ const addDoc = async () => {
     const endTime = convertToISOWithTimezone(endDate.value)
     const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
     const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
-    agencyCode.value = `[${prefix.value}]มจธ.[${suffix.value}]`;
+    agencyCode.value = `${prefix.value}มจธ.${suffix.value}`;
 
     if (agencyCode.value.trim().length === 0){
       alert("กรุณากรอกรหัสหน่วยงาน");
@@ -1244,7 +1244,7 @@ const positions = ref([
     type="submit" 
     class="form-button"
   >
-    Add Activity Document
+    Sent Activity Document
   </button>
 </form>
 

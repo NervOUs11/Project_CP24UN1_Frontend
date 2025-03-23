@@ -200,7 +200,6 @@ onMounted(async() => {
         sustainabilityData.value = await fetchAllSustainability();
         facultyData.value = await fetchAllFaculty();
         activityData.value = await fetchActivityDocument(docId, userid, role)
-        // console.log(activityData.value)
         if (activityData.value) {
             documentId.value = activityData.value.DocumentID;
             agencyCode.value = activityData.value.code;
@@ -641,6 +640,7 @@ const handleEditDocument = async () => {
         const endTime = convertToISOWithTimezone(endDate.value)
         const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
         const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
+        agencyCode.value = `${prefix.value}มจธ.${suffix.value}`;
 
         if (agencyCode.value.trim().length === 0){
           alert("กรุณากรอกรหัสหน่วยงาน");
@@ -1470,7 +1470,7 @@ const getProjectName = computed(() =>
     type="submit" 
     class="form-button"
   >
-    Edit Activity Document
+    Update Activity Document
   </button>
 </form>
 

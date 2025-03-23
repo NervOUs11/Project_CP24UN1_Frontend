@@ -226,6 +226,14 @@ const handleEdit = () => {
   router.push(`/editActivityDocument/${documentId}`);
 };
 
+const showApprovePopup = ref(false);
+const openApprovePopup = () => {
+  showApprovePopup.value = true;
+};
+const closeApprovePopup = () => {
+  showApprovePopup.value = false;
+};
+
 const sustainabilityProposeArray = ref([]);
 
 onMounted(async () => {
@@ -243,8 +251,8 @@ onMounted(async () => {
       if (activityData.value) {
           documentId.value = activityData.value.DocumentID;
           progressID.value = activityData.value.progressID;
-          // console.log(activityData.value)
-          console.log(activityData.value.sustainability)
+          console.log(activityData.value)
+          // console.log(activityData.value.sustainability)
           // console.log(activityData.value.sustainabilityPropose)
           sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
           // console.log(sustainabilityProposeArray.value);
@@ -537,7 +545,7 @@ onMounted(async () => {
     <div class="text-center">
       <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
         <template v-if="canApprove">
-          <button class="button bg-green-500 text-white mx-2" @click="handleApprove()">
+          <button class="button bg-green-500 text-white mx-2" @click="openApprovePopup()">
             Approve
           </button>
           <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
@@ -600,6 +608,27 @@ onMounted(async () => {
               class="button bg-red-500 text-white"
               @click="handleDelete">
               Delete
+            </button>
+        </div>    
+      </div>
+    </div>
+
+    <!-- Popup สำหรับ confirm การ approve document -->
+    <div 
+      v-if="showApprovePopup"
+      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to approve?</h2>
+          <div class="flex justify-end gap-2">
+            <button 
+              class="button bg-gray-500 text-white"
+              @click="closeApprovePopup">
+              Cancel
+            </button>
+            <button 
+              class="button bg-green-500 text-white"
+              @click="handleApprove">
+              Approve
             </button>
         </div>    
       </div>

@@ -447,7 +447,7 @@ const addDoc = async () => {
           type="submit" 
           class="form-button"
         >
-          Add New Document
+          Sent Absence Document
         </button>
 
       </form>

@@ -571,7 +571,7 @@ const handleEditDocument = async () => {
           type="submit" 
           class="form-button"
         >
-          Update Document
+          Update Absence Document
         </button>
       </form>
 
