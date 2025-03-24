@@ -550,6 +550,7 @@ const positions = ref([
                 v-model="prefix" 
                 class="form-input w-24 text-left" 
                 placeholder="รหัสหน่วยงาน"
+                required
               />
               <span class="text-gray-700 font-bold">มจธ.</span>
               <input 
@@ -557,6 +558,7 @@ const positions = ref([
                 v-model="suffix" 
                 class="form-input w-24 text-left" 
                 placeholder="ปีที่เบิกงบ"
+                required
               />
             </div>
             <p class="text-gray-500 text-sm mt-1">ตัวอย่าง: สนทศ.มจธ.1/2567</p>
