@@ -961,9 +961,9 @@ const positions = ref([
 
     <!-- วัตถุประสงค์ -->
     <div class="mb-6">
-      <label class="block text-gray-700 mb-2">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
+      <label class="block text-gray-700 mb-2">วัตถุประสงค์</label>
       <div v-for="(objective, index) in objectives" :key="index" class="flex items-center mb-2">
-        <span class="mr-2 w-6 text-right">{{ index + 1 }}.</span>
+        <span class="mr-2 w-6 text-right">{{ index + 1 }}.<span class="text-red-500 ml-1">*</span></span>
         <input 
           type="text" 
           v-model="objectives[index]" 
@@ -975,10 +975,11 @@ const positions = ref([
 
     <!-- ผู้เข้าร่วมโครงการ -->
     <div class="mb-6">
-      <label class="block text-gray-700 mb-2">ผู้เข้าร่วมโครงการ<span class="text-red-500 ml-1">*</span></label>
+      <label class="block text-gray-700 mb-2">ผู้เข้าร่วมโครงการ</label>
 
       <div v-for="participant in participantData" :key="participant.participantID" class="flex items-center mb-2">
-        <label class="w-48">{{ participant.participantName }} จำนวน:</label>
+        <label v-if="participant.participantName==='Student'||participant.participantName==='Staff'" class="w-48">{{ participant.participantName }} จำนวน:<span class="text-red-500 ml-1">*</span></label>
+        <label v-else class="w-48">{{ participant.participantName }} จำนวน:</label>
         <input 
           type="number" 
           v-model="participant.count"
