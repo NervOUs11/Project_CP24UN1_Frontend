@@ -248,26 +248,36 @@ const uploadedFiles = reactive({});
 
 const handleFileChange = async (e, fileType) => {
   const file = e.target.files[0];
+
   if (file) {
+    const allowedExtensions = ["pdf"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
+      e.target.value = "";
+      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
+    }
+
     const base64 = await fileToBase64(file);
     switch (fileType) {
-      case 'prepareFile':
+      case "prepareFile":
         prepareFile.value = base64;
         break;
-      case 'evaluationFile':
+      case "evaluationFile":
         evaluationFile.value = base64;
         break;
-      case 'budgetDetails':
+      case "budgetDetails":
         budgetDetails.value = base64;
         break;
-      case 'scheduleDetails':
+      case "scheduleDetails":
         scheduleDetails.value = base64;
         break;
       default:
-        console.error('Unknown file type');
+        console.error("Unknown file type");
     }
   }
-}
+};
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -436,6 +446,18 @@ const addDoc = async () => {
     const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
     agencyCode.value = `${prefix.value}มจธ.${suffix.value}`;
 
+    let totalPercentage = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
+    if (totalPercentage !== 100) {
+      alert("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
+      throw new Error("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
+    }
+
+    const hasPresident = committee.value.some(member => member.position === "ประธานโครงการ");
+        if (!hasPresident) {
+          alert("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
+          throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
+        }
+
     if (agencyCode.value.trim().length === 0){
       alert("กรุณากรอกรหัสหน่วยงาน");
       throw new Error("กรุณากรอกรหัสหน่วยงาน");
@@ -468,8 +490,6 @@ const addDoc = async () => {
       alert("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
       throw new Error("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
     }
-
-
 
     const dataToSend = {
       studentID: studentID,

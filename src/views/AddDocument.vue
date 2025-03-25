@@ -194,6 +194,7 @@ const addDoc = async () => {
         startTime = convertToISOWithTimezone(date, "13:00:00");
         endTime = convertToISOWithTimezone(date, "17:00:00");
       } else {
+        alert("กรุณาเลือกช่วงเวลาการลาวันเดียว");
         throw new Error("กรุณาเลือกช่วงเวลาการลาวันเดียว");
       }
     } else if (leaveType.value === "multipleDays") {
