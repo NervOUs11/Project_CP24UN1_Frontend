@@ -453,10 +453,10 @@ const addDoc = async () => {
     }
 
     const hasPresident = committee.value.some(member => member.position === "ประธานโครงการ");
-        if (!hasPresident) {
-          alert("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
-          throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
-        }
+    if (!hasPresident) {
+      alert("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
+      throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
+    }
 
     if (agencyCode.value.trim().length === 0){
       alert("กรุณากรอกรหัสหน่วยงาน");

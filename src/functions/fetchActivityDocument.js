@@ -1,7 +1,8 @@
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 const URL = import.meta.env.VITE_API_ROOT;
 
 const fetchActivityDocument = async (docId, userid, role) => {
+  const router = useRouter();
   // const route = useRoute();
   // const documentID = route.params.id;
   const documentID = docId
@@ -13,6 +14,10 @@ const fetchActivityDocument = async (docId, userid, role) => {
     });
 
     if (!res.ok) {
+      if (res.status === 403) {
+        router.push("/accessDenied");
+        return;
+      }
       throw new Error("Error, can't get activityDocument data");
     }
 
