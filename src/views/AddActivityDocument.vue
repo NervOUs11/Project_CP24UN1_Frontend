@@ -460,13 +460,18 @@ const addDoc = async () => {
 
     if (objectives.value.some(obj => obj.trim() === '')) {
       alert("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
-      return;
+      throw new Error("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
     }
 
     const uniqueObjectives = new Set(objectives.value.map(obj => obj.trim()));
     if (uniqueObjectives.size !== objectives.value.length) {
       alert("วัตถุประสงค์ต้องไม่ซ้ำกัน");
-      return;
+      throw new Error("วัตถุประสงค์ต้องไม่ซ้ำกัน");
+    }
+
+    if (!validateProjectNames()) {
+      alert("กรอกชื่อโครงการให้ถูกต้อง");
+      throw new Error("กรอกชื่อโครงการให้ถูกต้อง");
     }
 
     if (agencyCode.value.trim().length === 0){
@@ -554,6 +559,32 @@ watch(startDate, (newStart) => {
   }
 });
 
+const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
+const engRegex = /^[A-Za-z\s]+$/;
+
+const isThaiValid = computed(() => projectNameThai.value === "" || thaiRegex.test(projectNameThai.value));
+const isEngValid = computed(() => projectNameEng.value === "" || engRegex.test(projectNameEng.value));
+
+const validateProjectNames = () => {
+  const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
+  const engRegex = /^[A-Za-z\s]+$/;
+
+  const cleanThaiName = projectNameThai.value ? projectNameThai.value.trim() : "";
+  const cleanEngName = projectNameEng.value ? projectNameEng.value.trim() : "";
+
+  if (!thaiRegex.test(cleanThaiName)) {
+    alert("ชื่อโครงการ (ภาษาไทย) ต้องเป็นภาษาไทยเท่านั้น");
+    return false;
+  }
+
+  if (!engRegex.test(cleanEngName)) {
+    alert("ชื่อโครงการ (ภาษาอังกฤษ) ต้องเป็นภาษาอังกฤษเท่านั้น");
+    return false;
+  }
+
+  return true;
+};
+
 const positions = ref([
   "ประธานโครงการ",
   "รองประธานโครงการ",
@@ -631,6 +662,7 @@ const positions = ref([
               required
               minlength="5"
             />
+            <p v-if="!isThaiValid" class="text-red-500 text-sm">ต้องเป็นภาษาไทยเท่านั้น</p>
           </div>
 
           <div class="mb-3">
@@ -642,6 +674,7 @@ const positions = ref([
               required
               minlength="5"
             />
+            <p v-if="!isEngValid" class="text-red-500 text-sm">ต้องเป็นภาษาอังกฤษเท่านั้น</p>
           </div>
 
           <!-- เนื่องด้วย -->

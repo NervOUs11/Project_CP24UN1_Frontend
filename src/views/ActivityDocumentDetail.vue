@@ -4,6 +4,11 @@ import { fetchActivityDocument } from '../functions/fetchActivityDocument.js';
 import { deleteActivityDocument } from '../functions/deleteActivityDocument.js';
 import { approveActivity } from '../functions/approveActivity.js';
 import { rejectActivity } from '../functions/rejectActivity.js';
+import { fetchAllEntrepreneurial } from '../functions/fetchAllEntrepreneurial';
+import { fetchAllSustainability } from '../functions/fetchAllSustainability';
+import { fetchAllGoal } from '../functions/fetchAllGoal';
+import { fetchAllActivity } from '../functions/fetchAllActivity';
+
 import Navbar from '../components/Navbar.vue';
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -118,6 +123,29 @@ const canShowButtons = computed(() => {
   }
   return canApprove.value; // ถ้าไม่ใช่ student ให้แสดงปุ่ม approve กับ reject ถ้า canApprove เป็น true
 });
+
+const entrepreneurialDescriptions = {
+  "Entrepreneurial Mindset":
+    "ส่งเสริมให้นักศึกษามีจิตสำนักของความเป็นผู้ประกอบการ ได้แก่ คิด สร้างสรรค์ ลงมือทำจริง สู้จนสำเร็จ และสร้างผลกระทบที่มีความหมาย",
+  "Knowledge Sharing Society":
+    "ส่งเสริมให้เกิดสังคมแห่งการสร้างสรรค์ความรู้ ทั้งด้านการจัดกิจกรรมเสริมสร้างความรู้ และการสร้างสภาพแวดล้อมให้เอื้อต่อการเรียนรู้",
+  "Research and Innovation Impact":
+    "สร้างงานวิจัยและนวัตกรรมที่ทรงคุณค่า และเกิดประโยชน์กับสังคมอย่างกว้างขวาง",
+  "Financial Literacy":
+    "กิจกรรมการส่งเสริมให้มีความเข้าใจที่เกี่ยวข้องกับการเงิน เพื่อความยั่งยืน การสร้างสภาพแวดล้อมที่จะเอื้อให้นักศึกษาสามารถใช้ประโยชน์จากเครื่องมือทางการเงินที่ตอบโจทย์ด้านความยั่งยืน สร้างนักศึกษาให้มีองค์ความรู้ในการผลักดันงานด้านการเงินเพื่อความยั่งยืนให้เห็นผลเป็นรูปธรรม",
+};
+
+const sustainabilityDescriptions = {
+  "SDGs Culture":
+    "ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17 อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน",
+  "Sustainability Change Agents":
+    "ส่งเสริมให้เกิดผู้นำการเปลี่ยนแปลงที่ยั่งยืน สามารถนำความรู้ แนวทางปฏิบัติไปเผยแพร่และขยายผลต่อชุมชนและสังคมรอบข้างเพื่อให้เกิดความยั่งยืน และก่อให้เกิดผลดีต่อประเทศชาติสืบต่อไป",
+  "Green University and Smart Campus":
+    "ส่งเสริมให้เป็นมหาวิทยาลัยสีเขียว ปลูกจิตสำนึก สร้างความเข้าใจด้านการรักษาสิ่งแวดล้อม การอนุรักษ์พลังงาน และส่งเสริมให้เป็นมหาวิทยาลัยอัจฉริยะ มีการจัดการโดยใช้เทคโนโลยีที่ทันสมัย",
+  "Carbon Neutrality ":
+    "สนับสนุนให้มหาวิทยาลัยขับเคลื่อนเจตนารมณ์ลดการปล่อยคาร์บอนสุทธิเป็นศูนย์ และการลดการปล่อยคาร์บอนในกิจกรรมต่างๆ",
+};
+
 
 // ฟังก์ชัน Approve
 const handleApprove = async () => {
@@ -235,6 +263,37 @@ const closeApprovePopup = () => {
 };
 
 const sustainabilityProposeArray = ref([]);
+const entrepreneurialData = ref([]);
+const sustainabilityData = ref([]);
+const goalData = ref([]);
+const activity = ref([]);
+
+const selectedEntrepreneurial = computed(() => {
+  return (activityData.value.entrepreneurial || []).map(name => ({
+    entrepreneurialName: name,
+    description: entrepreneurialDescriptions[name] || ""
+  }));
+});
+
+const selectedSDGsCulture = computed(() => {
+  const sdgs = (activityData.value.sustainability || []).filter(item => item.sustainability === 'SDGs Culture');
+  return sdgs.length
+    ? {
+        sustainabilityName: 'SDGs Culture',
+        description: sustainabilityDescriptions['SDGs Culture'] || "",
+        goals: sdgs.map(item => item.goal).filter(Boolean), // เอาเฉพาะที่ไม่เป็น null
+      }
+    : null;
+});
+
+const selectedOtherSustainability = computed(() => {
+  return (activityData.value.sustainability || [])
+    .filter(item => item.sustainability !== 'SDGs Culture')
+    .map(item => ({
+      sustainabilityName: item.sustainability,
+      description: sustainabilityDescriptions[item.sustainability] || "",
+    }));
+});
 
 onMounted(async () => {
   let userid = null
@@ -251,11 +310,16 @@ onMounted(async () => {
       if (activityData.value) {
           documentId.value = activityData.value.DocumentID;
           progressID.value = activityData.value.progressID;
-          console.log(activityData.value)
-          // console.log(activityData.value.sustainability)
-          // console.log(activityData.value.sustainabilityPropose)
+          entrepreneurialData.value = await fetchAllEntrepreneurial();
+          sustainabilityData.value = await fetchAllSustainability();
+          goalData.value = await fetchAllGoal();
+          activity.value = await fetchAllActivity();
+          console.log(activityData.value.activity);
+          console.log(activity.value);
+          // console.log(activityData.value.activity.length);
+          entrepreneurialData.value = activityData.value.entrepreneurial
+          sustainabilityData.value =  activityData.value.sustainability
           sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
-          // console.log(sustainabilityProposeArray.value);
           activityData.value.startTime = activityData.value.startTime ? formatDateTime(activityData.value.startTime) : "N/A";
           activityData.value.endTime = activityData.value.endTime ? formatDateTime(activityData.value.endTime) : "N/A";
           activityData.value.prepareStart = activityData.value.prepareStart ? formatDate(activityData.value.prepareStart) : "N/A";
@@ -274,7 +338,7 @@ onMounted(async () => {
 <template>
 <Navbar class="fixed top-0 left-0 w-full z-50 h-[3vh] p-2 shadow-md" />
   <!-- Show loading or skeleton while data is being fetched -->
-  <div v-if="data === null" class="flex justify-center items-center min-h-screen">
+  <div v-if="activityData === null" class="flex justify-center items-center min-h-screen">
     <span>Loading...</span>
   </div>
 
@@ -355,43 +419,36 @@ onMounted(async () => {
           <div class="mb-6">
             <span class="font-bold">Entrepreneurial:</span>
             <ul class="list-disc pl-6 text-gray-700">
-              <li v-for="(entrepreneurial, index) in activityData.entrepreneurial" :key="index">
-                {{ entrepreneurial.join(', ') }}
+              <li v-if="selectedEntrepreneurial.length">
+                <span class="font-semibold">{{ selectedEntrepreneurial.map(e => e.entrepreneurialName).join(', ') }}: </span>
+                <span>{{ selectedEntrepreneurial.map(e => e.description).join(' ') }}</span>
               </li>
             </ul>
           </div>
 
-          <!-- Sustainability and Goals -->
-          <div class="mb-6">
-            <span class="font-bold">Sustainability:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <!-- SDGs Culture -->
-              <li v-if="(activityData.sustainability || []).some(item => item.sustainability === 'SDGs Culture')">
-                SDGs Culture
-                <ul class="list-disc pl-6 text-gray-700">
-                  <li v-for="(goal, index) in (activityData.sustainability || [])
-                    .filter(item => item.sustainability === 'SDGs Culture')
-                    .map(item => item.goal)" :key="index">
-                    {{ goal }}
-                  </li>
-                </ul>
-              </li>
-              <!-- Other Sustainability Items -->
-              <li
-                v-for="(item, index) in (activityData.sustainability || []).filter(item => item.sustainability !== 'SDGs Culture')"
-                :key="index">
-                {{ item.sustainability }}
-              </li>
-            </ul>
-          </div>
+        <!-- Sustainability and Goals -->
+        <div class="mb-6">
+          <span class="font-bold">Sustainability:</span>
+          <ul class="list-disc pl-6 text-gray-700">
+            <li v-if="selectedSDGsCulture">
+              <span class="font-semibold">{{ selectedSDGsCulture.sustainabilityName }}:</span>
+              <span>{{ selectedSDGsCulture.description }}</span>
+              <ul v-if="selectedSDGsCulture.goals.length" class="list-disc pl-6 text-gray-700">
+                <li v-for="(goal, index) in selectedSDGsCulture.goals" :key="index">
+                  {{ goal }}
+                </li>
+              </ul>
+            </li>
+            <li v-for="(sustainability, index) in selectedOtherSustainability" :key="index">
+              <span class="font-semibold">{{ sustainability.sustainabilityName }}:</span>
+              <span>{{ sustainability.description }}</span>
+            </li>
+          </ul>
+        </div>
 
           <div class="mb-6">
             <span class="font-bold">หลักการและเหตุผล:</span> {{ activityData.sustainabilityDetail }}
           </div>
-
-          <!-- <div class="mb-6">
-        <span class="font-bold">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
-      </div> -->
 
           <div class="mb-6">
             <span class="font-bold">วัตถุประสงค์:</span>
