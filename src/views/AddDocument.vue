@@ -14,12 +14,11 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
-    successMessage.value = "New document added successfully!";
-  } else if (type === "edit") {
-    successMessage.value = "Document edited successfully!";
-  } else if (type === "delete") {
-    successMessage.value = "Document deleted successfully!";
-  }
+    successMessage.value = "Added Document Successfully!";
+    } else if (type === "edit") {
+      successMessage.value = "Edited Successfully!";
+      } else if (type === "delete") {
+        successMessage.value = "Deleted Successfully!";  }
   showSuccessPopup.value = true;
 };
 const redirectToTracking = () => {
@@ -112,10 +111,10 @@ function fileToBase64(file) {
 }
 
 function downloadPDF(base64String, filename) {
-    const link = document.createElement('a');
-    link.href = 'data:application/pdf;base64,' + base64String;
-    link.download = filename;
-    link.click();
+  const link = document.createElement('a');
+  link.href = 'data:application/pdf;base64,' + base64String;
+  link.download = filename;
+  link.click();
 }
 
 function convertToISOWithTimezone(dateString, time) {
@@ -194,6 +193,7 @@ const addDoc = async () => {
         startTime = convertToISOWithTimezone(date, "13:00:00");
         endTime = convertToISOWithTimezone(date, "17:00:00");
       } else {
+        alert("กรุณาเลือกช่วงเวลาการลาวันเดียว");
         throw new Error("กรุณาเลือกช่วงเวลาการลาวันเดียว");
       }
     } else if (leaveType.value === "multipleDays") {
@@ -210,7 +210,7 @@ const addDoc = async () => {
         alert("วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น")
         throw new Error("EndDate must more than StartDate");
       }
-      
+
       startTime = convertToISOWithTimezone(starttime.value, "09:00:00");
       endTime = convertToISOWithTimezone(endtime.value, "17:00:00");
 
@@ -218,7 +218,7 @@ const addDoc = async () => {
       throw new Error("กรุณาเลือกประเภทการลา");
     }
 
-    if(detail.value.trim().length === 0){
+    if (detail.value.trim().length === 0) {
       alert('กรุณากรอกเหตุผลและรายละเอียดการลา')
       throw new Error("กรุณากรอกเหตุผลและรายละเอียดการลา");
     }
@@ -250,71 +250,68 @@ const addDoc = async () => {
 
 <template>
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
-      <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">Add Absence Document</h1>
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px] ">
+      <h1 class="text-3xl font-bold mb-4 text-center text-orange-500">Add Absence Document</h1>
 
       <form @submit.prevent="addDoc">
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div class="mb-3">
-            <label for="name" class="block text-gray-700 mb-1">ชื่อ: {{ userData.name }}</label>
+        <div class="grid grid-cols-2 gap-4 lable ">
+          <div class="mt-8 my-2">
+            <label for="name"> <span class="item">ชื่อ: </span>{{ userData.name }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="studentId" class="block text-gray-700 mb-1">รหัสประจำตัวนักศึกษา: {{ userData.studentId }}</label>
+          <div class="mt-8 my-2">
+            <label for="studentId"><span class="item">รหัสประจำตัวนักศึกษา: </span> {{ userData.studentId }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="faculty" class="block text-gray-700 mb-1">คณะ: {{ userData.faculty }}</label>
+          <div class="my-2">
+            <label for="faculty"><span class="item">คณะ: </span>{{ userData.faculty }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="department" class="block text-gray-700 mb-1">ภาควิชา/สาขาวิชา: {{ userData.department }}</label>
+          <div class="my-2">
+            <label for="department"><span class="item">ภาควิชา/สาขาวิชา:</span> {{ userData.department }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="classLevel" class="block text-gray-700 mb-1">ชั้นปีที่: {{ userData.classLevel }}</label>
+          <div class="my-2">
+            <label for="classLevel"><span class="item">ชั้นปีที่:</span> {{ userData.classLevel }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="studyLevel" class="block text-gray-700 mb-1">ระดับการศึกษา: {{ userData.studyLevel }}</label>
+          <div class="my-2">
+            <label for="studyLevel"><span class="item">ระดับการศึกษา:</span> {{ userData.studyLevel }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="programType" class="block text-gray-700 mb-1">ประเภทหลักสูตร: {{ userData.programType }}</label>
+          <div class="my-2">
+            <label for="programType"><span class="item">ประเภทหลักสูตร:</span> {{ userData.programType }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="studentStatus" class="block text-gray-700 mb-1">สถานะนักศึกษา: {{ userData.studentStatus }}</label>
+          <div class="my-2">
+            <label for="studentStatus"><span class="item">สถานะนักศึกษา:</span> {{ userData.studentStatus }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="currentGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยประจำภาค: {{ userData.currentGPA }}</label>
+          <div class="my-2">
+            <label for="currentGPA"><span class="item">คะแนนเฉลี่ยประจำภาค: </span>{{ userData.currentGPA }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="cumulativeGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยสะสม: {{ userData.cumulativeGPA }}</label>
+          <div class="my-2">
+            <label for="cumulativeGPA"><span class="item">คะแนนเฉลี่ยสะสม:</span> {{ userData.cumulativeGPA }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="contact" class="block text-gray-700 mb-1">ข้อมูลการติดต่อนักศึกษา: {{ userData.tel }}</label>
+          <div class="my-2">
+            <label for="contact"><span class="item">ข้อมูลการติดต่อนักศึกษา:</span> {{ userData.tel }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="email" class="block text-gray-700 mb-1">อีเมล: {{ userData.email }}</label>
+          <div class="my-2">
+            <label for="email"><span class="item">อีเมล: </span>{{ userData.email }}</label>
           </div>
 
         </div>
 
         <!-- ฟอร์มการกรอกข้อมูลการลา -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div class="mb-3">
-            <label for="type" class="block text-gray-700 mb-1">เรื่อง<span class="text-red-500 ml-1">*</span></label>
-            <select 
-              id="type" 
-              v-model="type"
-              class="form-input"
-              required
-            >
+        <div class="grid grid-cols-2 gap-4 lable ">
+          <div class="my-2">
+            <label for="type">
+              <span class="item">เรื่อง:</span><span class="text-red-500 ml-1">*</span></label>
+            <br />
+            <select id="type" v-model="type" class="ml-3 form-input form-input-select" required>
               <option value="" disabled>เลือกประเภทการลา</option>
               <option value="ลากิจ">ขออนุญาตลากิจ</option>
               <option value="ลาป่วย">ขออนุญาตลาป่วย</option>
@@ -322,55 +319,43 @@ const addDoc = async () => {
           </div>
 
           <div class="mb-3" style="margin-top: 30px;">
-            <label for="email" class="block text-gray-700 mb-1">อาจารย์ที่ปรึกษา: {{ userData.advisor }}</label>
+            <label for="email">
+              <span class="w-full item">อาจารย์ที่ปรึกษา:</span> {{ userData.advisor }}</label>
           </div>
 
-          <div class="mb-3">
-            <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา<span class="text-red-500 ml-1">*</span></label>
-            <select 
-              id="leaveType" 
-              v-model="leaveType"
-              class="form-input"
-              required
-            >
-              <option value="" disabled>เลือกประเภทการลา</option>
-              <option value="oneDay">ลา 1 วัน</option>
-              <option value="multipleDays">ลาหลายวัน</option>
+          <div class="my-2">
+            <label for="leaveType">
+              <span class="item">ประเภทวันลา:</span>
+              <span class="text-red-500 ml-1">*</span></label>
+
+
+            <select id="leaveType" v-model="leaveType" class="ml-3 form-input form-input-select" required>
+              <option value="" disabled>เลือกประเภทวันลา</option>
+              <option value="oneDay">การลา 1 วัน</option>
+              <option value="multipleDays">การลาหลายวัน</option>
             </select>
           </div>
 
           <!-- ถ้าเลือกลา 1 วัน -->
           <div v-if="leaveType === 'oneDay'">
-            <div class="mb-3">
-              <label for="oneDayDate" class="block text-gray-700 mb-1">เลือกวันที่<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="date" 
-                id="oneDayDate" 
-                v-model="oneDayDate"
-                class="form-input"
-                :min="today"
-                required
-              />
+            <div class="my-2"> 
+              <label for="oneDayDate">
+                <span class="item">เลือกวันที่</span>
+                <span class="text-red-500 ml-1">*</span></label>
+              <input type="date" id="oneDayDate" v-model="oneDayDate" class="form-input w-80" :min="today" required />
             </div>
 
-            <div class="mb-3">
-              <label for="oneDaySession" class="block text-gray-700 mb-1">ช่วงเวลา<span class="text-red-500 ml-1">*</span></label>
-              
-              <div class="flex items-center space-x-4">
+            <div class="my-2">
+              <label for="oneDaySession">
+                <span class="item">ช่วงเวลา</span><span class="text-red-500 ml-1">*</span></label>
+
+              <div class="flex pl-16 items-center space-x-4">
                 <label class="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    v-model="oneDaySession.morning" 
-                    class="form-checkbox"
-                  />
+                  <input type="checkbox" v-model="oneDaySession.morning" class="form-checkbox " />
                   <span class="ml-2">เช้า</span>
                 </label>
                 <label class="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    v-model="oneDaySession.afternoon" 
-                    class="form-checkbox"
-                  />
+                  <input type="checkbox" v-model="oneDaySession.afternoon" class="form-checkbox" />
                   <span class="ml-2">บ่าย</span>
                 </label>
               </div>
@@ -380,88 +365,59 @@ const addDoc = async () => {
           <!-- ถ้าเลือก ลาหลายวัน -->
           <div v-if="leaveType === 'multipleDays'" class="grid grid-cols-2 gap-4 mb-4">
             <!-- วันที่เริ่มต้น -->
-            <div class="mb-3">
-              <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="date" 
-                id="starttime" 
-                v-model="starttime"
-                class="form-input"
-                :min="today"
-                required
-              />
+            <div class="my-2">
+              <label for="starttime">
+                <span class="item">ระหว่างวันที่</span><span class="text-red-500 ml-1">*</span></label>
+              <input type="date" id="starttime" v-model="starttime" class="form-input" :min="today" required />
             </div>
 
             <!-- วันที่สิ้นสุด -->
-            <div class="mb-3">
-              <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="date" 
-                id="endtime" 
-                v-model="endtime"
-                class="form-input"
-                 :min="getNextDay(starttime)"
-                required
-              />
+            <div class="my-2">
+              <label for="endtime">
+                <span class="item">ถึงวันที่</span><span class="text-red-500 ml-1">*</span></label>
+              <input type="date" id="endtime" v-model="endtime" class="form-input" :min="getNextDay(starttime)"
+                required />
             </div>
           </div>
 
           <div class="mb-3 col-span-2">
-            <label for="detail" class="block text-gray-700 mb-1">โดยมีเหตุผลและรายละเอียด<span class="text-red-500 ml-1">*</span></label>
-            <textarea 
-              id="detail" 
-              v-model="detail"
-              class="form-input detail-input"
-              minlength="5"
-              maxlength="500"
-              required
-              @input="updateRemainingCharacters"
-            ></textarea>
+            <label for="detail"><span class="item">โดยมีเหตุผลและรายละเอียด:</span> <span
+                class="text-red-500 ml-1">*</span></label>
+            <textarea id="detail" v-model="detail" class="ml-6 form-input form-input-text" minlength="5" maxlength="500"
+              required @input="updateRemainingCharacters"></textarea>
             <div class="text-right text-sm text-gray-600">
-              ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }} 
+              ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }}
             </div>
           </div>
 
-          <div class="mb-3">
-            <label for="attachmentFile1" class="block text-gray-700 mb-1">หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์</label>
-            <input 
-              type="file" 
-              id="attachmentFile1" 
-              @change="handleFile1Change" 
-              class="form-input"
-            />
+          <div class="my-2">
+            <label for="attachmentFile1">หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์</label>
+            <input type="file" id="attachmentFile1" @change="handleFile1Change" class="ml-5 form-input form-input-select" />
           </div>
 
-          <div class="mb-3">
-            <label for="attachmentFile2" class="block text-gray-700 mb-1">หลักฐานอื่นๆ</label>
-            <input 
-              type="file" 
-              id="attachmentFile2" 
-              @change="handleFile2Change" 
-              class="form-input"
-            />
+          <div class="my-2"> 
+            <label for="attachmentFile2">เอกสารแนบอื่น ๆ : <span class="text-right text-sm text-gray-600">
+              (เช่น หลักฐานการเข้าร่วมกิจกรรม)</span></label> 
+            <input type="file" id="attachmentFile2" @change="handleFile1Change" class="ml-5 form-input form-input-select" />
           </div>
         </div>
 
-        <button 
-          type="submit" 
-          class="form-button"
-        >
+        <div class="flex justify-center items-center text-center">
+        <button type="submit" class="form-button bg-orange-400 ml-2% hover:bg-orange-300">
           Sent Absence Document
         </button>
+      </div>
 
       </form>
-      
-      <div 
-        v-if="showSuccessPopup"
-        class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+
+      <div v-if="showSuccessPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
         <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
           <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
           <div class="flex justify-center">
             <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
               OK
             </button>
-          </div>    
+          </div>
         </div>
       </div>
 
@@ -470,29 +426,44 @@ const addDoc = async () => {
 </template>
 
 <style scoped>
+.lable{
+  /* mb-6 mx-2 */
+  margin: 1rem 1.5rem 2rem ;
+}
+.item {
+  font-weight: 600;
+  font-size: medium;
+}
 .form-input {
-  width: 100%;
+  display: block;
   padding: 8px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #7b7a9f;
   border-radius: 100px;
   outline: none;
   transition: border-color 0.2s ease-in-out;
 }
-
-.detail-input {
+.form-input-select{
+  width:60%;
+}
+.form-input-text {
+  width:95%;
   border-radius: 20px;
+
 }
 
 .form-button {
-  width: 100%;
+  width: 50%;
   padding: 10px 0;
   border: none;
   border-radius: 100px;
-  background-color: #fb923c;
   color: white;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+}
+
+.button:hover {
+  opacity: 0.9;
 }
 
 .form-input:focus {

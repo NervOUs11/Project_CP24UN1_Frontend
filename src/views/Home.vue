@@ -19,7 +19,7 @@ import Navbar from '../components/Navbar.vue';
         class="large-button flex justify-center items-center w-full"
       >
         <button class="w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
-          ใบคำร้องขออนุมัติจัดกิจกรรม
+          ใบคำร้องขออนุมัติการจัดกิจกรรม
         </button>
       </router-link>
     </div>

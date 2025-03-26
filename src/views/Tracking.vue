@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed  } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { tracking } from '../functions/tracking.js';
 import Navbar from '../components/Navbar.vue';
@@ -12,11 +12,11 @@ const router = useRouter();
 const firstName = ref(localStorage.getItem('firstName'));
 
 const formatDate = (dateString) => {
-  const options = { 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit', 
-    hour: '2-digit', 
+  const options = {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
     minute: '2-digit',
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
   };
@@ -31,10 +31,10 @@ const formatDate = (dateString) => {
 
 onMounted(async () => {
   try {
-    let id =  null
+    let id = null
     const role = localStorage.getItem("role");
 
-    if(role === "Student"){
+    if (role === "Student") {
       id = localStorage.getItem("studentID");
     }
     else if (role !== "Student") {
@@ -79,11 +79,11 @@ const goToDocument = (documentType, documentID) => {
 
 
 const goToDocumentDetail = (documentID) => {
-  router.push({ name: 'DocumentDetail', params: { id: documentID } }); 
+  router.push({ name: 'DocumentDetail', params: { id: documentID } });
 };
 
 const goToActivityDocument = (documentID) => {
-  router.push({ name: 'ActivityDocumentDetail', params: { id: documentID } }); 
+  router.push({ name: 'ActivityDocumentDetail', params: { id: documentID } });
 }
 
 const filteredDocuments = computed(() =>
@@ -98,31 +98,30 @@ const filteredDocuments = computed(() =>
   <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md" />
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
-      <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
-      <table class="document-table w-full text-left border-collapse">
+      <h1 class="text-3xl font-bold mb-6 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
+      <table class="document-table w-full table-fixed border-collapse">
         <thead>
           <tr class="bg-orange-500 text-white">
-            <th class="px-4 py-2">#</th>
-            <th class="px-4 py-2">Document Name</th>
-            <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2">Date Sent</th>
-            <th class="px-4 py-2">Last Edit</th>
+            <th class="px-4 py-2">No.</th>
+            <th class="px-4 py-2 text-left">Document Type</th>
+            <th class="px-4 py-2 text-left">Document Name</th>
+            <th class="px-4 py-2 text-left">Status</th>
+            <th class="px-4 py-2 text-left">Date Sent</th>
+            <th class="px-4 py-2 text-left">Date Last Edit</th>
           </tr>
         </thead>
         <tbody v-if="documents.length === 0">
           <tr>
-            <td class="text-center text-red-600 font-bold text-2xl" colspan="5">No Document Send</td>
+            <td class="text-center text-red-600 font-bold text-2xl" colspan="6">No Document Send</td>
           </tr>
         </tbody>
         <tbody v-else>
-          <tr
-            v-for="(doc, index) in paginatedDocuments"
-            :key="doc.documentID"
+          <tr v-for="(doc, index) in paginatedDocuments" :key="doc.documentID"
             class="hover:bg-orange-100 border-b border-gray-200"
-            @click="goToDocument(doc.documentType, doc.documentID)"
-          >
-            <td class="px-4 py-2">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-            <td class="px-4 py-2">{{ doc.documentType }}</td>
+            @click="goToDocument(doc.documentType, doc.documentID)">
+            <td class="px-4 py-2 text-center font-medium">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
+            <td class="px-4 py-2">{{ doc.documentType === 'ลากิจ' || doc.documentType === 'ลาป่วย' ? 'ใบคำร้องขอลากิจ/ลาป่วย':'ใบคำร้องขออนุมัติจัดกิจกรรม' }}</td>
+            <td class="px-4 py-2">{{ doc.documentName }}</td>
             <td class="px-4 py-2">
               <span
                 :class="{
@@ -134,6 +133,7 @@ const filteredDocuments = computed(() =>
               >
                 {{ doc.status }}
               </span>
+       
             </td>
             <td class="px-4 py-2">{{ formatDate(doc.createDate) }}</td>
             <td class="px-4 py-2">{{ formatDate(doc.editDate) }}</td>
@@ -142,22 +142,15 @@ const filteredDocuments = computed(() =>
       </table>
 
       <!-- Pagination -->
-      <div class="flex justify-center mt-4">
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          :class="['pagination-button', { 'bg-orange-500 text-white': currentPage === page }]"
-          @click="goToPage(page)"
-        >
+      <div class="flex justify-center mt-4 overflow-x-auto">
+        <button v-for="page in totalPages" :key="page"
+          :class="['pagination-button', { 'bg-orange-500 text-white': currentPage === page }]" @click="goToPage(page)">
           {{ page }}
         </button>
       </div>
 
-      <div class="text-center mt-6">
-        <button 
-          @click="goHome"
-          class="form-button"
-        >
+      <div class=" text-center text-xs inline-flex mt-6">
+        <button @click="goHome" class="form-button">
           Back to Home
         </button>
       </div>
@@ -173,7 +166,7 @@ const filteredDocuments = computed(() =>
   border-radius: 5px;
   background-color: white;
   color: #fb923c;
-  font-weight: bold;
+  font-weight: bolder;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
@@ -187,9 +180,11 @@ const filteredDocuments = computed(() =>
   border-color: #fb923c;
 }
 
+
+
 .form-button {
   width: 100%;
-  padding: 10px 0;
+  padding: 15px 15px;
   border: none;
   border-radius: 100px;
   background-color: #fb923c;
@@ -200,10 +195,26 @@ const filteredDocuments = computed(() =>
 }
 
 .document-table {
-  border-collapse: collapse;
   width: 100%;
-  margin-top: 20px;
+  border-collapse: collapse;
+  table-layout: auto;
+  /* ให้ตารางปรับขนาดตามเนื้อหา */
 }
+
+.document-table th,
+.document-table td {
+  white-space: nowrap;
+  /* ป้องกันข้อความขึ้นบรรทัดใหม่ */
+  padding: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.document-table th {
+  background-color: #fb923c;
+  color: white;
+  font-weight: bold;
+}
+
 
 .document-table th,
 .document-table td {
@@ -280,5 +291,19 @@ const filteredDocuments = computed(() =>
 
 .w-full {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+
+  .document-table th,
+  .document-table td {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  .text-2xl {
+    font-size: 1.25rem;
+    /* ลดขนาดหัวข้อ */
+  }
 }
 </style>

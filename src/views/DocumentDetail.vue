@@ -38,7 +38,6 @@ const canApprove = computed(() => {
       progress.staffID === parseInt(staffID) && progress.status === "Waiting for approve"
   ) ?? null;
 
-
   return !!progressMatch; // ถ้ามี progress ที่ตรงตามเงื่อนไข จะคืนค่า true
 });
 
@@ -52,7 +51,7 @@ const canShowButtons = computed(() => {
 // ฟังก์ชัน Approve
 const handleApprove = async () => {
   try {
-    const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value}
+    const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value }
     const res = await approveDocument(data);
     if (res.ok) {
       showSuccess("approve")
@@ -71,7 +70,7 @@ const handleReject = async () => {
     return;
   }
   try {
-    const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value, comment: comment.value}
+    const data = { progressID: progressID.value, staffID: staffID, documentID: documentID.value, comment: comment.value }
     const res = await rejectDocument(data);
     if (res.ok) {
       showSuccess("reject")
@@ -220,8 +219,8 @@ const redirectToTracking = () => {
 const sortedProgress = computed(() => {
   return data.value?.allProgress
     ? [...data.value.allProgress]
-        .filter((step) => step.status !== 'Other advisor approve') // กรองออก
-        .sort((a, b) => a.step - b.step) // เรียงตาม step
+      .filter((step) => step.status !== 'Other advisor approve') // กรองออก
+      .sort((a, b) => a.step - b.step) // เรียงตาม step
     : [];
 });
 
@@ -229,10 +228,10 @@ onMounted(async () => {
   let userid = null
   const role = localStorage.getItem("role")
 
-  if(role != "Student"){
+  if (role != "Student") {
     userid = localStorage.getItem("staffID")
-  } 
-  else if (role === "Student"){
+  }
+  else if (role === "Student") {
     userid = localStorage.getItem("studentID")
   }
 
@@ -256,111 +255,114 @@ onMounted(async () => {
 </script>
 
 <template>
-<Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md"/>
+  <Navbar class="fixed top-0 left-0 w-full z-50 h-[3vh] p-2 shadow-md" />
   <!-- Show loading or skeleton while data is being fetched -->
   <div v-if="data === null" class="flex justify-center items-center min-h-screen">
     <span>Loading...</span>
   </div>
 
   <!-- Show the document details once data is fetched -->
-  <div v-else class="flex justify-center items-center min-h-screen bg-orange-100">
+  <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[900px]">
-      <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">Document Detail</h1>
+      <h1 class="text-3xl font-bold mb-4 text-center text-orange-500">Activity Document Detail</h1>
+
 
       <div class="mb-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-2">Document Information</h2>
-        <div class="grid grid-cols-2 gap-4">
+        <h2 class="subhead">Document Information</h2>
+        <div class="grid grid-cols-2 gap-4 lable">
           <div>
-            <span class="font-bold">ชื่อนักศึกษา:</span> {{ data.Owner?.name }}
+            <span class="items">ชื่อนักศึกษา:</span> {{ data.Owner?.name }}
           </div>
           <div>
-            <span class="font-bold">รหัสประจำตัวนักศึกษา:</span> {{ data.Owner?.studentID }}
+            <span class="items">รหัสประจำตัวนักศึกษา:</span> {{ data.Owner?.studentID }}
           </div>
           <div>
-            <span class="font-bold">คณะ:</span> {{ data.Owner?.faculty }}
+            <span class="items">คณะ:</span> {{ data.Owner?.faculty }}
           </div>
           <div>
-            <span class="font-bold">ภาควิชา/สาขาวิชา:</span> {{ data.Owner?.department }}
+            <span class="items">ภาควิชา/สาขาวิชา:</span><span class="whitespace-nowrap"> {{ data.Owner?.department }}</span>
           </div>
           <div>
-            <span class="font-bold">ชั้นปีที่:</span> {{ data.Owner?.year }}
+            <span class="items">ชั้นปีที่:</span> {{ data.Owner?.year }}
           </div>
           <div>
-            <span class="font-bold">ระดับการศึกษา:</span>  ปริญญาตรี
+            <span class="items">ระดับการศึกษา:</span> ปริญญาตรี
           </div>
           <div>
-            <span class="font-bold">ประเภทหลักสูตร:</span> ปกติ
+            <span class="items">ประเภทหลักสูตร:</span> ปกติ
           </div>
           <div>
-            <span class="font-bold">สถานะนักศึกษา:</span>  ปกติ
+            <span class="items">สถานะนักศึกษา:</span> ปกติ
           </div>
           <div>
-            <span class="font-bold">คะแนนเฉลี่ยประจำภาค:</span> 
+            <span class="items">คะแนนเฉลี่ยประจำภาค:</span>
             {{ (data.Owner?.currentGPA % 1 === 0) ? data.Owner?.currentGPA.toFixed(1) : data.Owner?.currentGPA }}
           </div>
           <div>
-            <span class="font-bold">คะแนนเฉลี่ยสะสม:</span> 
-            {{ (data.Owner?.cumulativeGPA % 1 === 0) ? data.Owner?.cumulativeGPA.toFixed(1) : data.Owner?.cumulativeGPA }}
+            <span class="items">คะแนนเฉลี่ยสะสม:</span>
+            {{ (data.Owner?.cumulativeGPA % 1 === 0) ? data.Owner?.cumulativeGPA.toFixed(1) : data.Owner?.cumulativeGPA
+            }}
           </div>
           <div>
-            <span class="font-bold">ข้อมูลการติดต่อนักศึกษา:</span> {{ data.Owner?.tel }}
+            <span class="items">ข้อมูลการติดต่อนักศึกษา:</span> {{ data.Owner?.tel }}
           </div>
           <div>
-            <span class="font-bold">อีเมล:</span> {{ data.Owner?.email }}
+            <span class="items">อีเมล:</span> {{ data.Owner?.email }}
           </div>
 
           <div>
-            <span class="font-bold">ประเภทการลา:</span> {{ data.DocumentType }}
+            <span class="items">ประเภทการลา:</span> {{ data.DocumentType }}
           </div>
-          <div>  
-            <span class="font-bold">เหตุผลและรายละเอียด:</span> {{ data.detail }}
+          <div>
+            <span class="items">เหตุผลและรายละเอียด:</span> {{ data.detail }}
           </div>
 
           <div>
-            <span class="font-bold">วันที่เริ่มลา:</span> {{ data.startTime?.date }} เวลา {{ data.startTime?.time }}
+            <span class="items">วันที่เริ่มลา:</span> {{ data.startTime?.date }} เวลา {{ data.startTime?.time }}
           </div>
           <div>
-            <span class="font-bold">ลาถึงวันที่:</span> {{ data.endTime?.date }} เวลา {{ data.endTime?.time }}
+            <span class="items">ลาถึงวันที่:</span> {{ data.endTime?.date }} เวลา {{ data.endTime?.time }}
           </div>
           <div>
-            <span class="font-bold">วันที่สร้างแบบฟอร์ม:</span> {{ data.createDate?.date }} เวลา {{ data.createDate?.time }}
-          </div>
-          <div>
-            <span class="font-bold">วันที่แก้ไขแบบฟอร์ม:</span> {{ data.editDate?.date }} เวลา {{ data.editDate?.time }}
-          </div>
-
-        </div>
-      </div>
-
-      <div class="mb-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-2">Files</h2>
-        <div class="grid grid-cols-2 gap-4">
-          <div v-if="data.file1">
-            <span class="font-bold">File 1:</span>
-            <a v-if="data.file1.length>30"
-              href="javascript:void(0);" 
-              @click="openFileInNewTab(data.file1, 'application/pdf')" 
-              class="text-orange-500 underline">
-              View Attachment File 1
-            </a>
-            <span v-else> No Attachment File 1</span>
-          </div>
-          <div v-if="data.file2">
-            <span class="font-bold">File 2:</span>
-            <a v-if="data.file2.length>30"
-              href="javascript:void(0);" 
-              @click="openFileInNewTab(data.file2, 'application/pdf')" 
-              class="text-orange-500 underline">
-              View Attachment File 2
-            </a>
-            <span v-else> No Attachment File 2</span>
           </div>
         </div>
       </div>
 
+      <div class="mb-8">
+        <h2 class="items mx-2">เอกสารแนบ:</h2>
+        <table class="w-auto border-collapse border border-gray-300 mx-4">
+          <tbody>
+            <tr v-if="data.file1">
+              <td class="px-4 py-2 border border-white font-medium">หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์:</td>
+              <td class="py-2 border border-white">
+                <a v-if="data.file1.length > 30" href="javascript:void(0);"
+                  @click="openFileInNewTab(data.file1, 'application/pdf')" class="text-orange-500 underline">
+                  หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
+                </a>
+                <span v-else class="text-gray-500">No Attachment File </span>
+              </td>
+            </tr>
+            <tr v-if="data.file2">
+              <td class="px-4 py-2 border border-white font-medium">เอกสารแนบอื่น ๆ :</td>
+              <td class="py-2 border border-white">
+                <a v-if="data.file2.length > 30" href="javascript:void(0);"
+                  @click="openFileInNewTab(data.file2, 'application/pdf')" class="text-orange-500 underline">
+                  เอกสารแนบอื่น ๆ
+                </a>
+                <span v-else class="text-gray-500">No Attachment File </span>
+              </td>
+            </tr>
+            <tr v-if="!data.file1 && !data.file2">
+              <td colspan="2" class="px-4 py-2 border border-white text-center text-gray-500">No Attachment Files</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="border-t border-gray-300 my-9"></div>
+
       <div class="mb-6">
-        <h2 class="text-lg font-semibold text-gray-700 mb-2">Progress</h2>
-        <table class="w-full border-collapse border border-gray-300">
+        <h2 class="subhead mb-8">Progress</h2>
+        <table class="w-full border-collapse border border-gray-300 ml-2 mb-10">
           <thead>
             <tr class="bg-gray-200">
               <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">ชื่อเจ้าหน้าที่</th>
@@ -384,112 +386,88 @@ onMounted(async () => {
       </div>
 
 
-    <div class="text-center">
-      <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
-        <!-- ถ้าเป็น staff และสามารถ approve ได้ จะมีปุ่ม approve และ reject -->
-        <template v-if="canApprove">
-          <button class="button bg-green-500 text-white mx-2" @click="openApprovePopup()">
-            Approve
-          </button>
-          <button class="button bg-red-500 text-white mx-2" @click="openRejectPopup()">
-            Reject
-          </button>
-        </template>
-        
-        <!-- ถ้าเป็น student และ allProgress เป็น Approve ทั้งหมด ให้ซ่อนปุ่ม Edit และ Delete -->
-        <template v-else-if="!allApproved()">
-          <button v-if="hasRejectedStatus()" class="button bg-blue-500 text-white mx-2" @click="handleEdit">
-            Edit
-          </button>
-          <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
-            Delete
-          </button>
-        </template>
-      </div>
-    </div>
-
-    <!-- Popup สำหรับกรอก Comment -->
-    <div 
-      v-if="showCommentPopup"
-      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white p-6 rounded shadow-md w-[400px]">
-        <h2 class="text-lg font-bold mb-4">Provide a Comment</h2>
-        <textarea
-          v-model="comment"
-          class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-          placeholder="Enter your comment here..."
-          rows="4"
-          maxlength="400"
-        ></textarea>
-        <div class="mt-4 flex justify-end gap-2">
-          <button 
-            class="button bg-gray-500 text-white"
-            @click="closeRejectPopup">
-            Cancel
-          </button>
-          <button 
-            class="button bg-red-500 text-white"
-            @click="handleReject">
-            Reject
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Popup สำหรับ confirm การ delete document -->
-    <div 
-      v-if="showDeletePopup"
-      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
-          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to delete?</h2>
-          <div class="flex justify-end gap-2">
-            <button 
-              class="button bg-gray-500 text-white"
-              @click="closeDeletePopup">
-              Cancel
-            </button>
-            <button 
-              class="button bg-red-500 text-white"
-              @click="handleDelete">
-              Delete
-            </button>
-        </div>    
-      </div>
-    </div>
-
-    <!-- Popup สำหรับ confirm การ approve document -->
-    <div 
-      v-if="showApprovePopup"
-      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
-          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to approve?</h2>
-          <div class="flex justify-end gap-2">
-            <button 
-              class="button bg-gray-500 text-white"
-              @click="closeApprovePopup">
-              Cancel
-            </button>
-            <button 
-              class="button bg-green-500 text-white"
-              @click="handleApprove">
+      <div class="text-center">
+        <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
+          <!-- ถ้าเป็น staff และสามารถ approve ได้ จะมีปุ่ม approve และ reject -->
+          <template v-if="canApprove">
+            <button class=" button bg-green-500 hover:bg-green-300" @click="openApprovePopup()">
               Approve
             </button>
-        </div>    
-      </div>
-    </div>
+            <button class="button bg-red-500 hover:bg-red-400 " @click="openRejectPopup()">
+              Reject
+            </button>
+          </template>
 
-    <div 
-      v-if="showSuccessPopup"
-      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
-        <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
-        <div class="flex justify-center">
-          <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
-            OK
-          </button>
-        </div>    
+          <!-- ถ้าเป็น student และ allProgress เป็น Approve ทั้งหมด ให้ซ่อนปุ่ม Edit และ Delete -->
+          <template v-else-if="!allApproved()">
+            <button v-if="hasRejectedStatus()" class="form-button bg-blue-500" @click="handleEdit">
+              Edit
+            </button>
+            <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
+              Delete
+            </button>
+          </template>
+        </div>
       </div>
-    </div>
+
+      <!-- Popup สำหรับกรอก Comment -->
+      <div v-if="showCommentPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded shadow-md w-[400px]">
+          <h2 class="text-lg font-bold mb-4">Provide a Comment</h2>
+          <textarea v-model="comment"
+            class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+            placeholder="Enter your comment here..." rows="4" maxlength="400"></textarea>
+          <div class="mt-4 flex justify-end gap-2">
+            <button class="button bg-gray-500" @click="closeRejectPopup">
+              Cancel
+            </button>
+            <button class="button bg-red-500" @click="handleReject">
+              Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup สำหรับ confirm การ delete document -->
+      <div v-if="showDeletePopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to delete?</h2>
+          <div class="flex justify-end gap-2">
+            <button class="button bg-gray-500" @click="closeDeletePopup">
+              Cancel
+            </button>
+            <button class="button bg-red-500" @click="handleDelete">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup สำหรับ confirm การ approve document -->
+      <div v-if="showApprovePopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center">Are you sure to approve?</h2>
+          <div class="flex justify-end gap-2">
+            <button class="button bg-gray-500" @click="closeApprovePopup">
+              Cancel
+            </button>
+            <button class="button bg-green-500" @click="handleApprove">
+              Approve
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="showSuccessPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+          <div class="flex justify-center">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="text-center">
         <button class="form-button" @click="goBack">
@@ -500,10 +478,40 @@ onMounted(async () => {
   </div>
 </template>
 
+
+
+
+
+
+
+
+
+
+
 <style scoped>
+.subhead {
+  font-size: 1.25rem;
+  /* text-xl */
+  font-weight: bold;
+  /* font-bold */
+  color: #ea580c;
+  /* text-orange-600 */
+  margin-bottom: 1rem;
+  /* mb-4 */
+}
+.lable{
+  /* mb-6 mx-2 */
+  margin: 1rem 2rem 2rem ;
+}
+.items {
+  font-weight: bold;
+  font-size: medium;
+  margin-bottom: 0.5rem;
+}
+
 .form-button {
   width: 100%;
-  padding: 10px 0;
+  padding: 0.7rem;
   border: none;
   border-radius: 100px;
   background-color: #fb923c;
@@ -515,7 +523,7 @@ onMounted(async () => {
 
 .button {
   width: 50%;
-  padding: 10px 0;
+  padding: 0.7rem;
   border: none;
   border-radius: 100px;
   font-weight: bold;
@@ -531,7 +539,7 @@ textarea {
 }
 
 .form-button:hover {
-  background-color: #f97316;
+  color: black;
 }
 
 .grid {

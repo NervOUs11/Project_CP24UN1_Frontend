@@ -56,12 +56,9 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
-    successMessage.value = "New document added successfully!";
-  } else if (type === "edit") {
-    successMessage.value = "Document edited successfully!";
-  } else if (type === "delete") {
-    successMessage.value = "Document deleted successfully!";
-  }
+    successMessage.value = "Added Document Successfully!";  } else if (type === "edit") {
+      successMessage.value = "Edited Successfully!";  } else if (type === "delete") {
+        successMessage.value = "Deleted Successfully!";  }
   showSuccessPopup.value = true;
 };
 const redirectToTracking = () => {
