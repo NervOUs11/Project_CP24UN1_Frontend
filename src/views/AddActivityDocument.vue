@@ -458,6 +458,17 @@ const addDoc = async () => {
       throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
     }
 
+    if (objectives.value.some(obj => obj.trim() === '')) {
+      alert("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
+      return;
+    }
+
+    const uniqueObjectives = new Set(objectives.value.map(obj => obj.trim()));
+    if (uniqueObjectives.size !== objectives.value.length) {
+      alert("วัตถุประสงค์ต้องไม่ซ้ำกัน");
+      return;
+    }
+
     if (agencyCode.value.trim().length === 0){
       alert("กรุณากรอกรหัสหน่วยงาน");
       throw new Error("กรุณากรอกรหัสหน่วยงาน");

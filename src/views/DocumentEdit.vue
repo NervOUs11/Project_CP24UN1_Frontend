@@ -192,6 +192,15 @@ const handleFile1Change = async (e) => {
   console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
+    const allowedExtensions = ["pdf"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
+      e.target.value = "";
+      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
+    }
+    
     const base64 = await fileToBase64(file);
     attachmentFile1.value = base64
   }
@@ -201,6 +210,15 @@ const handleFile2Change = async (e) => {
   console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
+    const allowedExtensions = ["pdf"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
+      e.target.value = "";
+      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
+    }
+
     const base64 = await fileToBase64(file);
     attachmentFile2.value = base64
   }
