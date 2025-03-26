@@ -14,11 +14,11 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
-    successMessage.value = "New document added successfully!";
+    successMessage.value = "Added Document Successfully!";
   } else if (type === "edit") {
-    successMessage.value = "Document edited successfully!";
+    successMessage.value = "Edited Successfully!";
   } else if (type === "delete") {
-    successMessage.value = "Document deleted successfully!";
+    successMessage.value = "Deleted Successfully!";
   }
   showSuccessPopup.value = true;
 };

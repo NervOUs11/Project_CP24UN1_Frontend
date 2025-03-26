@@ -56,11 +56,11 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
-    successMessage.value = "New document added successfully!";
+    successMessage.value = "Added Document Successfully!";
   } else if (type === "edit") {
-    successMessage.value = "Document edited successfully!";
+    successMessage.value = "Edited Successfully!";
   } else if (type === "delete") {
-    successMessage.value = "Document deleted successfully!";
+    successMessage.value = "Deleted Successfully!";
   }
   showSuccessPopup.value = true;
 };
@@ -200,7 +200,7 @@ const handleFile1Change = async (e) => {
       e.target.value = "";
       throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
     }
-    
+
     const base64 = await fileToBase64(file);
     attachmentFile1.value = base64
   }
