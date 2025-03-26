@@ -56,9 +56,18 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
+<<<<<<< HEAD
     successMessage.value = "Added Document Successfully!";  } else if (type === "edit") {
       successMessage.value = "Edited Successfully!";  } else if (type === "delete") {
         successMessage.value = "Deleted Successfully!";  }
+=======
+    successMessage.value = "Added Document Successfully!";
+  } else if (type === "edit") {
+    successMessage.value = "Edited Successfully!";
+  } else if (type === "delete") {
+    successMessage.value = "Deleted Successfully!";
+  }
+>>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
   showSuccessPopup.value = true;
 };
 const redirectToTracking = () => {
@@ -189,6 +198,15 @@ const handleFile1Change = async (e) => {
   console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
+    const allowedExtensions = ["pdf"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
+      e.target.value = "";
+      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
+    }
+
     const base64 = await fileToBase64(file);
     attachmentFile1.value = base64
   }
@@ -198,6 +216,15 @@ const handleFile2Change = async (e) => {
   console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
+    const allowedExtensions = ["pdf"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
+      e.target.value = "";
+      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
+    }
+
     const base64 = await fileToBase64(file);
     attachmentFile2.value = base64
   }

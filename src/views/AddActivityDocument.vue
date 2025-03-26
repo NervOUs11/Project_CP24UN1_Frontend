@@ -248,6 +248,7 @@ const uploadedFiles = reactive({});
 
 const handleFileChange = async (e, fileType) => {
   const file = e.target.files[0];
+
   if (file) {
     const allowedExtensions = ["pdf"];
     const fileExtension = file.name.split(".").pop().toLowerCase();
@@ -273,10 +274,10 @@ const handleFileChange = async (e, fileType) => {
         scheduleDetails.value = base64;
         break;
       default:
-        console.error('Unknown file type');
+        console.error("Unknown file type");
     }
   }
-}
+};
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -474,7 +475,11 @@ const addDoc = async () => {
       throw new Error("กรอกชื่อโครงการให้ถูกต้อง");
     }
 
+<<<<<<< HEAD
     if (agencyCode.value.trim().length === 0) {
+=======
+    if (agencyCode.value.trim().length === 0){
+>>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
       alert("กรุณากรอกรหัสหน่วยงาน");
       throw new Error("กรุณากรอกรหัสหน่วยงาน");
     }
@@ -507,7 +512,10 @@ const addDoc = async () => {
       throw new Error("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
     const dataToSend = {
       studentID: studentID,
       type: type.value,
@@ -585,6 +593,32 @@ const validateProjectNames = () => {
   return true;
 };
 
+const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
+const engRegex = /^[A-Za-z\s]+$/;
+
+const isThaiValid = computed(() => projectNameThai.value === "" || thaiRegex.test(projectNameThai.value));
+const isEngValid = computed(() => projectNameEng.value === "" || engRegex.test(projectNameEng.value));
+
+const validateProjectNames = () => {
+  const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
+  const engRegex = /^[A-Za-z\s]+$/;
+
+  const cleanThaiName = projectNameThai.value ? projectNameThai.value.trim() : "";
+  const cleanEngName = projectNameEng.value ? projectNameEng.value.trim() : "";
+
+  if (!thaiRegex.test(cleanThaiName)) {
+    alert("ชื่อโครงการ (ภาษาไทย) ต้องเป็นภาษาไทยเท่านั้น");
+    return false;
+  }
+
+  if (!engRegex.test(cleanEngName)) {
+    alert("ชื่อโครงการ (ภาษาอังกฤษ) ต้องเป็นภาษาอังกฤษเท่านั้น");
+    return false;
+  }
+
+  return true;
+};
+
 const positions = ref([
   "ประธานโครงการ",
   "รองประธานโครงการ",
@@ -603,6 +637,7 @@ const positions = ref([
       <h1 class="text-2xl font-bold mb-4 text-center text-blue-500">Add Activity Document</h1>
 
       <form @submit.prevent="addDoc">
+<<<<<<< HEAD
         <div class="grid grid-cols-2 gap-4 lable">
 
           <div class="flex items-center gap-4 mt-8">
@@ -615,6 +650,27 @@ const positions = ref([
                 <p class="text-gray-700 ">มจธ.</p>
                 <input type="text" v-model="suffix" class="form-input w-24 text-left" placeholder="ลำดับที่เอกสาร" />
               </div>
+=======
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="mb-3 flex items-center gap-4 mt-7">
+            <div class="flex items-center gap-2">
+              <label for="agencyCode" class="text-gray-700">ที่<span class="text-red-500 ml-1">*</span></label>
+              <input 
+                type="text" 
+                v-model="prefix" 
+                class="form-input w-24 text-left" 
+                placeholder="รหัสหน่วยงาน"
+                required
+              />
+              <span class="text-gray-700 font-bold">มจธ.</span>
+              <input 
+                type="text" 
+                v-model="suffix" 
+                class="form-input w-24 text-left" 
+                placeholder="ปีที่เบิกงบ"
+                required
+              />
+>>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
             </div>
           </div>
 
@@ -640,6 +696,7 @@ const positions = ref([
 
 
           <!-- ชื่อโครงการ -->
+<<<<<<< HEAD
           <div class="layer-left">
             <label class="block item mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
             <input type="text" v-model="projectNameThai" class="form-input form-input-text" required minlength="5"
@@ -651,6 +708,29 @@ const positions = ref([
             <label class="block item mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
             <input type="text" v-model="projectNameEng" class="form-input form-input-text" required minlength="5"
               placeholder="Project name" />
+=======
+          <div class="mb-3">
+            <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
+            <input 
+              type="text" 
+              v-model="projectNameThai" 
+              class="form-input w-full" 
+              required
+              minlength="5"
+            />
+            <p v-if="!isThaiValid" class="text-red-500 text-sm">ต้องเป็นภาษาไทยเท่านั้น</p>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
+            <input 
+              type="text" 
+              v-model="projectNameEng" 
+              class="form-input w-full" 
+              required
+              minlength="5"
+            />
+>>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
             <p v-if="!isEngValid" class="text-red-500 text-sm">ต้องเป็นภาษาอังกฤษเท่านั้น</p>
           </div>
 
@@ -1189,6 +1269,233 @@ const positions = ref([
       </div>
     </div>
 
+<<<<<<< HEAD
+=======
+    <!-- วัตถุประสงค์ -->
+    <div class="mb-6">
+      <label class="block text-gray-700 mb-2">วัตถุประสงค์</label>
+      <div v-for="(objective, index) in objectives" :key="index" class="flex items-center mb-2">
+        <span class="mr-2 w-6 text-right">{{ index + 1 }}.<span class="text-red-500 ml-1">*</span></span>
+        <input 
+          type="text" 
+          v-model="objectives[index]" 
+          class="form-input flex-1" 
+          placeholder="กรอกวัตถุประสงค์"
+        />
+      </div>
+    </div>
+
+    <!-- ผู้เข้าร่วมโครงการ -->
+    <div class="mb-6">
+      <label class="block text-gray-700 mb-2">ผู้เข้าร่วมโครงการ</label>
+
+      <div v-for="participant in participantData" :key="participant.participantID" class="flex items-center mb-2">
+        <label v-if="participant.participantName==='Student'||participant.participantName==='Staff'" class="w-48">{{ participant.participantName }} จำนวน:<span class="text-red-500 ml-1">*</span></label>
+        <label v-else class="w-48">{{ participant.participantName }} จำนวน:</label>
+        <input 
+          type="number" 
+          v-model="participant.count"
+          class="form-input w-20 mr-2 text-right"
+          style="width: 10%;"
+          min="0"
+          :value="participant.count || 0"
+        />
+        <span>คน</span>
+      </div>
+    </div>
+    
+    <!-- ลักษณะกิจกรรม (activityCharacteristic) -->
+    <div class="mb-6">
+      <label for="activityCharacteristic" class="block text-gray-700 mb-2">ลักษณะกิจกรรม<span class="text-red-500 ml-1">*</span></label>
+      <textarea 
+        id="activityCharacteristic" 
+        v-model="activityCharacteristic" 
+        class="form-textarea w-full h-32" 
+        placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม ให้เห็นภาพการจัดกิจกรรม"
+        :minlength="10"
+      ></textarea>
+    </div>
+
+    <!-- Code of Honor -->
+    <div class="mb-6">
+      <label for="codeOfHonor" class="block text-gray-700 mb-2">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code of Honor) ดังนี้<span class="text-red-500 ml-1">*</span></label>
+      <textarea 
+        id="codeOfHonor" 
+        v-model="codeOfHonor" 
+        class="form-textarea w-full h-22" 
+        placeholder="อธิบายความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor"
+        :minlength="10"
+      ></textarea>
+    </div>
+
+    <!-- ระยะเวลาดำเนินงาน -->
+    <div class="mb-6">
+      <!-- ระยะเวลาเตรียมงาน -->
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-2">ระยะเวลาเตรียมงาน:</label>
+        <div class="flex items-center">
+          <label class="w-40">เริ่มต้น:<span class="text-red-500 ml-1">*</span></label>
+          <input 
+            type="date" 
+            v-model="prepareStart" 
+            class="form-input w-20"
+            style="width: 80%;"
+          />
+          <label class="w-40">สิ้นสุด:<span class="text-red-500 ml-1">*</span></label>
+          <input 
+            type="date" 
+            v-model="prepareEnd" 
+            class="form-input w-20"
+            style="width: 80%;" 
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- ขั้นตอนการดำเนินงาน -->
+    <div class="mb-6">
+      <label for="scheduleDetails" class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน<span class="text-red-500 ml-1">*</span></label>
+      <div class="mb-2">
+        <label for="scheduleDetails">อัพโหลดไฟล์ขั้นตอนการดำเนินงาน:</label>
+        <input 
+          id="scheduleDetails" 
+          type="file" 
+          @change="handleFileChange($event, 'scheduleDetails')" 
+          class="form-input mt-2"
+        />
+      </div>
+    </div>
+
+    <!-- คณะกรรมการจัดโครงการ -->
+    <div class="mb-6">
+    <label class="block text-gray-700 mb-2">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
+
+    <!-- Dropdown สำหรับเลือกชื่อ -->
+    <div class="mb-4">
+      <label for="select-student" class="block mb-1">เลือกชื่อจากรายการ:</label>
+      <select 
+        id="select-student" 
+        v-model="selectedStudent" 
+        class="form-select w-60"
+      >
+        <option value="" disabled>รายชื่อ</option>
+        <option v-for="student in students" :key="student.id" :value="student.id">
+          {{ student.name }}
+        </option>
+      </select>
+      <button 
+        @click="addCommitteeMember" 
+        :disabled="!selectedStudent" 
+        class="bg-green-500 text-white px-4 py-2 ml-2 rounded"
+      >
+        เพิ่มคณะกรรมการ
+      </button>
+    </div>
+
+    <!-- แสดงรายการคณะกรรมการ -->
+    <div v-for="(member, index) in committee" :key="member.id" class="mb-4 flex items-center justify-between border-b pb-2">
+      <div class="flex space-x-4 w-full">
+        <span class="w-10">{{ index + 1 }}</span>
+        <span class="w-32">{{ member.id }}</span>
+        <span class="w-48">{{ member.name }}</span>
+        <span class="w-48">{{ member.department }}</span>
+        <span class="w-40">{{ member.phone }}</span>
+  
+        <!-- Dropdown ตำแหน่ง -->
+        <select v-model="member.position" class="form-input w-36" style="width: 30%;">
+          <option value="" disabled selected>เลือกตำแหน่ง</option>
+          <option v-for="position in positions" :key="position" :value="position">
+            {{ position }}
+          </option>
+        </select>
+        
+      </div>
+
+      <!-- ปุ่มลบ -->
+      <button 
+        type="button" 
+        @click="removeCommitteeMember(index)" 
+        class="bg-red-500 text-white px-4 py-2 rounded mt-2 sm:mt-0"
+      >
+        ลบ
+      </button>
+    </div>
+
+
+    <!-- รูปแบบการประเมินผล -->
+    <div class="mb-6">
+    <label class="block text-gray-700 mb-2">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+
+    <!-- รายการตัวเลือก -->
+    <div v-for="(option, key) in evaluationData" :key="key" class="mb-4">
+      <input 
+        type="checkbox" 
+        :id="option.evaluationID" 
+        :value="option.evaluationID" 
+        v-model="selectedEvaluation" 
+        class="mr-2"
+      />
+      <label :for="option.evaluationID">{{ option.evaluationName }}</label>
+    </div>
+
+    <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
+    <div class="mb-6">
+      <label for="evaluationFile" class="block text-gray-700 mb-2">อัพโหลดไฟล์ตัวอย่างการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+      <input 
+        id="evaluationFile" 
+        type="file" 
+        @change="handleFileChange($event, 'evaluationFile')" 
+        class="form-input"
+      />
+    </div>
+
+  <!-- ผลที่คาดว่าจะได้รับ -->
+  <div class="mb-6">
+    <label class="block text-gray-700 mb-2">ผลที่คาดว่าจะได้รับที่สอดคล้องกับวัตถุประสงค์</label>
+
+    <div v-for="(expectedResult, index) in expectedResults" :key="index" class="flex items-center gap-4 mb-4">
+      <!-- ผลที่คาดว่าจะได้รับ -->
+      <div class="flex-1">
+        <label :for="'expected-' + index" class="block mb-1">ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1 }}<span class="text-red-500 ml-1">*</span></label>
+        <input 
+          type="text" 
+          :id="'expected-' + index" 
+          v-model="expectedResults[index].result" 
+          class="form-input w-full"
+          placeholder="ผลที่คาดว่าจะได้รับ"
+          :minlength="10"
+        />
+      </div>
+
+      <!-- ตัวชี้วัด (KPI) -->
+      <div class="flex-1">
+        <label :for="'kpi-' + index" class="block mb-1">ตัวชี้วัด (KPI)<span class="text-red-500 ml-1">*</span></label>
+        <input 
+          type="text" 
+          :id="'kpi-' + index" 
+          v-model="expectedResults[index].kpi" 
+          class="form-input w-full"
+          placeholder="KPI"
+          :minlength="10"
+        />
+      </div>
+
+      <!-- ค่าเป้าหมาย -->
+      <div class="flex-1">
+        <label :for="'target-' + index" class="block mb-1 whitespace-nowrap">ค่าเป้าหมาย (%)<span class="text-red-500 ml-1">*</span></label>
+        <input 
+          type="number" 
+          min="0"
+          max="100"
+          :id="'target-' + index" 
+          v-model="expectedResults[index].target"
+          class="form-input w-full"
+          placeholder="ค่าเป้าหมาย"
+          @input="validateTarget($event, index)"
+        />
+      </div>
+    </div>
+>>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
   </div>
 </template>
 

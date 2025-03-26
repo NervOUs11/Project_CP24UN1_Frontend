@@ -11,6 +11,7 @@ import AddActivityDocument from '../views/AddActivityDocument.vue'
 import AllUser from '../views/AllUser.vue'
 import ActivityDocumentDetail from '@/views/ActivityDocumentDetail.vue'
 import EditActivityDocument from '@/views/EditActivityDocument.vue'
+import AccessDenied from '@/views/AccessDenied.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -77,7 +78,13 @@ const router = createRouter({
       path: "/editActivityDocument/:id",
       name: "EditActivityDocument",
       component: EditActivityDocument
+    },
+    {
+      path: "/accessDenied",
+      name: "AccessDenied",
+      component: AccessDenied
     }
+
   ]
 })
 
