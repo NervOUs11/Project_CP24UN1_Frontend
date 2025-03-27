@@ -3,22 +3,19 @@ import Navbar from '../components/Navbar.vue';
 </script>
 
 <template>
-  <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md"/>
+  <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md" />
+
   <div class="app mt-16 w-full h-[80vh] bg-[#ffe5b4] flex justify-center items-center">
     <div class="button-container flex justify-center w-4/5 max-w-[800px]">
-      <router-link 
-        :to="{ name: 'adddocument' }" 
-        class="large-button flex justify-center items-center w-full"
-      >
-        <button class="w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
+      <router-link :to="{ name: 'adddocument' }" class="large-button flex justify-center items-center w-full">
+        <button
+          class="w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
           ใบคำร้องขอลากิจ/ลาป่วย
         </button>
       </router-link>
-      <router-link 
-        :to="{ name: 'AddActivityDocument' }" 
-        class="large-button flex justify-center items-center w-full"
-      >
-        <button class="w-full p-8 text-lg bg-white text-black border-4 border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
+      <router-link :to="{ name: 'AddActivityDocument' }" class="large-button flex justify-center items-center w-full">
+        <button
+          class="w-full p-8 text-lg bg-white text-black border-4 whitespace-nowrap border-[#cc5200] font-bold rounded-full cursor-pointer transition duration-300 hover:bg-[#dfab89]">
           ใบคำร้องขออนุมัติการจัดกิจกรรม
         </button>
       </router-link>
@@ -27,7 +24,9 @@ import Navbar from '../components/Navbar.vue';
 </template>
 
 <style scoped>
-html, body, #app {
+html,
+body,
+#app {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -43,7 +42,7 @@ html, body, #app {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%; 
+  width: 100%;
 }
 
 .large-button {
