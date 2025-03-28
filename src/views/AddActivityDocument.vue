@@ -259,6 +259,13 @@ const handleFileChange = async (e, fileType) => {
       throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
     }
 
+    const maxSize = 1024 * 1024;
+    if (file && file.size > maxSize) {
+      alert("ไฟล์ PDF ต้องไม่เกิน 1MB");
+      e.target.value = "";
+      throw new Error("ไฟล์ PDF ต้องไม่เกิน 1MB");
+    }
+
     const base64 = await fileToBase64(file);
     switch (fileType) {
       case "prepareFile":

@@ -70,9 +70,9 @@ const goHome = () => {
 }
 
 const goToDocument = (documentType, documentID) => {
-  if (documentType === 'ลากิจ' || documentType === 'ลาป่วย') {
+  if (documentType === 'ใบคำร้องขอลากิจ/ลาป่วย') {
     goToDocumentDetail(documentID);
-  } else if (documentType === 'Workshop' || documentType === 'Volunteer' || documentType === 'Seminar') {
+  } else if (documentType === 'ใบคำร้องขออนุมัติจัดกิจกรรม') {
     goToActivityDocument(documentID);
   }
 };
@@ -97,7 +97,7 @@ const filteredDocuments = computed(() =>
 <template>
   <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md" />
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1200px]">
       <h1 class="text-4xl font-bold mt-2 mb-8 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
       <table class="document-table w-full table-fixed border-collapse">
         <thead>
@@ -120,8 +120,7 @@ const filteredDocuments = computed(() =>
             class="hover:bg-orange-100 border-b border-gray-200"
             @click="goToDocument(doc.documentType, doc.documentID)">
             <td class="px-4 py-2 text-center font-medium">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-            <td class="px-4 py-2">{{ doc.documentType === 'ลากิจ' || doc.documentType === 'ลาป่วย' ?
-              'ใบคำร้องขอลากิจ/ลาป่วย' : 'ใบคำร้องขออนุมัติจัดกิจกรรม' }}</td>
+            <td class="px-4 py-2">{{ doc.documentType }}</td>
             <td class="px-4 py-2">{{ doc.documentName }}</td>
             <td class="px-4 py-2">
               <span :class="{

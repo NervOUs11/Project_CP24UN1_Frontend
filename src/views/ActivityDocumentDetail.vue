@@ -302,6 +302,7 @@ const selectedOtherSustainability = computed(() => {
       description: sustainabilityDescriptions[item.sustainability] || "",
     }));
 });
+const expenses = ref(0);
 
 onMounted(async () => {
   let userid = null
@@ -322,9 +323,8 @@ onMounted(async () => {
       sustainabilityData.value = await fetchAllSustainability();
       goalData.value = await fetchAllGoal();
       activity.value = await fetchAllActivity();
-      console.log(activityData.value.activity);
-      console.log(activity.value);
-      // console.log(activityData.value.activity.length);
+      console.log(activityData.value);
+      expenses.value = activityData.value.payment
       entrepreneurialData.value = activityData.value.entrepreneurial
       sustainabilityData.value = activityData.value.sustainability
       sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
@@ -341,18 +341,51 @@ onMounted(async () => {
 
 })
 
+const expensesThaiText = computed(() => {
+  return convertNumberToThaiText(expenses.value);
+});
+const convertNumberToThaiText = (num) => {
+  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+
+  if (isNaN(num) || num === 0) return 'ศูนย์บาท';
+
+  let bahtText = '';
+  const numStr = num.toString();
+  const len = numStr.length;
+
+  for (let i = 0; i < len; i++) {
+    const digit = parseInt(numStr[i]);
+    const position = len - i - 1;
+
+    if (digit !== 0) {
+      if (position === 1 && digit === 1) {
+        bahtText += 'สิบ';
+      } else if (position === 1 && digit === 2) {
+        bahtText += 'ยี่สิบ';
+      } else if (position === 0 && digit === 1 && len > 1) {
+        bahtText += 'เอ็ด';
+      } else {
+        bahtText += numbers[digit] + units[position];
+      }
+    }
+  }
+
+  return bahtText + 'บาท';
+};
+
 </script>
 
 <template>
   <Navbar class="fixed top-0 left-0 w-full z-50 h-[3vh] p-2 shadow-md" />
   <!-- Show loading or skeleton while data is being fetched -->
-  <div v-if="data === null" class="flex justify-center items-center min-h-screen">
+  <div v-if="activityData.value === null" class="flex justify-center items-center min-h-screen">
     <span>Loading...</span>
   </div>
 
   <!-- Show the document details once data is fetched -->
   <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[900px]">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
       <h1 class="text-3xl font-extrabold mb-4 text-center text-blue-500">Activity Document Detail</h1>
 
 
@@ -397,13 +430,12 @@ onMounted(async () => {
                   <td class="items whitespace-nowrap" style="width: 85px;">ค่าใช้จ่าย:</td>
                   <td class=" border border-white">เป็นจำนวนเงิน</td>
                   <td class="p-2 border border-white  w-auto mx-1 text-right">
-                    <!-- <input type="number" class="" v-model.number="activityData.payment"
-                      readonly style="width: auto; min-width: 150px; max-width: 100px;" /> -->
+
                     {{ activityData.payment }}
                   </td>
-                  <td class="p-2 border border-white">บาท</td>
-                  <td class="p-2 border border-white">
-                    ( {{ expensesThaiText }} <span>ถ้วน )</span>
+                  <td class="border border-white">บาท</td>
+                  <td class="border border-white">
+                    ( {{ expensesThaiText }}ถ้วน )
                   </td>
                 </tr>
               </tbody>
@@ -603,10 +635,10 @@ onMounted(async () => {
             <tbody>
               <tr v-for="(committee, index) in activityData.committee" :key="index" class="hover:bg-gray-100 text-sm">
                 <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ committee.id }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.studentID }}</td>
                 <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.name }}</td>
-                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.department }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ committee.phone }}</td>
+                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.departmentName }} ชั้นปีที่ {{ committee.year }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.tel }}</td>
                 <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.position }}</td>
               </tr>
             </tbody>

@@ -431,6 +431,22 @@ const removeCommitteeMember = (index) => {
 const handleFileChange = async (e, fileType) => {
   const file = e.target.files[0];
   if (file) {
+    const allowedExtensions = ["pdf"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
+      e.target.value = "";
+      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
+    }
+
+    const maxSize = 1024 * 1024;
+    if (file && file.size > maxSize) {
+      alert("ไฟล์ PDF ต้องไม่เกิน 1MB");
+      e.target.value = "";
+      throw new Error("ไฟล์ PDF ต้องไม่เกิน 1MB");
+    }
+    
     const base64 = await fileToBase64(file);
     switch (fileType) {
       case 'prepareFile':
