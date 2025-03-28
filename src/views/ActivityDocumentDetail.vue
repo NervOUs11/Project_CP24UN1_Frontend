@@ -575,7 +575,7 @@ onMounted(async () => {
 
         <div class="lable">
           <label class="font-bold ">คณะกรรมการจัดโครงการ:</label>
-          <table class="table mx-4 my-4 text-sm">
+          <table class="table mx-4 my-4 w-90% text-sm">
             <thead class="bg-gray-100  whitespace-nowrap">
               <tr>
                 <th class="border border-gray-300 px-4 py-2 text-center">ที่</th>
@@ -584,7 +584,7 @@ onMounted(async () => {
                 <th class="px-4 py-2 text-center border border-gray-300">ภาควิชา/ชั้นปี</th>
                 <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-300">หมายเลขโทรศัพท์
                 </th>
-                <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง</th>
+                <th class="px-4 py-2 text-center whitespace-nowrap border border-gray-300">ตำแหน่ง</th>
               </tr>
             </thead>
             <tbody>
