@@ -816,9 +816,10 @@ const positions = ref([
         </div>
 
         <div class="lable">
-          <div class="ml-10 mb-10">
+          <div class="ml-3 mb-10">
             <div class="mb-8">
-              <label for="activityHours" class="block item">ประเภทโครงการกิจกรรม</label>
+              <label for="activityHours" class="block item">ประเภทโครงการกิจกรรม<span
+                  class="text-red-500 ml-1">*</span></label>
               <div v-if="isHourCount === true">
                 <div class="text-left text-sm text-gray-600 mt-3 ml-3">เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการ
                   เพียง 1 ด้าน</div>
@@ -1080,14 +1081,14 @@ const positions = ref([
                 </div>
               </div>
               <!-- แสดงรายการคณะกรรมการ -->
-              <div v-for="(member, index) in committee" :key="member.id"
-                class="mx-2 mb-4 flex items-center justify-between border-b pb-6">
-                <table class="min-w-full table-auto border-collapse border  border-gray-400 ">
-                  <thead class="text-sm border border-gray-400 ">
+              <div>
+                <table v-if="committee && committee.length > 0"
+                  class="min-w-50% table-auto border-collapse border  border-gray-400 text-sm">
+                  <thead class=" border border-gray-400 ">
                     <tr>
                       <th class="px-4 pt-2 text-center">ที่</th>
                       <th class="px-4 py-2 text-center border border-gray-400">รหัสนักศึกษา</th>
-                      <th class="px-4 py-2 text-center">ชื่อ - นามสกุล</th>
+                      <th class="px-4 py-2 border-gray-400">ชื่อ - นามสกุล</th>
                       <th class="px-4 py-2 text-center border border-gray-400">ภาควิชา/ชั้นปี</th>
                       <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-400">หมายเลขโทรศัพท์ </th>
                       <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง(ในโครงการ)</th>
@@ -1097,7 +1098,7 @@ const positions = ref([
                     <tr v-for="(member, index) in committee" :key="member.id">
                       <td class="px-4 ">{{ index + 1 }}</td>
                       <td class="px-4  text-center border border-gray-400">{{ member.id }}</td>
-                      <td class="px-4  text-center whitespace-nowrap">{{ member.name }}</td>
+                      <td class="px-4  text-center whitespace-nowrap border-gray-400">{{ member.name }}</td>
                       <td class="px-4 text-center whitespace-nowrap border border-gray-400">{{ member.department }}</td>
                       <td class="px-4 text-center border border-gray-400">{{ member.phone }}</td>
 
@@ -1126,22 +1127,14 @@ const positions = ref([
             <!-- รูปแบบการประเมินผล -->
             <div class="mb-10">
               <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-              <!-- <div class="my-2 ml-4">
-                <div class="text-left text-sm text-gray-600 mt-3 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
-                </div>
-              </div>
 
-              <hr> -->
-              <!-- รายการตัวเลือก -->
               <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
                 <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID"
-                  v-model="selectedEvaluation" :disabled="selectedSkills.length >= 1" />
+                  v-model="selectedEvaluation" />
                 <label :for="option.evaluationID">{{ option.evaluationName }}</label>
               </div>
             </div>
-            <p v-if="selectedSkills.length >= 1" class="text-red-500 mt-2">
-              คุณได้เลือกรูปแบบการประเมินแล้ว
-            </p>
+
             <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
             <div class="mb-8">
               <label for="evaluationFile" class="block item">อัปโหลดไฟล์ตัวอย่างการประเมินผล<span
@@ -1238,10 +1231,9 @@ const positions = ref([
           </div>
         </div>
 
-        <div class="parent-container">
-          <button type="submit" class="form-button"> Sent Activity Document
-          </button>
-        </div>
+        <button type="submit" class="form-button">
+          Sent Activity Document
+        </button>
 
 
       </form>

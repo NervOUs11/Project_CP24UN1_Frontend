@@ -285,6 +285,14 @@ const selectedSDGsCulture = computed(() => {
     }
     : null;
 });
+const totalHours = computed(() => {
+  return (activityData.value.activity || []).reduce((sum, activity) => sum + (activity.countHour || 0), 0);
+});
+
+const activityStatus = computed(() => {
+  return totalHours.value === 0 ? 'ไม่นับชั่วโมงกิจกรรม' : 'กิจกรรมเลือกเข้าร่วม';
+});
+
 
 const selectedOtherSustainability = computed(() => {
   return (activityData.value.sustainability || [])
@@ -405,9 +413,8 @@ onMounted(async () => {
           <div>
             <div class="flex items-center whitespace-nowrap w-full">
               <span class="items">การเทียบค่าชั่วโมงกิจกรรม:&nbsp;
-                <span class="no-style">
-                  {{ activityData.activity === null ? 'ไม่นับชั่วโมงกิจกรรม' : 'กิจกรรมเลือกเข้าร่วม' }}
-                </span></span>
+                <span class="no-style">{{ activityStatus }}</span>
+              </span>
             </div>
 
             <table class="table-auto w-full border-collapse border border-white whitespace-nowrap mb-3">
@@ -417,7 +424,7 @@ onMounted(async () => {
                   <td class="border border-white px-4 py-2">{{ activity.activityName }}</td>
                   <td class="border border-white px-4 py-2 text-center">จำนวน</td>
                   <td class="border border-white px-4 py-2 text-center">{{ activity.countHour }}</td>
-                  <td class="border border-white px-4 py-2 text-center">ชั่วโมง</td>
+                  <td class="border border-white px-4 py-2 text-center">หน่วยชั่วโมง</td>
                 </tr>
               </tbody>
             </table>
@@ -568,7 +575,7 @@ onMounted(async () => {
 
         <div class="lable">
           <label class="font-bold ">คณะกรรมการจัดโครงการ:</label>
-          <table class="table mx-6 my-4">
+          <table class="table mx-4 my-4 text-sm">
             <thead class="bg-gray-100  whitespace-nowrap">
               <tr>
                 <th class="border border-gray-300 px-4 py-2 text-center">ที่</th>
@@ -581,13 +588,13 @@ onMounted(async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(committee, index) in activityData.committee" :key="index" class="hover:bg-gray-100">
+              <tr v-for="(committee, index) in activityData.committee" :key="index" class="hover:bg-gray-100 text-sm">
                 <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ committee.id }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ committee.name }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ committee.department }}</td>
+                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.name }}</td>
+                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.department }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ committee.phone }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ committee.position }}</td>
+                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.position }}</td>
               </tr>
             </tbody>
           </table>
