@@ -137,7 +137,7 @@ const entrepreneurialDescriptions = {
 
 const sustainabilityDescriptions = {
   "SDGs Culture":
-    "ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17 อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน",
+    "ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17 อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้าน",
   "Sustainability Change Agents":
     "ส่งเสริมให้เกิดผู้นำการเปลี่ยนแปลงที่ยั่งยืน สามารถนำความรู้ แนวทางปฏิบัติไปเผยแพร่และขยายผลต่อชุมชนและสังคมรอบข้างเพื่อให้เกิดความยั่งยืน และก่อให้เกิดผลดีต่อประเทศชาติสืบต่อไป",
   "Green University and Smart Campus":
@@ -487,22 +487,34 @@ onMounted(async () => {
           <span class="items">Sustainability:</span>
           <ul class="list-disc pl-6 text-gray-700">
             <!-- SDGs Culture -->
-            <table class="table-auto border-collapse border w-80% border-white mb-6 ml-2">
+            <table class="table-auto border-collapse border w-80% border-white mb-8 ml-2">
               <tbody>
                 <!-- SDGs Culture -->
                 <tr v-if="(activityData.sustainability || []).some(item => item.sustainability === 'SDGs Culture')">
-                  <td class="border border-white  pt-3 " colspan="2">&#x2611; SDGs Culture
+                  <td class="border border-white pt-3" colspan="2">
+                    &#x2611;<span class="font-bold"> SDGs Culture</span>
+                    <div class="mt-2 ml-7">
+                      <!-- แสดงคำอธิบายของ SDGs Culture -->
+                      {{ sustainabilityDescriptions['SDGs Culture'] }}
+                    </div>
                     <div v-for="(goal, index) in (activityData.sustainability || [])
                       .filter(item => item.sustainability === 'SDGs Culture')
                       .map(item => item.goal)" :key="index">
-                      <div class="border border-white px-8 py-2">&#x2611; {{ goal }}</div>
+                      <div class="border border-white px-16 py-3">&#x2611; {{ goal }}</div>
                     </div>
                   </td>
                 </tr>
+
                 <!-- Other Sustainability Items -->
                 <tr v-for="(item, index) in (activityData.sustainability || [])
                   .filter(item => item.sustainability !== 'SDGs Culture')" :key="index">
-                  <td class="border border-white pt-3">&#x2611; {{ item.sustainability }}</td>
+                  <td class="border border-white pt-3">
+                    &#x2611; <span class="font-bold"> {{ item.sustainability }}</span>
+                    <div class="mt-2 ml-7">
+                      <!-- แสดงคำอธิบายของ Other Sustainability -->
+                      {{ sustainabilityDescriptions[item.sustainability] || 'ไม่มีคำอธิบาย' }}
+                    </div>
+                  </td>
                   <td class="border border-white px-4 py-3"></td>
                 </tr>
               </tbody>
@@ -515,6 +527,7 @@ onMounted(async () => {
           <label class="block items">หลักการและเหตุผล:</label>
           <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
         </div>
+
         <div class="lable">
           <span class="items">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
         </div>
