@@ -361,7 +361,7 @@ const addDoc = async () => {
                 <!-- ฟอร์มการกรอกข้อมูลการลา -->
                 <tr class="border border-white">
                   <td class="p-3 border border-white">
-                    <label for="type" class="block item">เรื่อง </label>
+                    <label for="type" class="block item">เรื่อง<span class="text-red-500 ml-1">*</span></label>
                     <select v-model="type" class="form-input form-input-text w-full" required>
                       <option value="" disabled>เลือกประเภทการลา</option>
                       <option value="ลากิจ">ขออนุญาตลากิจ</option>
@@ -378,7 +378,8 @@ const addDoc = async () => {
                 <!-- ประเภทวันลา -->
                 <tr class="border border-white">
                   <td class="p-3 border border-white">
-                    <label for="leaveType" class="block item">ประเภทวันลา </label>
+                    <label for="leaveType" class="block item">ประเภทวันลา<span
+                        class="text-red-500 ml-1">*</span></label>
                     <select v-model="leaveType" class="form-input form-input-text w-full" required>
                       <option value="" disabled>เลือกประเภทวันลา</option>
                       <option value="oneDay">การลา 1 วัน</option>
@@ -390,8 +391,47 @@ const addDoc = async () => {
                 <!-- วันที่เลือกลา 1 วัน -->
                 <tr v-if="leaveType === 'oneDay'" class="border border-white">
                   <td class="p-3 border border-white">
-                    <label for="oneDayDate" class="block item">เลือกวันที่ </label>
-                    <input type="date" v-model="oneDayDate" class="form-input w-full" :min="today" required />
+                    <label for="oneDayDate" class="block item">เลือกวันที่ <span
+                        class="text-red-500 ml-1">*</span></label>
+                    <input type="date" v-model="oneDayDate" class="form-input input-date" :min="today" required />
+                  </td>
+
+                  <td class="p-3 pl-4 border border-white">
+                    <label for="oneDaySession" class="block item">ช่วงเวลา
+                      <span class="text-red-500 ml-1">*</span></label>
+                    <div class="flex pl-16 items-center space-x-4">
+                      <label class="flex items-center">
+                        <input type="checkbox" v-model="oneDaySession.morning" class="form-checkbox" />
+                        <span class="ml-2">เช้า</span>
+                      </label>
+                      <label class="flex items-center">
+                        <input type="checkbox" v-model="oneDaySession.afternoon" class="form-checkbox" />
+                        <span class="ml-2">บ่าย</span>
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- ถ้าเลือก ลาหลายวัน -->
+                <tr v-if="leaveType === 'multipleDays'" class="border border-white">
+                  <td class="p-3 border border-white" colspan="2">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                      <!-- วันที่เริ่มต้น -->
+                      <div class="my-2">
+                        <label for="starttime">
+                          <span class="item">ระหว่างวันที่</span><span class="text-red-500 ml-1">*</span></label>
+                        <input type="date" id="starttime" v-model="starttime" class="form-input input-date" :min="today"
+                          required />
+                      </div>
+
+                      <!-- วันที่สิ้นสุด -->
+                      <div class="my-2">
+                        <label for="endtime">
+                          <span class="item">ถึงวันที่</span><span class="text-red-500 ml-1">*</span></label>
+                        <input type="date" id="endtime" v-model="endtime" class="form-input input-date"
+                          :min="getNextDay(starttime)" required />
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -401,8 +441,9 @@ const addDoc = async () => {
           <div class="lable col-span-2">
             <label for="detail" class="block item">โดยมีเหตุผลและรายละเอียด<span
                 class="text-red-500 ml-1">*</span></label>
-            <textarea id="detail" v-model="detail" class="form-input detail-input" minlength="5" maxlength="500"
-              required @input="updateRemainingCharacters"></textarea>
+            <textarea id="detail" v-model="detail" class="form-input detail-input " minlength="5" maxlength="1000"
+              placeholder="กรุณาระบุรายวิชา section ที่ต้องการลา พร้อมอธิบายเหตุผล" required
+              @input="updateRemainingCharacters"></textarea>
             <div class="text-right text-sm text-gray-600">
               ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }}
             </div>
@@ -420,9 +461,10 @@ const addDoc = async () => {
         </div>
 
         <div>
-          <button type="submit" class="form-button">
-            Sent Absence Document
-          </button>
+          <div class="parent-container">
+            <button type="submit" class="form-button"> Sent Absence Document
+            </button>
+          </div>
         </div>
 
       </form>
@@ -519,9 +561,19 @@ const addDoc = async () => {
   border-radius: 10px;
 }
 
+.parent-container {
+  display: flex;
+  justify-content: center;
+  /* จัดตำแหน่งในแนวนอน */
+  align-items: center;
+  /* จัดตำแหน่งในแนวตั้ง */
+  /* ตั้งค่าความสูงให้เป็น 100% ของหน้าจอ */
+}
+
+/* ปุ่ม .form-button */
 .form-button {
   width: 100%;
-  padding: 10px 0;
+  padding: 12px 0;
   border: none;
   border-radius: 100px;
   background-color: #fb923c;
@@ -529,6 +581,8 @@ const addDoc = async () => {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+  text-align: center;
+  /* ทำให้ข้อความภายในปุ่มอยู่กลาง */
 }
 
 .form-input:focus {

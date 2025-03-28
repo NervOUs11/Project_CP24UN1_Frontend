@@ -8,10 +8,7 @@ import { fetchAllEntrepreneurial } from '../functions/fetchAllEntrepreneurial';
 import { fetchAllSustainability } from '../functions/fetchAllSustainability';
 import { fetchAllGoal } from '../functions/fetchAllGoal';
 import { fetchAllActivity } from '../functions/fetchAllActivity';
-<<<<<<< HEAD
-=======
 
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 import Navbar from '../components/Navbar.vue';
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -126,6 +123,7 @@ const canShowButtons = computed(() => {
   }
   return canApprove.value; // ถ้าไม่ใช่ student ให้แสดงปุ่ม approve กับ reject ถ้า canApprove เป็น true
 });
+
 const entrepreneurialDescriptions = {
   "Entrepreneurial Mindset":
     "ส่งเสริมให้นักศึกษามีจิตสำนักของความเป็นผู้ประกอบการ ได้แก่ คิด สร้างสรรค์ ลงมือทำจริง สู้จนสำเร็จ และสร้างผลกระทบที่มีความหมาย",
@@ -137,20 +135,6 @@ const entrepreneurialDescriptions = {
     "กิจกรรมการส่งเสริมให้มีความเข้าใจที่เกี่ยวข้องกับการเงิน เพื่อความยั่งยืน การสร้างสภาพแวดล้อมที่จะเอื้อให้นักศึกษาสามารถใช้ประโยชน์จากเครื่องมือทางการเงินที่ตอบโจทย์ด้านความยั่งยืน สร้างนักศึกษาให้มีองค์ความรู้ในการผลักดันงานด้านการเงินเพื่อความยั่งยืนให้เห็นผลเป็นรูปธรรม",
 };
 
-<<<<<<< HEAD
-=======
-const entrepreneurialDescriptions = {
-  "Entrepreneurial Mindset":
-    "ส่งเสริมให้นักศึกษามีจิตสำนักของความเป็นผู้ประกอบการ ได้แก่ คิด สร้างสรรค์ ลงมือทำจริง สู้จนสำเร็จ และสร้างผลกระทบที่มีความหมาย",
-  "Knowledge Sharing Society":
-    "ส่งเสริมให้เกิดสังคมแห่งการสร้างสรรค์ความรู้ ทั้งด้านการจัดกิจกรรมเสริมสร้างความรู้ และการสร้างสภาพแวดล้อมให้เอื้อต่อการเรียนรู้",
-  "Research and Innovation Impact":
-    "สร้างงานวิจัยและนวัตกรรมที่ทรงคุณค่า และเกิดประโยชน์กับสังคมอย่างกว้างขวาง",
-  "Financial Literacy":
-    "กิจกรรมการส่งเสริมให้มีความเข้าใจที่เกี่ยวข้องกับการเงิน เพื่อความยั่งยืน การสร้างสภาพแวดล้อมที่จะเอื้อให้นักศึกษาสามารถใช้ประโยชน์จากเครื่องมือทางการเงินที่ตอบโจทย์ด้านความยั่งยืน สร้างนักศึกษาให้มีองค์ความรู้ในการผลักดันงานด้านการเงินเพื่อความยั่งยืนให้เห็นผลเป็นรูปธรรม",
-};
-
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 const sustainabilityDescriptions = {
   "SDGs Culture":
     "ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17 อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน",
@@ -161,11 +145,8 @@ const sustainabilityDescriptions = {
   "Carbon Neutrality ":
     "สนับสนุนให้มหาวิทยาลัยขับเคลื่อนเจตนารมณ์ลดการปล่อยคาร์บอนสุทธิเป็นศูนย์ และการลดการปล่อยคาร์บอนในกิจกรรมต่างๆ",
 };
-<<<<<<< HEAD
-=======
 
 
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 // ฟังก์ชัน Approve
 const handleApprove = async () => {
   try {
@@ -286,8 +267,6 @@ const entrepreneurialData = ref([]);
 const sustainabilityData = ref([]);
 const goalData = ref([]);
 const activity = ref([]);
-<<<<<<< HEAD
-=======
 
 const selectedEntrepreneurial = computed(() => {
   return (activityData.value.entrepreneurial || []).map(name => ({
@@ -300,10 +279,10 @@ const selectedSDGsCulture = computed(() => {
   const sdgs = (activityData.value.sustainability || []).filter(item => item.sustainability === 'SDGs Culture');
   return sdgs.length
     ? {
-        sustainabilityName: 'SDGs Culture',
-        description: sustainabilityDescriptions['SDGs Culture'] || "",
-        goals: sdgs.map(item => item.goal).filter(Boolean), // เอาเฉพาะที่ไม่เป็น null
-      }
+      sustainabilityName: 'SDGs Culture',
+      description: sustainabilityDescriptions['SDGs Culture'] || "",
+      goals: sdgs.map(item => item.goal).filter(Boolean), // เอาเฉพาะที่ไม่เป็น null
+    }
     : null;
 });
 
@@ -315,34 +294,7 @@ const selectedOtherSustainability = computed(() => {
       description: sustainabilityDescriptions[item.sustainability] || "",
     }));
 });
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 
-const selectedEntrepreneurial = computed(() => {
-  return (activityData.value.entrepreneurial || []).map(name => ({
-    entrepreneurialName: name,
-    description: entrepreneurialDescriptions[name] || ""
-  }));
-});
-
-const selectedSDGsCulture = computed(() => {
-  const sdgs = (activityData.value.sustainability || []).filter(item => item.sustainability === 'SDGs Culture');
-  return sdgs.length
-    ? {
-        sustainabilityName: 'SDGs Culture',
-        description: sustainabilityDescriptions['SDGs Culture'] || "",
-        goals: sdgs.map(item => item.goal).filter(Boolean), // เอาเฉพาะที่ไม่เป็น null
-      }
-    : null;
-});
-
-const selectedOtherSustainability = computed(() => {
-  return (activityData.value.sustainability || [])
-    .filter(item => item.sustainability !== 'SDGs Culture')
-    .map(item => ({
-      sustainabilityName: item.sustainability,
-      description: sustainabilityDescriptions[item.sustainability] || "",
-    }));
-});
 onMounted(async () => {
   let userid = null
   const role = localStorage.getItem("role")
@@ -353,93 +305,57 @@ onMounted(async () => {
     userid = localStorage.getItem("studentID")
   }
 
-<<<<<<< HEAD
   try {
     activityData.value = await fetchActivityDocument(docId, userid, role)
     if (activityData.value) {
       documentId.value = activityData.value.DocumentID;
       progressID.value = activityData.value.progressID;
-=======
-  try{
-      activityData.value = await fetchActivityDocument(docId, userid, role)
-      if (activityData.value) {
-          documentId.value = activityData.value.DocumentID;
-          progressID.value = activityData.value.progressID;
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
-          entrepreneurialData.value = await fetchAllEntrepreneurial();
-          sustainabilityData.value = await fetchAllSustainability();
-          goalData.value = await fetchAllGoal();
-          activity.value = await fetchAllActivity();
-          console.log(activityData.value.activity);
-          console.log(activity.value);
-          // console.log(activityData.value.activity.length);
-          entrepreneurialData.value = activityData.value.entrepreneurial
-          sustainabilityData.value =  activityData.value.sustainability
-<<<<<<< HEAD
+      entrepreneurialData.value = await fetchAllEntrepreneurial();
+      sustainabilityData.value = await fetchAllSustainability();
+      goalData.value = await fetchAllGoal();
+      activity.value = await fetchAllActivity();
+      console.log(activityData.value.activity);
+      console.log(activity.value);
+      // console.log(activityData.value.activity.length);
+      entrepreneurialData.value = activityData.value.entrepreneurial
+      sustainabilityData.value = activityData.value.sustainability
       sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
-      // console.log(sustainabilityProposeArray.value);
       activityData.value.startTime = activityData.value.startTime ? formatDateTime(activityData.value.startTime) : "N/A";
       activityData.value.endTime = activityData.value.endTime ? formatDateTime(activityData.value.endTime) : "N/A";
       activityData.value.prepareStart = activityData.value.prepareStart ? formatDate(activityData.value.prepareStart) : "N/A";
       activityData.value.prepareEnd = activityData.value.prepareEnd ? formatDate(activityData.value.prepareEnd) : "N/A";
       activityData.value.createDate = activityData.value.createDate ? formatDateTime(activityData.value.createDate) : "N/A";
-
     }
-=======
-          sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
-          activityData.value.startTime = activityData.value.startTime ? formatDateTime(activityData.value.startTime) : "N/A";
-          activityData.value.endTime = activityData.value.endTime ? formatDateTime(activityData.value.endTime) : "N/A";
-          activityData.value.prepareStart = activityData.value.prepareStart ? formatDate(activityData.value.prepareStart) : "N/A";
-          activityData.value.prepareEnd = activityData.value.prepareEnd ? formatDate(activityData.value.prepareEnd) : "N/A";
-          activityData.value.createDate = activityData.value.createDate ? formatDateTime(activityData.value.createDate) : "N/A";
-      }
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
   }
   catch (error) {
     console.log(error)
   }
 
 })
+
 </script>
 
 <template>
-<<<<<<< HEAD
   <Navbar class="fixed top-0 left-0 w-full z-50 h-[3vh] p-2 shadow-md" />
   <!-- Show loading or skeleton while data is being fetched -->
-  <div v-if="activityData === null" class="flex justify-center items-center min-h-screen">    <span>Loading...</span>
-=======
-<Navbar class="fixed top-0 left-0 w-full z-50 h-[3vh] p-2 shadow-md" />
-  <!-- Show loading or skeleton while data is being fetched -->
-  <div v-if="activityData === null" class="flex justify-center items-center min-h-screen">
+  <div v-if="data === null" class="flex justify-center items-center min-h-screen">
     <span>Loading...</span>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
   </div>
 
   <!-- Show the document details once data is fetched -->
   <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[900px]">
-      <h1 class="text-3xl font-bold mb-4 text-center text-blue-500">Activity Document Detail</h1>
-<<<<<<< HEAD
+      <h1 class="text-3xl font-extrabold mb-4 text-center text-blue-500">Activity Document Detail</h1>
 
 
-      <div class="mb-6">
+      <div class="lable">
         <h2 class="subhead">Document Information</h2>
-        <div class="grid grid-cols-2 gap-4 lable">
-=======
-
-      <div class="mb-6">
-        <h2 class="text-xl font-bold text-blue-600 mb-4">Document Information</h2>
-        <div class="grid grid-cols-2 gap-4  mx-2">
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
+        <div class="grid grid-cols-2 gap-4 lable ">
           <div>
             <span class="items">ที่:</span> {{ activityData.code }}
           </div>
           <div>
-<<<<<<< HEAD
             <span class="items">วันที่เขียน:</span> {{ activityData.createDate }}
-=======
-            <span class="font-bold">วันที่เขียน:</span> {{ activityData.createDate }}
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
           </div>
 
           <div>
@@ -458,543 +374,346 @@ onMounted(async () => {
             <span class="items">ณ สถานที่:</span> {{ activityData.location }}
           </div>
           <div>
-            <span class="items">รูปแบบกิจกรรม:</span> {{ activityData.type }}
+            <span class="items">รูปแบบการจัดกิจกรรม:</span> {{ activityData.type }}
           </div>
-          <div>
-            <span class="items mr-2">วัตถุประสงค์:</span><span class="whitespace-nowrap"> {{ activityData.propose }}</span>
+          <div class="col-span-2">
+            <label class="block items">วัตถุประสงค์โดยภาพรวม:</label>
+            <span class=" w-full ml-3" rows="4" readonly>{{ activityData.propose }}</span>
           </div>
-          <!-- ฝากขึ้นบรรทัดใหม่ -->
-          <div>
-          <span class="items">ค่าใช้จ่ายในโครงการ:</span> {{ activityData.payment }}<span class="pl-1">บาท</span>
-          </div>
-<<<<<<< HEAD
-        </div>
 
-        
-
-        <div class="lable">
-          <span class="items whitespace-nowrap mr-2">การเทียบค่าชั่วโมงกิจกรรม:</span>
-          <template v-if="!activityData.activity || activityData.activity.length === 0">
-            <a class="whitespace-nowrap">กิจกรรมที่ไม่นับหน่วยชั่วโมง</a>
-          </template>
-          <template v-else>
-            <a class="whitespace-nowrap">กิจกรรมเลือกเข้าร่วม (นับชั่วโมงกิจกรรม)</a>
-          </template>
-          <!-- แสดงตารางเฉพาะเมื่อ activityData.activity มีค่า -->
-          <template v-if="activityData.activity && activityData.activity.length > 0">
-            <table class="table-sub">
+          <!-- ค่าใช้จ่าย -->
+          <div class="col-span-2 flex items-center">
+            <table class="  whitespace-nowrap ">
               <tbody>
-                <tr v-for="(activity, index) in activityData.activity" :key="index" class="hover:bg-gray-100">
-                  <td class="border border-white py-2 px-2 whitespace-nowrap">
-                    {{ index + 1 }}<span>.</span>
+                <tr>
+                  <td class="items whitespace-nowrap" style="width: 85px;">ค่าใช้จ่าย:</td>
+                  <td class=" border border-white">เป็นจำนวนเงิน</td>
+                  <td class="p-2 border border-white  w-auto mx-1 text-right">
+                    <!-- <input type="number" class="" v-model.number="activityData.payment"
+                      readonly style="width: auto; min-width: 150px; max-width: 100px;" /> -->
+                    {{ activityData.payment }}
                   </td>
-                  <td class="border border-white py-2 whitespace-nowrap">
-                    {{ activity.activityName }}
+                  <td class="p-2 border border-white">บาท</td>
+                  <td class="p-2 border border-white">
+                    ( {{ expensesThaiText }} <span>ถ้วน )</span>
                   </td>
-                  <td class="border border-white px-7"> จำนวน</td>
-                  <td class="border border-white px-2">{{ activity.countHour }}</td>
-                  <td class="border border-white px-6 whitespace-nowrap"> หน่วยชั่วโมง</td>
                 </tr>
               </tbody>
             </table>
-          </template>
+          </div>
+
+          <div>
+            <div class="flex items-center whitespace-nowrap w-full">
+              <span class="items">การเทียบค่าชั่วโมงกิจกรรม:&nbsp;
+                <span class="no-style">
+                  {{ activityData.activity === null ? 'ไม่นับชั่วโมงกิจกรรม' : 'กิจกรรมเลือกเข้าร่วม' }}
+                </span></span>
+            </div>
+
+            <table class="table-auto w-full border-collapse border border-white whitespace-nowrap mb-3">
+              <tbody>
+                <tr v-for="(activity, index) in activityData.activity" :key="index" class="hover:bg-gray-50">
+                  <td class="border border-white pl-4 py-2"> {{ index + 1 }}. </td>
+                  <td class="border border-white px-4 py-2">{{ activity.activityName }}</td>
+                  <td class="border border-white px-4 py-2 text-center">จำนวน</td>
+                  <td class="border border-white px-4 py-2 text-center">{{ activity.countHour }}</td>
+                  <td class="border border-white px-4 py-2 text-center">ชั่วโมง</td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
         </div>
 
+        <div class="lable">
+          <table class="table-auto w-auto mb-4">
 
-
-
-        <div class=" mx-2">
-          <table class="table">
-            <thead>
-              <tr class="bg-gray-500 text-white">
-                <th class="px-8  border-gray-50 py-5 whitespace-nowrap">อาจารย์ที่ปรึกษา/รองคณบดี</th>
-                <th class="px-4 border py-5">นายก/ประธานชมรม</th>
-                <th class="px-4 py-5">นักศึกษาผู้รับผิดชอบโครงการ</th>
-              </tr>
-            </thead>
             <tbody>
-              <tr v-if="activityData.allProgress && activityData.allProgress.length > 0" class="hover:bg-gray-100">
-                <td class="px-4 py-5 text-center bg-gray-50">{{ activityData.allProgress[0]?.staffName }}</td>
-                <td class="px-4 py-5 border text-center bg-gray-50">{{ activityData.allProgress[1]?.staffName }}</td>
-                <td class="px-4 py-5 text-center bg-gray-50 text-red-400"> เจ้าของโครงการ </td>
+              <tr>
+                <td class="items">อาจารย์ที่ปรึกษา/รองคณบดี:</td>
+                <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[0]?.staffName }}</td>
+              </tr>
+              <tr>
+                <td class="items">นายก/ประธานชมรม:</td>
+                <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[1]?.staffName }}</td>
+              </tr>
+              <tr>
+                <td class="items">ประธานฝ่าย:</td>
+                <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[2]?.staffName }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        
-        <div class=" mx-2 mt-10">
-          <section>
-          <div class="lable">
-            <span class="items">ประเภทโครงการกิจกรรม:</span>
-            <table class="table-sub">
-              <tbody>
-                <tr v-for="(activity, index) in activityData.activity" :key="index" class="hover:bg-gray-100">
-                  <td class="border border-white py-2 px-2 whitespace-nowrap">
-                    {{ index + 1 }}<span>.</span></td>
-                  <td class="border border-white  py-2 whitespace-nowrap"> {{ activity.activityName }}</td>
-                  <td class="border border-white px-7 "> จำนวน</td>
-                  <td class="border  border-white px-2">{{ activity.countHour }}</td>
-                  <td class="border border-white px-6 whitespace-nowrap"> หน่วยชั่วโมง</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="lable">
-            <span class="items">KMUTT Student QF:</span>
-            <table class="table-sub">
-              <tbody>
-                <tr v-for="(studentQF, index) in activityData.studentQF" :key="index" class="hover:bg-gray-100">
-                  <td class="border border-white  py-2 pr-2 whitespace-nowrap"> {{ index + 1 }}<span>.</span></td>
-                  <td class="border border-white  py-2 whitespace-nowrap"> {{ studentQF.name }}</td>
-                  <td class="border border-white px-7 "> จำนวน</td>
-                  <td class="border  border-white px-2">{{ studentQF.percentage }}</td>
-                  <td class="border border-white px-6 "> %</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
 
-          <div class="lable">
-            <span class="items">Entrepreneurial:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li v-if="selectedEntrepreneurial.length">
-                <span class="font-semibold">{{ selectedEntrepreneurial.map(e => e.entrepreneurialName).join(', ') }}: </span>
-                <span>{{ selectedEntrepreneurial.map(e => e.description).join(' ') }}</span>              </li>
-            </ul>
-          </div>
+        <div class="lable">
+          <span class="items">KMUTT Student QF:</span>
+          <table class="table-auto w-auto border-collapse border border-white whitespace-nowrap mb-3">
+            <tbody>
+              <tr v-for="(studentQF, index) in activityData.studentQF" :key="index" class="hover:bg-gray-50">
+                <td class="border border-white pl-4 py-2"> {{ index + 1 }}. </td>
+                <td class="border border-white px-4 py-2"> {{ studentQF.name }} </td>
+                <td class="border border-white px-4 py-2 text-center">{{ studentQF.percentage }}</td>
+                <td class="border border-white px-4 py-2 text-center">%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-            <!-- Sustainability and Goals -->
+        <div class="lable">
+          <span class="items">Entrepreneurial:</span>
+          <table class="table-auto border-collapse border w-20%  border-gray-300 mb-3 ml-3">
+            <tbody>
+              <tr v-for="(entrepreneurial, index) in selectedEntrepreneurial" :key="index">
+                <td class="border border-white px-4 py-3">&#x2611; {{ entrepreneurial.entrepreneurialName.join(', ')
+                }} <br>
+                  <div class="pt-2 pl-7 text-sm">{{selectedEntrepreneurial.map(e => e.description).join(' ')}}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <!-- Sustainability and Goals -->
         <div class="lable">
           <span class="items">Sustainability:</span>
           <ul class="list-disc pl-6 text-gray-700">
-            <li v-if="selectedSDGsCulture">
-              <span class="font-semibold">{{ selectedSDGsCulture.sustainabilityName }}:</span>
-              <span>{{ selectedSDGsCulture.description }}</span>
-              <ul v-if="selectedSDGsCulture.goals.length" class="list-disc pl-6 text-gray-700">
-                <li v-for="(goal, index) in selectedSDGsCulture.goals" :key="index">
-                  {{ goal }}
-                </li>
-              </ul>
-            </li>
-            <li v-for="(sustainability, index) in selectedOtherSustainability" :key="index">
-              <span class="font-semibold">{{ sustainability.sustainabilityName }}:</span>
-              <span>{{ sustainability.description }}</span>
-            </li>
+            <!-- SDGs Culture -->
+            <table class="table-auto border-collapse border w-80% border-white mb-6 ml-2">
+              <tbody>
+                <!-- SDGs Culture -->
+                <tr v-if="(activityData.sustainability || []).some(item => item.sustainability === 'SDGs Culture')">
+                  <td class="border border-white  pt-3 " colspan="2">&#x2611; SDGs Culture
+                    <div v-for="(goal, index) in (activityData.sustainability || [])
+                      .filter(item => item.sustainability === 'SDGs Culture')
+                      .map(item => item.goal)" :key="index">
+                      <div class="border border-white px-8 py-2">&#x2611; {{ goal }}</div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Other Sustainability Items -->
+                <tr v-for="(item, index) in (activityData.sustainability || [])
+                  .filter(item => item.sustainability !== 'SDGs Culture')" :key="index">
+                  <td class="border border-white pt-3">&#x2611; {{ item.sustainability }}</td>
+                  <td class="border border-white px-4 py-3"></td>
+                </tr>
+              </tbody>
+            </table>
           </ul>
         </div>
 
 
-
-
-
-
-
-          <div class="lable">
-            <span class="items">หลักการและเหตุผล:</span> {{ activityData.sustainabilityDetail }}
-          </div>
-
-          <div class="lable">
-            <span class="items">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
-          </div>
-
-          <div class="lable">
-            <span class="items">ผู้เข้าร่วมโครงการ:</span>
-            <table class="table-sub">
-              <tbody>
-                <tr v-for="(participant, index) in activityData.participant" :key="index" class="hover:bg-gray-100">
-                  <td class="border border-white  py-2 whitespace-nowrap"> {{ participant.participantName }}</td>
-                  <td class="border border-white px-7 "> จำนวน</td>
-                  <td class="border  border-white px-2">{{ participant.count }}</td>
-                  <td class="border border-white px-6 "> คน</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="lable">
-            <span class="items">ลักษณะกิจกรรม:</span>
-            <span class="ml-4"> {{ activityData.activityCharacteristic }}</span>
-          </div>
-
-          <div class="lable">
-            <span class="items">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code of Honor)
-              ดังนี้:</span>
-            <div class="ml-4 my-1">{{ activityData.codeOfHonor }}</div>
-          </div>
-
-        </section>
-          <div class="lable">
-            <span class="items">ระยะเวลาเตรียมงาน:</span> {{ activityData.prepareStart }} ถึงวันที่ {{
-              activityData.prepareEnd }}
-          </div>
-          <div class="lable">
-            <span class="items">ระยะเวลาปฏิบัติงาน:</span> {{ activityData.startTime }} ถึงวันที่ {{ activityData.endTime }}
-          </div>
-
-
-          <div class="lable">
-            <h2 class="items">ขั้นตอนการดำเนินงาน</h2>
-            <table class="w-auto border-collapse border border-white mx-4">
-              <tbody>
-                <tr v-for="(file, index) in [activityData.scheduleDetails]" :key="index">
-                  <td class="px-4 py-2">ไฟล์ขั้นตอนการดำเนินงาน:</td>
-                  <td class="px-4 py-2">
-                    <a href="javascript:void(0);"
-                      @click="openFileInNewTab(activityData.scheduleDetails, 'application/pdf')"
-                      class="text-orange-500 underline">
-                      Click to open file in new tab.
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="lable">
-            <span class="font-bold ">คณะกรรมการจัดโครงการ:</span>
-            <table class="table">
-              <thead class="bg-gray-200">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ลำดับที่</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ชื่อ - นามสกุล</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ตำแหน่ง</th>
-                </tr>
-=======
-
-          <div class="mb-6">
-            <span class="font-bold">ชั่วโมงกิจกรรม:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li v-for="(activity, index) in activityData.activity" :key="index">
-                {{ activity.activityName }} จำนวน {{ activity.countHour }} ชั่วโมง
-              </li>
-            </ul>
-          </div>
-
+        <div class="lable col-span-2">
+          <label class="block items">หลักการและเหตุผล:</label>
+          <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
+        </div>
+        <div class="lable">
+          <span class="items">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
         </div>
 
-        <div class=" mx-2">
-          <div class="mb-6">
-            <span class="font-bold">อาจารย์ที่ปรึกษา/รองคณบดี:</span>
-            <span class="mx-2" v-if="activityData.allProgress">{{ activityData.allProgress[0]?.staffName }}</span>
-          </div>
-          <div class="mb-6">
-            <span class="font-bold">นายก/ประธานชมรม:</span>
-            <span class="mx-2" v-if="activityData.allProgress">{{ activityData.allProgress[1]?.staffName }}</span>
-          </div>
-          <div class="mb-6">
-            <span class="font-bold">ประธานฝ่าย:</span>
-            <span class="mx-2" v-if="activityData.allProgress">{{ activityData.allProgress[2]?.staffName }}</span>
-          </div>
+        <div class="lable">
+          <span class="items">ผู้เข้าร่วมโครงการ:</span>
+          <table class="table-sub ml-4">
+            <tbody>
+              <tr v-for="(participant, index) in activityData.participant" :key="index" class="hover:bg-gray-100">
+                <td class="border border-white pl-4 pr-2 py-2"> {{ index + 1 }}. </td>
+                <td class="border border-white  py-2 whitespace-nowrap"> {{ participant.participantName }}</td>
+                <td class="border border-white px-7 "> จำนวน</td>
+                <td class="border  border-white px-2">{{ participant.count }}</td>
+                <td class="border border-white px-6 "> คน</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div class="mb-6">
-            <span class="font-bold">KMUTT Student QF:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li v-for="(studentQF, index) in activityData.studentQF" :key="index">
-                {{ studentQF.name }} {{ studentQF.percentage }}%
-              </li>
-            </ul>
-          </div>
+        <div class="lable col-span-2">
+          <label class="items">ลักษณะกิจกรรม:</label>
+          <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.activityCharacteristic }}</div>
+        </div>
 
-          <div class="mb-6">
-            <span class="font-bold">Entrepreneurial:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li v-if="selectedEntrepreneurial.length">
-                <span class="font-semibold">{{ selectedEntrepreneurial.map(e => e.entrepreneurialName).join(', ') }}: </span>
-                <span>{{ selectedEntrepreneurial.map(e => e.description).join(' ') }}</span>
-              </li>
-            </ul>
-          </div>
+        <div class="lable col-span-2">
+          <label class="items whitespace-nowrap">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code
+            of Honor)
+            ดังนี้:</label>
+          <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.codeOfHonor }}</div>
+        </div>
 
-        <!-- Sustainability and Goals -->
-        <div class="mb-6">
-          <span class="font-bold">Sustainability:</span>
-          <ul class="list-disc pl-6 text-gray-700">
-            <li v-if="selectedSDGsCulture">
-              <span class="font-semibold">{{ selectedSDGsCulture.sustainabilityName }}:</span>
-              <span>{{ selectedSDGsCulture.description }}</span>
-              <ul v-if="selectedSDGsCulture.goals.length" class="list-disc pl-6 text-gray-700">
-                <li v-for="(goal, index) in selectedSDGsCulture.goals" :key="index">
-                  {{ goal }}
-                </li>
-              </ul>
+        <div class="lable">
+          <span class="items">ระยะเวลาเตรียมงาน:</span> {{ activityData.prepareStart }} ถึงวันที่ {{
+            activityData.prepareEnd }}
+        </div>
+        <div class="lable">
+          <span class="items">ระยะเวลาปฏิบัติงาน:</span> {{ activityData.startTime }} ถึงวันที่ {{ activityData.endTime
+          }}
+        </div>
+
+        <div class="lable">
+          <h2 class="items">ขั้นตอนการดำเนินงาน:</h2>
+          <table class="w-auto border-collapse border border-white mx-4">
+            <tbody>
+              <tr v-for="(file, index) in [activityData.scheduleDetails]" :key="index">
+                <td class="px-4 py-2">ไฟล์ขั้นตอนการดำเนินงาน:</td>
+                <td class="px-4 py-2">
+                  <a href="javascript:void(0);"
+                    @click="openFileInNewTab(activityData.scheduleDetails, 'application/pdf')"
+                    class="text-orange-500 underline">
+                    Click to open file in new tab.
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lable">
+          <label class="font-bold ">คณะกรรมการจัดโครงการ:</label>
+          <table class="table mx-6 my-4">
+            <thead class="bg-gray-100  whitespace-nowrap">
+              <tr>
+                <th class="border border-gray-300 px-4 py-2 text-center">ที่</th>
+                <th class="px-4 py-2 text-center border border-gray-300">รหัสนักศึกษา</th>
+                <th class="border border-gray-300 px-4 py-2 text-center ">ชื่อ - นามสกุล</th>
+                <th class="px-4 py-2 text-center border border-gray-300">ภาควิชา/ชั้นปี</th>
+                <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-300">หมายเลขโทรศัพท์
+                </th>
+                <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(committee, index) in activityData.committee" :key="index" class="hover:bg-gray-100">
+                <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.id }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.name }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.department }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.phone }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ committee.position }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lable">
+          <span class="items">รูปแบบการประเมินผล:</span>
+          <ul class="list-none pl-6 text-gray-700 ml-4 my-2">
+            <li v-for="(evaluation, index) in (activityData.evaluation)" :key="index" class="py-1">
+              <span class="px-2">&#x2611;</span> {{ evaluation.evaluation == "Other" ? evaluation.otherEvaluation :
+                evaluation.evaluation }}
             </li>
-            <li v-for="(sustainability, index) in selectedOtherSustainability" :key="index">
-              <span class="font-semibold">{{ sustainability.sustainabilityName }}:</span>
-              <span>{{ sustainability.description }}</span>
-            </li>
+
           </ul>
         </div>
 
-          <div class="mb-6">
-            <span class="font-bold">หลักการและเหตุผล:</span> {{ activityData.sustainabilityDetail }}
-          </div>
+        <div class="lable">
+          <h2 class="items">รายละเอียดรูปแบบการประเมินผล:</h2>
+          <table class="w-auto border-collapse border border-white mx-4">
+            <tbody>
+              <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
+                <td class="px-4 py-2">ไฟล์รูปแบบการประเมินผล:</td>
+                <td class="px-4 py-2">
+                  <a href="javascript:void(0);"
+                    @click="openFileInNewTab(activityData.evaluationFile, 'application/pdf')"
+                    class="text-orange-500 underline">
+                    Click to open file in new tab.
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div class="mb-6">
-            <span class="font-bold">วัตถุประสงค์:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li v-for="(item, index) in sustainabilityProposeArray" :key="index">
-                {{ item }}
-              </li>
-            </ul>
-          </div>
+        <div class="lable">
+          <span class="items">ผลที่คาดว่าจะได้รับ:</span>
+          <table class="table mx-8 my-4">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border border-gray-300 px-4 py-2 text-center">ข้อที่</th>
+                <th class="border border-gray-300 px-4 py-2 text-center">ผลที่คาดว่าจะได้รับ</th>
+                <th class="border border-gray-300 px-4 py-2 text-center">ตัวชี้วัด (KPI)</th>
+                <th class="border border-gray-300 px-4 py-2 text-center">ค่าเป้าหมาย (%)</th>
 
-          <div class="mb-6">
-            <span class="font-bold">ผู้เข้าร่วมโครงการ:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li v-for="(participant, index) in activityData.participant" :key="index">
-                {{ participant.participantName }} จำนวน {{ participant.count }} คน
-              </li>
-            </ul>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in activityData.result" :key="index" class="hover:bg-gray-100">
+                <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ item.detail }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ item.kpi }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ item.target }}</td>
+              </tr>
+            </tbody>
+          </table>
 
-          <div class="mb-6">
-            <span class="font-bold">ลักษณะกิจกรรม:</span> {{ activityData.activityCharacteristic }}
-          </div>
-
-          <div class="mb-6">
-            <span class="font-bold">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code of Honor)
-              ดังนี้:</span><br>{{ activityData.codeOfHonor }}
-          </div>
-
-          <div class="mb-6">
-            <span class="font-bold">ระยะเวลาเตรียมงาน:</span> {{ activityData.prepareStart }} ถึงวันที่ {{
-              activityData.prepareEnd }}
-          </div>
-
-          <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">ขั้นตอนการดำเนินงาน</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <div v-if="activityData.scheduleDetails">
-                <span class="font-bold ml-3">ไฟล์ขั้นตอนการดำเนินงาน:</span>
-                <a href="javascript:void(0);" @click="openFileInNewTab(activityData.scheduleDetails, 'application/pdf')"
-                  class="text-orange-500 underline">
-                  Click to open file in new tab.
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <span class="font-bold ">คณะกรรมการจัดโครงการ:</span>
-            <table class="w-full border-collapse border mx-3 my-3 border-gray-300 text-gray-700">
-              <thead class="bg-gray-200">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ลำดับที่</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">ชื่อ - นามสกุล</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">ตำแหน่ง</th>
-                </tr>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
-              </thead>
-              <tbody>
-                <tr v-for="(committee, index) in activityData.committee" :key="index" class="hover:bg-gray-100">
-                  <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ committee.name }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ committee.position }}</td>
-                </tr>
-              </tbody>
-            </table>
-<<<<<<< HEAD
-          </div>
-
-          <div class="lable">
-            <span class="items">รูปแบบการประเมินผล:</span>
-            <ul class="list-none pl-6 text-gray-700 ml-4 my-2">
-              <li
-                v-for="(evaluation, index) in (activityData.evaluation)" :key="index" class="py-1">
-                <span class="px-2">&#x2611;</span> {{  evaluation.evaluation == "Other" ? evaluation.otherEvaluation : evaluation.evaluation }}
-              </li>
-              
-            </ul>
-          </div>
-
-          <div class="lable">
-            <h2 class="items">รายละเอียดรูปแบบการประเมินผล</h2>
-            <table class="w-auto border-collapse border border-white mx-4">
-              <tbody>
-                <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
-                  <td class="px-4 py-2">ไฟล์รูปแบบการประเมินผล:</td>
-                  <td class="px-4 py-2">
-                    <a href="javascript:void(0);"
-                      @click="openFileInNewTab(activityData.evaluationFile, 'application/pdf')"
-                      class="text-orange-500 underline">
-                      Click to open file in new tab.
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-          </div>
-
-          <div class="lable">
-            <span class="items">ผลที่คาดว่าจะได้รับ:</span>
-            <table class="table">
-              <thead class="bg-gray-200">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ข้อที่</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ผลที่คาดว่าจะได้รับ</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ตัวชี้วัด (KPI)</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ค่าเป้าหมาย (%)</th>
-=======
-            <!-- <ul class="list-disc pl-6 text-gray-700">
-              <li v-for="(committee, index) in activityData.committee" :key="index">
-                <b>Name:</b> {{ committee.name }} <b>Position:</b> {{ committee.position }}
-              </li>
-            </ul> -->
-          </div>
-
-          <div class="mb-6">
-            <span class="font-bold">รูปแบบการประเมินผล:</span>
-            <ul class="list-disc pl-6 text-gray-700 ml-4 my-2">
-              <li class="my-1" v-for="(evaluation, index) in activityData.evaluation" :key="index">
-                {{ evaluation.evaluation == "Other" ? evaluation.otherEvaluation : evaluation.evaluation }}
-              </li>
-            </ul>
-          </div>
-
-          <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">รูปแบบการประเมินผล</h2>
-            <div class="grid grid-cols-2 gap-4 ml-3">
-              <div v-if="activityData.evaluationFile">
-                <span class="font-bold">ไฟล์รูปแบบการประเมินผล:</span>
-                <a href="javascript:void(0);" @click="openFileInNewTab(activityData.evaluationFile, 'application/pdf')"
-                  class="text-orange-500 underline">
-                  Click to open file in new tab.
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <span class="font-bold">ผลที่คาดว่าจะได้รับ:</span>
-            <table class="w-full border-collapse border mx-3 my-3 border-gray-300 text-gray-700">
-              <thead class="bg-gray-200">
-                <tr>
-                  <th class="border border-gray-300 px-4 py-2 text-center">ข้อที่</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">ผลที่คาดว่าจะได้รับ</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">ตัวชี้วัด (KPI)</th>
-                  <th class="border border-gray-300 px-4 py-2 text-left">ค่าเป้าหมาย (%)</th>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
-
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in activityData.result" :key="index" class="hover:bg-gray-100">
-                  <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ item.detail }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ item.kpi }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ item.target }}</td>
-                </tr>
-              </tbody>
-            </table>
-<<<<<<< HEAD
-
-          </div>
-
-          <div class="lable">
-            <h2 class="items mb-2">รายละเอียดงบประมาณ</h2>
-            <table class="w-auto border-collapse border border-white mx-4">
-              <tbody>
-                <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
-                  <td class="px-4 py-2">ไฟล์รายละเอียดงบประมาณ:</td>
-                  <td class="px-4 py-2">
-                    <a href="javascript:void(0);"
-                      @click="openFileInNewTab(activityData.budgetDetails, 'application/pdf')"
-                      class="text-orange-500 underline">
-                      Click to open file in new tab.
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="lable">
-            <h2 class="items mb-2">ไฟล์เพิ่มเติม</h2>
-            <table class="w-auto border-collapse border border-white mx-4">
-              <tbody>
-                <tr v-for="(file, index) in [activityData.prepareFile]" :key="index">
-                  <td class="px-4 py-2">ไฟล์เพิ่มเติม:</td>
-                  <td class="px-4 py-2">
-                    <a href="javascript:void(0);" @click="openFileInNewTab(activityData.prepareFile, 'application/pdf')"
-                      class="text-orange-500 underline">
-                      Click to open file in new tab.
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-=======
-            <!-- <ul class="list-disc pl-6 text-gray-700">
-              <li class="mb-3" v-for="(item, index) in activityData.result" :key="index">
-                <b>ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1 }}:</b> {{ item.detail }} <b class="mx-5">ตัวชี้วัด (KPI):</b>
-                {{ item.kpi }} <b class="mx-5">ค่าเป้าหมาย:</b> {{ item.target }}
-              </li>
-            </ul>
-          </div>
-
+        </div>
+        <div class="lable">
           <div v-if="activityData.problem?.some(p => p.problemDetail || p.solution)" class="mb-6">
-            <span
-              class="font-bold">ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้:</span>
-            <ul class="list-disc pl-6 text-gray-700">
-              <li class="mb-3" v-for="(problem, index) in activityData.problem" :key="index">
-                <b>ปัญหาข้อที่ {{ index + 1 }}:</b> {{ problem.problemDetail }} <b>แนวทางการแก้ไขข้อที่ {{ index + 1
-                }}:</b> {{ problem.solution }}
-              </li>
-            </ul> -->
+            <label
+              class="items whitespace-nowrap ">ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้:</label>
+            <table class="table mx-8 my-4">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="border border-gray-300 px-4 py-2 text-center">ข้อที่</th>
+                  <th class="border border-gray-300 px-4 py-2 text-center">ปัญหาอุปสรรค</th>
+                  <th class="border border-gray-300 px-4 py-2 text-center">แนวทางการแก้ไข</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(problem, index) in activityData.problem" :key="index" class="hover:bg-gray-100">
+                  <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ problem.problemDetail }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ problem.solution }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+        </div>
 
-          <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">รายละเอียดงบประมาณ</h2>
-            <div class="grid grid-cols-1 gap-4 mx-3">
-              <div v-if="activityData.evaluationFile">
-                <span class="font-bold">ไฟล์รายละเอียดงบประมาณ:</span>
-                <a href="javascript:void(0);" @click="openFileInNewTab(activityData.budgetDetails, 'application/pdf')"
-                  class="text-orange-500 underline">
-                  Click to open file in new tab.
-                </a>
-              </div>
-            </div>
-          </div>
+        <div class="lable">
+          <h2 class="items mb-2">รายละเอียดงบประมาณ</h2>
+          <table class="w-auto border-collapse border border-white mx-4">
+            <tbody>
+              <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
+                <td class="px-4 py-2">ไฟล์รายละเอียดงบประมาณ:</td>
+                <td class="px-4 py-2">
+                  <a href="javascript:void(0);" @click="openFileInNewTab(activityData.budgetDetails, 'application/pdf')"
+                    class="text-orange-500 underline">
+                    Click to open file in new tab.
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-2">ไฟล์เพิ่มเติม</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <div v-if="activityData.evaluationFile">
-                <span class="font-bold ml-3">ไฟล์เพิ่มเติม:</span>
-                <a href="javascript:void(0);" @click="openFileInNewTab(activityData.prepareFile, 'application/pdf')"
-                  class="text-orange-500 underline">
-                  Click to open file in new tab.
-                </a>
-              </div>
-            </div>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
-          </div>
+        <div class="lable">
+          <h2 class="items mb-2">ไฟล์เพิ่มเติม</h2>
+          <table class="w-auto border-collapse border border-white mx-4">
+            <tbody>
+              <tr v-for="(file, index) in [activityData.prepareFile]" :key="index">
+                <td class="px-4 py-2">ไฟล์เพิ่มเติม:</td>
+                <td class="px-4 py-2">
+                  <a href="javascript:void(0);" @click="openFileInNewTab(activityData.prepareFile, 'application/pdf')"
+                    class="text-orange-500 underline">
+                    Click to open file in new tab.
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <div class="border-t border-gray-300 my-9"></div>
 
-      <div class="mb-6">
-<<<<<<< HEAD
-        <h2 class="subhead">Progress</h2>
-        <table class="table ">
-          <thead>
-            <tr class="bg-gray-200">
-              <th class="border border-gray-300 px-4 py-2 text-center w-[25%]">ชื่อเจ้าหน้าที่</th>
-              <th class="border border-gray-300 px-4 py-2 text-center w-[40%]">ตำแหน่ง</th>
-              <th class="border border-gray-300 px-4 py-2 text-center w-[25%]">สถานะ</th>
-              <th class="border border-gray-300 px-4 py-2 text-center w-[10%]">หมายเหตุ</th>
-=======
-        <h2 class="text-xl font-bold text-orange-600 mb-6">Progress</h2>
-        <table class="w-full border-collapse border border-gray-300 mb-10">
+      <div class="lable">
+        <h2 class="subhead mb-8">Progress</h2>
+        <table class="w-auto border-collapse border border-gray-300 ml-2 mb-10">
           <thead>
             <tr class="bg-gray-200">
               <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">ชื่อเจ้าหน้าที่</th>
               <th class="border border-gray-300 px-4 py-2 text-left w-[40%]">ตำแหน่ง</th>
               <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">สถานะ</th>
               <th class="border border-gray-300 px-4 py-2 text-left w-[10%]">หมายเหตุ</th>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
             </tr>
           </thead>
           <tbody>
@@ -1011,10 +730,7 @@ onMounted(async () => {
         </table>
       </div>
 
-<<<<<<< HEAD
 
-=======
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
       <div class="text-center">
         <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
           <template v-if="canApprove">
@@ -1108,41 +824,33 @@ onMounted(async () => {
 
 <style scoped>
 .subhead {
-  font-size: 1.25rem;
+  font-size: larger;
   /* text-xl */
-  font-weight: bold;
+  font-weight: 700;
   /* font-bold */
-  color:  #2196F3;
+  color: #0c82ea;
   /* text-orange-600 */
-  margin: 1rem 0;
+  margin: 2.5rem 0 1.5rem 0;
   /* mb-4 */
 }
-.lable{
+
+.lable {
   /* mb-6 mx-2 */
-  margin: 1rem 2rem 2rem ;
+  margin: 1rem 2rem 2rem;
 }
+
 .items {
-  font-weight: bold;
+  font-weight: 700;
   font-size: medium;
+  margin-right: 0.15rem;
   margin-bottom: 0.5rem;
 }
 
-.table {
-  border-collapse: collapse;
-  border: 1px solid #d1d5db;
-  /* #d1d5db คือสีเทาอ่อน */
-  margin: 0.5rem 1.25rem;
-  margin-left: auto;
-  margin-right: auto;
-  width: auto;
-}
-
-.table-sub {
-  border-collapse: collapse;
-  border: 1px solid #d1d5db;
-  /* #d1d5db คือสีเทาอ่อน */
-  margin: 0.5rem 1.25rem;
-  width: auto;
+.no-style {
+  all: unset;
+  /* เอาทุกๆ สไตล์ออก */
+  font-weight: 500;
+  /* สามารถเพิ่มสไตล์ที่ต้องการที่นี่ */
 }
 
 .form-button {
@@ -1158,7 +866,7 @@ onMounted(async () => {
 }
 
 .button {
-  width: 50%;
+  width: 60%;
   padding: 0.7rem;
   border: none;
   border-radius: 100px;
@@ -1176,7 +884,7 @@ textarea {
 }
 
 .form-button:hover {
-  background-color: #f97316;
+  color: black;
 }
 
 .grid {
@@ -1187,4 +895,3 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 </style>
-

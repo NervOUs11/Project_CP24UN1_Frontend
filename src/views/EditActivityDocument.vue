@@ -430,39 +430,26 @@ const removeCommitteeMember = (index) => {
 
 const handleFileChange = async (e, fileType) => {
   const file = e.target.files[0];
-
   if (file) {
-    const allowedExtensions = ["pdf"];
-    const fileExtension = file.name.split(".").pop().toLowerCase();
-
-    if (!allowedExtensions.includes(fileExtension)) {
-      alert("กรุณาอัปโหลดไฟล์ PDF เท่านั้น");
-      e.target.value = "";
-      throw new Error("ไฟล์ที่อัปโหลดต้องเป็น .pdf เท่านั้น");
-    }
-<<<<<<< HEAD
-=======
-
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
     const base64 = await fileToBase64(file);
     switch (fileType) {
-      case "prepareFile":
+      case 'prepareFile':
         prepareFile.value = base64;
         break;
-      case "evaluationFile":
+      case 'evaluationFile':
         evaluationFile.value = base64;
         break;
-      case "budgetDetails":
+      case 'budgetDetails':
         budgetDetails.value = base64;
         break;
-      case "scheduleDetails":
+      case 'scheduleDetails':
         scheduleDetails.value = base64;
         break;
       default:
-        console.error("Unknown file type");
+        console.error('Unknown file type');
     }
   }
-};
+}
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -580,9 +567,6 @@ const validatePercentage = () => {
   let total = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
   if (total > 100) {
     alert('เปอร์เซ็นต์รวมกันต้องไม่เกิน 100%');
-    Object.keys(percentages.value).forEach(skillID => {
-      percentages.value[skillID] = 0;
-    });
   }
 };
 
@@ -646,20 +630,10 @@ const handleEditDocument = async () => {
         }
       });
 
-<<<<<<< HEAD
-      const formattedActivity = isHourCount.value ? activity.value.map(a => {
-            const hour = hoursCount.value[a.activityName] || 0; // ดึงค่าตามชื่อ activity
+    const formattedActivity = activity.value.map(a => {
+      const hour = hoursCount.value[a.activityName] || 0; // ดึงค่าตามชื่อ activity
       return hour > 0 ? [a.activityID, hour] : null;
-    }).filter(Boolean)
-    : [];
-=======
-        const formattedActivity = isHourCount.value 
-        ? activity.value.map(a => {
-            const hour = hoursCount.value[a.activityName] || 0;
-            return hour > 0 ? [a.activityID, hour] : null;
-          }).filter(Boolean)
-        : [];
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
+    }).filter(Boolean);
 
     sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`).join('');
     const startTime = convertToISOWithTimezone(startDate.value)
@@ -667,135 +641,82 @@ const handleEditDocument = async () => {
     const prepareStart1 = convertToISOWithTimezone(prepareStart.value)
     const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
     agencyCode.value = `${prefix.value}มจธ.${suffix.value}`;
-    let totalPercentage = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
-    if (totalPercentage !== 100) {
-          alert("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
-          throw new Error("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
-        }
 
-        const hasPresident = committee.value.some(member => member.position === "ประธานโครงการ");
-        if (!hasPresident) {
-          alert("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
-          throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
-        }
-
-        if (objectives.value.some(obj => obj.trim() === '')) {
-          alert("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
-          throw new Error("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
-        }
-
-        const uniqueObjectives = new Set(objectives.value.map(obj => obj.trim()));
-        if (uniqueObjectives.size !== objectives.value.length) {
-          alert("วัตถุประสงค์ต้องไม่ซ้ำกัน");
-          throw new Error("วัตถุประสงค์ต้องไม่ซ้ำกัน");
-        }
-
-        if (!validateProjectNames()) {
-          throw new Error("กรอกชื่อโครงการให้ถูกต้อง");
-        }
-
-        let totalPercentage = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
-        if (totalPercentage !== 100) {
-          alert("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
-          throw new Error("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
-        }
-
-        const hasPresident = committee.value.some(member => member.position === "ประธานโครงการ");
-        if (!hasPresident) {
-          alert("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
-          throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
-        }
-
-        if (objectives.value.some(obj => obj.trim() === '')) {
-          alert("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
-          throw new Error("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
-        }
-
-        const uniqueObjectives = new Set(objectives.value.map(obj => obj.trim()));
-        if (uniqueObjectives.size !== objectives.value.length) {
-          alert("วัตถุประสงค์ต้องไม่ซ้ำกัน");
-          throw new Error("วัตถุประสงค์ต้องไม่ซ้ำกัน");
-        }
-
-        if (!validateProjectNames()) {
-          throw new Error("กรอกชื่อโครงการให้ถูกต้อง");
-        }
-
-        if (agencyCode.value.trim().length === 0){
-          alert("กรุณากรอกรหัสหน่วยงาน");
-          throw new Error("กรุณากรอกรหัสหน่วยงาน");
-        } 
-        else if (projectNameThai.value.trim().length === 0) {
-          alert("กรุณากรอกชื่อโครงการภาษาไทย");
-          throw new Error("กรุณากรอกชื่อโครงการภาษาไทย");
-        } 
-        else if (projectNameEng.value.trim().length === 0) {
-          alert("กรุณากรอกชื่อโครงการภาษาอังกฤษ");
-          throw new Error("กรุณากรอกชื่อโครงการภาษาอังกฤษ");
-        }
-        else if (location.value.trim().length === 0) {
-          alert("กรุณากรอกสถานที่");
-          throw new Error("กรุณากรอกสถานที่");
-        }
-        else if (purpose.value.trim().length === 0) {
-          alert("กรุณากรอกวัตถุประสงค์");
-          throw new Error("กรุณากรอกวัตถุประสงค์");
-        }
-        else if (sustainabilityDetail.value.trim().length === 0) {
-          alert("กรุณากรอกหลักการและเหตุผล");
-          throw new Error("กรุณากรอกหลักการและเหตุผล");
-        }
-        else if (activityCharacteristic.value.trim().length === 0) {
-          alert("กรุณาเขียนบรรยายรูปแบบการจัดกิจกรรม");
-          throw new Error("กรุณาเขียนบรรยายรูปแบบการจัดกิจกรรม");
-        }
-        else if (codeOfHonor.value.trim().length === 0) {
-          alert("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
-          throw new Error("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
-        }
-
-        const dataToSend = {
-          studentID: studentID,
-          type: type.value,
-          startTime: startTime,
-          endTime: endTime,
-          code: agencyCode.value,
-          departmentName: agencyName.value,
-          title: projectName.value,
-          location: location.value,
-          propose: purpose.value,
-          payment: expenses.value.toString(),
-          staffID: advisor.value,
-          sustainabilityDetail: sustainabilityDetail.value,
-          sustainabilityPropose: sustainabilityPropose.value,
-          activityCharacteristic: activityCharacteristic.value,
-          codeOfHonor: codeOfHonor.value,
-          prepareStart: prepareStart1,
-          prepareEnd: prepareEnd1,
-          prepareFile: prepareFile.value,
-          evaluationFile: evaluationFile.value,
-          budgetDetails: budgetDetails.value,
-          scheduleDetails: scheduleDetails.value,
-          participant: participant.value,
-          activity: formattedActivity,
-          problem: pastEvaluations.map(item => [item.problem, item.solution]),
-          studentQF: selectedSkills.value.map((id) => [id, percentages.value[id] || 0]),
-          entrepreneurial: selectedEntrepreneurialOptions.value,
-          evaluation: selectedEvaluation.value.map(id => [id, null]),
-          result: expectedResults.map(item => [item.kpi, item.result, String(item.target)]),
-          sustainability: sustainability.value,
-          committee: committee.value.map(member => [member.id, member.position]),
-          staffIDProgress2: president.value,
-          staffIDProgress3: departmentPresident.value,
-        }
-        console.log("Data to send:", dataToSend);
-        const res = await editActivityDocument(studentID, documentId.value.toString(), dataToSend);
-        if (res.ok) {
-          showSuccess("edit")
-        }
-    } catch (error) {
-        console.error("Failed to update document:", error);
+    if (agencyCode.value.trim().length === 0) {
+      alert("กรุณากรอกรหัสหน่วยงาน");
+      throw new Error("กรุณากรอกรหัสหน่วยงาน");
     }
+    else if (projectNameThai.value.trim().length === 0) {
+      alert("กรุณากรอกชื่อโครงการภาษาไทย");
+      throw new Error("กรุณากรอกชื่อโครงการภาษาไทย");
+    }
+    else if (projectNameEng.value.trim().length === 0) {
+      alert("กรุณากรอกชื่อโครงการภาษาอังกฤษ");
+      throw new Error("กรุณากรอกชื่อโครงการภาษาอังกฤษ");
+    }
+    else if (location.value.trim().length === 0) {
+      alert("กรุณากรอกสถานที่");
+      throw new Error("กรุณากรอกสถานที่");
+    }
+    else if (purpose.value.trim().length === 0) {
+      alert("กรุณากรอกวัตถุประสงค์");
+      throw new Error("กรุณากรอกวัตถุประสงค์");
+    }
+    else if (sustainabilityDetail.value.trim().length === 0) {
+      alert("กรุณากรอกหลักการและเหตุผล");
+      throw new Error("กรุณากรอกหลักการและเหตุผล");
+    }
+    else if (activityCharacteristic.value.trim().length === 0) {
+      alert("กรุณาเขียนบรรยายรูปแบบการจัดกิจกรรม");
+      throw new Error("กรุณาเขียนบรรยายรูปแบบการจัดกิจกรรม");
+    }
+    else if (codeOfHonor.value.trim().length === 0) {
+      alert("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
+      throw new Error("กรุณากรอกความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor");
+    }
+
+    const dataToSend = {
+      studentID: studentID,
+      type: type.value,
+      startTime: startTime,
+      endTime: endTime,
+      code: agencyCode.value,
+      departmentName: agencyName.value,
+      title: projectName.value,
+      location: location.value,
+      propose: purpose.value,
+      payment: expenses.value.toString(),
+      staffID: advisor.value,
+      sustainabilityDetail: sustainabilityDetail.value,
+      sustainabilityPropose: sustainabilityPropose.value,
+      activityCharacteristic: activityCharacteristic.value,
+      codeOfHonor: codeOfHonor.value,
+      prepareStart: prepareStart1,
+      prepareEnd: prepareEnd1,
+      prepareFile: prepareFile.value,
+      evaluationFile: evaluationFile.value,
+      budgetDetails: budgetDetails.value,
+      scheduleDetails: scheduleDetails.value,
+      participant: participant.value,
+      activity: formattedActivity,
+      problem: pastEvaluations.map(item => [item.problem, item.solution]),
+      studentQF: selectedSkills.value.map((id) => [id, percentages.value[id] || 0]),
+      entrepreneurial: selectedEntrepreneurialOptions.value,
+      evaluation: selectedEvaluation.value.map(id => [id, null]),
+      result: expectedResults.map(item => [item.kpi, item.result, String(item.target)]),
+      sustainability: sustainability.value,
+      committee: committee.value.map(member => [member.id, member.position]),
+      staffIDProgress2: president.value,
+      staffIDProgress3: departmentPresident.value,
+    }
+    console.log("Data to send:", dataToSend);
+    const res = await editActivityDocument(studentID, documentId.value.toString(), dataToSend);
+    if (res.ok) {
+      showSuccess("edit")
+    }
+  } catch (error) {
+    console.error("Failed to update document:", error);
+  }
 };
 const today = new Date().toISOString().split('T')[0];
 
@@ -806,39 +727,10 @@ const getNextDay = (date) => {
   return nextDay.toISOString().split("T")[0];
 };
 
-const getProjectName = computed(() => 
+const getProjectName = computed(() =>
   projectNameEng.value ? `${projectNameThai.value} (${projectNameEng.value})` : projectNameThai.value
 );
 
-const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
-const engRegex = /^[A-Za-z\s]+$/;
-
-const isThaiValid = computed(() => projectNameThai.value === "" || thaiRegex.test(projectNameThai.value));
-const isEngValid = computed(() => projectNameEng.value === "" || engRegex.test(projectNameEng.value));
-
-const validateProjectNames = () => {
-  const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
-  const engRegex = /^[A-Za-z\s]+$/;
-
-  const cleanThaiName = projectNameThai.value ? projectNameThai.value.trim() : "";
-  const cleanEngName = projectNameEng.value ? projectNameEng.value.trim() : "";
-
-  if (!thaiRegex.test(cleanThaiName)) {
-    alert("ชื่อโครงการ (ภาษาไทย) ต้องเป็นภาษาไทยเท่านั้น");
-    return false;
-  }
-
-  if (!engRegex.test(cleanEngName)) {
-    alert("ชื่อโครงการ (ภาษาอังกฤษ) ต้องเป็นภาษาอังกฤษเท่านั้น");
-    return false;
-  }
-
-  return true;
-};
-<<<<<<< HEAD
-=======
-
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 </script>
 
 
@@ -847,9 +739,9 @@ const validateProjectNames = () => {
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px] ">
       <h1 class="text-2xl font-bold mb-4 text-center text-blue-500">Add Activity Document</h1>
 
-      <form @submit.prevent="addDoc">
-        <div class="grid grid-cols-2 gap-4 lable">
 
+      <form @submit.prevent="handleEditDocument">
+        <div class="grid grid-cols-2 gap-4 lable">
           <div class="flex items-center gap-4 mt-8">
             <div class="items-center gap-2">
               <label for="agencyCode" class="item">ที่<span class="text-red-500 ml-1">*</span> <a
@@ -863,7 +755,6 @@ const validateProjectNames = () => {
             </div>
           </div>
 
-<<<<<<< HEAD
           <!-- กลุ่ม ชื่อหน่วยงาน + วันที่เขียน -->
           <div class=" mt-8 layer-rt flex items-center justify-between gap-4">
             <div class="flex-1">
@@ -877,171 +768,137 @@ const validateProjectNames = () => {
               </select>
             </div>
 
-            <!-- วันที่เขียน
-            <div class="flex items-center">
-              <input type="date" id="writtenDate" v-model="writtenDate" class="form-input w-40 mt-9" width="100%"
-                disabled />
-            </div>-->
-          </div>
-
-
-          <!-- ชื่อโครงการ -->
-          <div class="layer-left">
-            <label class="block item mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
-            <input type="text" v-model="projectNameThai" class="form-input form-input-text" required minlength="5"
-              placeholder="ชื่อโครงการ" />
-            <p v-if="!isThaiValid" class="text-red-500 text-sm">ต้องเป็นภาษาไทยเท่านั้น</p>
-          </div>
-
-          <div class="layer-rt">
-            <label class="block item mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
-            <input type="text" v-model="projectNameEng" class="form-input form-input-text" required minlength="5"
-              placeholder="Project name" />
-=======
             <!-- ชื่อโครงการ -->
-            <div class="mb-3">
-              <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="text" 
-                v-model="projectNameThai" 
-                class="form-input w-full" 
-                required
-                minlength="5"
-              />
+            <div class="layer-left">
+              <label class="block item mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
+              <input type="text" v-model="projectNameThai" class="form-input form-input-text" required minlength="5"
+                placeholder="ชื่อโครงการ" />
               <p v-if="!isThaiValid" class="text-red-500 text-sm">ต้องเป็นภาษาไทยเท่านั้น</p>
             </div>
 
-          <div class="mb-3">
-            <label class="block text-gray-700 mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
-            <input 
-              type="text" 
-              v-model="projectNameEng" 
-              class="form-input w-full" 
-              required
-              minlength="5"
-            />
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
-            <p v-if="!isEngValid" class="text-red-500 text-sm">ต้องเป็นภาษาอังกฤษเท่านั้น</p>
+            <div class="layer-rt">
+              <label class="block item mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
+              <input type="text" v-model="projectNameEng" class="form-input form-input-text" required minlength="5"
+                placeholder="Project name" />
+
+              <!-- เนื่องด้วย -->
+              <div class="layer-left">
+                <label for="reason" class="block item">เนื่องด้วย</label>
+                <input type="text" id="reason" :value="reason" class="form-input  form-input-text" disabled />
+              </div>
+
+              <!-- จัดโครงการ -->
+              <div class="layer-rt">
+                <label for="organizeProject" class="block item">จัดโครงการ</label>
+                <input type="text" id="organizeProject" :value="getProjectName" class="form-input  form-input-text "
+                  disabled />
+              </div>
+
+              <!-- วันที่จัดกิจกรรม -->
+              <div class="layer-left flex items-center">
+                <label for="startDate" class="item whitespace-nowrap">ระหว่างวันที่<span
+                    class="text-red-500 ml-1">*</span></label>
+                <input type="date" id="startDate" v-model="startDate" class="form-input  form-input-date" :min="today"
+                  required />
+              </div>
+
+              <div class="layer-rt flex items-center">
+                <label for="endDate" class="item whitespace-nowrap">ถึงวันที่<span
+                    class="text-red-500 ml-1">*</span></label>
+                <input type="date" id="endDate" v-model="endDate" class="form-input form-input-date" :min="startDate"
+                  required />
+              </div>
+
+              <!-- ณ สถานที่ -->
+              <div class="layer-left">
+                <label for="location" class="block item">ณ สถานที่<span class="text-red-500 ml-1">*</span></label>
+                <input type="text" id="location" v-model="location" class="form-input form-input-text" minlength="10"
+                  placeholder="ชื่ออาคาร/สถานที่ ชั้นที่/ห้องที่" required />
+              </div>
+
+              <!-- ประเภทกิจกรรม -->
+              <div class="layer-rt">
+                <label for="type" class="block item">ประเภทโครงการกิจกรรม<span
+                    class="text-red-500 ml-1">*</span></label>
+                <select id="type" v-model="type" class="form-input form-input-select" style="margin-top: 10px;"
+                  required>
+                  <option value="">เลือกประเภทที่ตรงกับกิจกรรม</option>
+                  <option v-for="option in typeOptions" :key="option" :value="option">
+                    {{ option }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- วัตถุประสงค์ -->
+              <div class="col-span-2">
+                <label for="purpose" class="block item">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
+                <textarea id="purpose" v-model="purpose" class="form-input detail-input w-full" rows="4" required
+                  placeholder="วัตถุประสงค์โดยภาพรวมของโครงการที่จัด" minlength="20"></textarea>
+              </div>
+
+              <!-- ค่าใช้จ่าย -->
+              <div class="mb-3">
+                <label for="expenses" class="item whitespace-nowrap mr-2" style="width: 85px;">ค่าใช้จ่ายในโครงการ<span
+                    class="text-red-500">*</span></label>
+                <div class="text-left text-sm text-gray-600 my-2 ml-4">จำนวนต้องมากกว่า 1 บาท</div>
+                <hr>
+                <table class="w-full border border-white rounded-lg whitespace-nowrap ml-5">
+                  <tbody> <!-- Wrap the <tr> inside <tbody> -->
+                    <tr>
+                      <td class="p-2 border  border-white">เป็นจำนวนเงิน</td>
+                      <td class="p-2 border  border-white">
+                        <input type="number" id="expenses" v-model.number="expenses"
+                          class="input-field my-4 py-2 ml-6 w-60 border border-gray-300 text-right rounded-3xl" required
+                          :max="9999999" maxlength="7" @input="limitExpensesLength" />
+                      </td>
+                      <td class="p-2 border  border-white">บาท</td>
+                      <td class="p-2 border w-auto 0  border-white">{{ expensesThaiText }}<span>ถ้วน</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+              </div>
+
+              <div class="my-2 mt-4">
+
+              </div>
+
+              <!-- เลือกชั่วโมงกิจกรรม -->
+              <div class="mb-3">
+                <label for="activityHours" class="block item">การเทียบค่าชั่วโมงกิจกรรม<span
+                    class="text-red-500 ml-1">*</span></label>
+                <select id="activityHours" v-model="isHourCount" class="form-input" @change="handleActivityHoursChange"
+                  required>
+                  <option :value="false">ไม่นับชั่วโมง</option>
+                  <option :value="true">นับชั่วโมง</option>
+                </select>
+              </div>
+              <br>
+              <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
+
+              <div v-if="isHourCount === true">
+                <div class="text-left text-sm text-gray-600 ml-3">เลือกประเภทที่ตรงกับกิจกรรที่จัด เพียง 1 ด้าน
+                </div>
+                <hr>
+                <table class="table-auto w-full border-collapse border border-gray-300 my-3">
+                  <tbody>
+                    <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
+                      <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">{{ activity.activityName }}
+                      </td>
+                      <td class="border border-white px-4 py-1">
+                        <input type="number" :id="'hours-' + activity.activityID"
+                          v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
+                          style="width: 70px;" />
+                      </td>
+                      <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-
-          <!-- เนื่องด้วย -->
-          <div class="layer-left">
-            <label for="reason" class="block item">เนื่องด้วย</label>
-            <input type="text" id="reason" :value="reason" class="form-input  form-input-text" disabled />
-          </div>
-
-          <!-- จัดโครงการ -->
-          <div class="layer-rt">
-            <label for="organizeProject" class="block item">จัดโครงการ</label>
-            <input type="text" id="organizeProject" :value="getProjectName" class="form-input  form-input-text "
-              disabled />
-          </div>
-
-          <!-- วันที่จัดกิจกรรม -->
-          <div class="layer-left flex items-center">
-            <label for="startDate" class="item whitespace-nowrap">ระหว่างวันที่<span
-                class="text-red-500 ml-1">*</span></label>
-            <input type="date" id="startDate" v-model="startDate" class="form-input  form-input-date" :min="today"
-              required />
-          </div>
-
-          <div class="layer-rt flex items-center">
-            <label for="endDate" class="item whitespace-nowrap">ถึงวันที่<span
-                class="text-red-500 ml-1">*</span></label>
-            <input type="date" id="endDate" v-model="endDate" class="form-input form-input-date" :min="startDate"
-              required />
-          </div>
-
-          <!-- ณ สถานที่ -->
-          <div class="layer-left">
-            <label for="location" class="block item">ณ สถานที่<span class="text-red-500 ml-1">*</span></label>
-            <input type="text" id="location" v-model="location" class="form-input form-input-text" minlength="10"
-              placeholder="ชื่ออาคาร/สถานที่ ชั้นที่/ห้องที่" required />
-          </div>
-
-          <!-- ประเภทกิจกรรม -->
-          <div class="layer-rt">
-            <label for="type" class="block item">ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span></label>
-            <select id="type" v-model="type" class="form-input form-input-select" style="margin-top: 10px;" required>
-              <option value="">เลือกประเภทที่ตรงกับกิจกรรม</option>
-              <option v-for="option in typeOptions" :key="option" :value="option">
-                {{ option }}
-              </option>
-            </select>
-          </div>
-
-          <!-- วัตถุประสงค์ -->
-          <div class="col-span-2">
-            <label for="purpose" class="block item">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
-            <textarea id="purpose" v-model="purpose" class="form-input detail-input w-full" rows="4" required
-              placeholder="วัตถุประสงค์โดยภาพรวมของโครงการที่จัด" minlength="20"></textarea>
-          </div>
-
-          <!-- ค่าใช้จ่าย -->
-          <div class="mb-3">
-            <label for="expenses" class="item whitespace-nowrap mr-2" style="width: 85px;">ค่าใช้จ่ายในโครงการ<span
-                class="text-red-500">*</span></label>
-            <div class="text-left text-sm text-gray-600 my-2 ml-4">จำนวนต้องมากกว่า 1 บาท</div>
-            <hr>
-            <table class="w-full border border-white rounded-lg whitespace-nowrap ml-5">
-              <tr>
-                <td class="p-2 border  border-white">เป็นจำนวนเงิน</td>
-                <td class="p-2 border  border-white">
-                  <input type="number" id="expenses" v-model.number="expenses"
-                    class="input-field my-4 py-2 ml-6 w-60 border border-gray-300 text-right rounded-3xl" required :max="9999999" maxlength="7"
-                    @input="limitExpensesLength" />
-                </td>
-                <td class="p-2 border  border-white">บาท</td>
-                <td class="p-2 border w-auto 0  border-white">{{ expensesThaiText }}<span>ถ้วน</span></td>
-              </tr>
-            </table>
-          </div>
-
-          <div class="my-2 mt-4">
-
-          </div>
-
-          <!-- เลือกชั่วโมงกิจกรรม -->
-          <div class="mb-3">
-            <label for="activityHours" class="block item">การเทียบค่าชั่วโมงกิจกรรม<span
-                class="text-red-500 ml-1">*</span></label>
-            <select id="activityHours" v-model="isHourCount" class="form-input" @change="handleActivityHoursChange"
-              required>
-              <option :value="false">ไม่นับชั่วโมง</option>
-              <option :value="true">นับชั่วโมง</option>
-            </select>
-          </div>
-          <br>
-          <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
-<<<<<<< HEAD
-
-=======
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
-          <div v-if="isHourCount === true">
-            <div class="text-left text-sm text-gray-600 ml-3">เลือกประเภทที่ตรงกับกิจกรรที่จัด เพียง 1 ด้าน</div>
-            <hr>
-            <table class="table-auto w-full border-collapse border border-gray-300 my-3">
-              <tbody>
-                <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
-                  <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">{{ activity.activityName }}</td>
-                  <td class="border border-white px-4 py-1">
-                    <input type="number" :id="'hours-' + activity.activityID" v-model="hoursCount[activity.activityID]"
-                      class="form-input px-10 w-24 text-right" style="width: 70px;" />
-                  </td>
-                  <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-<<<<<<< HEAD
-=======
-
         </div>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 
-
-
-        </div>
         <div class="grid grid-cols-3 gap-4 lable mb-10">
           <!-- อาจารย์ที่ปรึกษา/รองคณบดี -->
           <div>
@@ -1085,13 +942,12 @@ const validateProjectNames = () => {
               </option>
             </select>
           </div>
-
         </div>
+
         <div class="lable">
           <!-- เลือกทักษะ StudentQF (checkbox) -->
           <div class="mb-10 ">
             <div class="item">KMUTT Student QF<span class="text-red-500 ml-1">*</span></div>
-            <!-- <label class="block my-3 mx-3">เลือกทักษะ (สูงสุด 3 ทักษะ):</label> -->
             <span class="text-right text-sm text-gray-600 ml-2">
               ทักษะที่พัฒนาจากการเข้าร่วม เลือกได้สูงสุดเพียง 3 ด้าน ในสัดส่วนที่ต่างกัน</span>
             <hr>
@@ -1126,7 +982,8 @@ const validateProjectNames = () => {
           <div class=" mb-10">
             <div class="item">Entrepreneurial<span class="text-red-500 ml-1">*</span></div>
             <div>
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรมอย่างน้อย 1 ด้าน
+              <div class="text-left text-sm text-gray-600 ml-3">
+                เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรมอย่างน้อย 1 ด้าน
               </div>
               <hr>
               <div v-for="option in entrepreneurialWithDescriptions" :key="option.entrepreneurialID"
@@ -1160,8 +1017,8 @@ const validateProjectNames = () => {
                 <!-- แสดง Goals ที่เกี่ยวข้อง ถ้าเลือก SDGs Culture -->
 
                 <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-2">
-                  <div class="text-left text-sm text-cyan-600 my-4 ml-12"> เลือก Goals ที่เกี่ยวข้องกับกิจกรรม<span
-                      class="text-red-500 ml-1">*</span>
+                  <div class="text-left text-sm text-cyan-600 my-4 ml-12"> เลือก Goals
+                    ที่เกี่ยวข้องกับกิจกรรม<span class="text-red-500 ml-1">*</span>
                   </div>
                   <!-- Grid 4 คอลัมน์ -->
                   <div class="grid grid-cols-2 gap-4 ml-14">
@@ -1253,186 +1110,227 @@ const validateProjectNames = () => {
               <!-- ใส่ระยะเวลาปฏิบัติงาน แบบที่ดึงตรงวันที่ด้านบนมาแสดงด้วยน่าจะดีกว่า -->
             </div>
           </div>
-        
 
-        <!-- ขั้นตอนการดำเนินงาน -->
-        <div class="mb-6">
-          <label class="block item">ขั้นตอนการดำเนินงาน<span class="text-red-500 ml-1">*</span></label>
-
-          <div v-if="scheduleDetails" class="mb-2">
-            <a @click="openFileInNewTab(scheduleDetails, 'application/pdf')" target="_blank"
-              class="text-blue-500 underline">
-              ดูไฟล์ที่อัปโหลด
-            </a>
+          <!-- ขั้นตอนการดำเนินงาน -->
+          <div class="mb-6">
+            <label for="scheduleDetails" class="block item">ขั้นตอนการดำเนินงาน<span
+                class="text-red-500 ml-1">*</span></label>
+            <div class="my-2 ml-4">
+              <div class="text-left text-sm text-gray-600 ml-3"> อัปโหลดไฟล์ขั้นตอนการดำเนินงาน
+              </div>
+              <hr>
+              <div v-if="scheduleDetails" class="mb-2">
+                <a @click="openFileInNewTab(scheduleDetails, 'application/pdf')" target="_blank"
+                  class="text-blue-500 underline">
+                  ดูไฟล์ขั้นตอนการดำเนินงานที่อัปโหลด
+                </a>
+              </div>
+              <input id="scheduleDetails" type="file" @change="handleFileChange($event, 'scheduleDetails')"
+                class="form-input mt-4" />
+            </div>
           </div>
 
-          <input type="file" @change="handleFileChange($event, 'scheduleDetails')" class="form-input" />
-        </div>
+          <!-- คณะกรรมการจัดโครงการ -->
+          <div class=" mb-6">
+            <label class="block item">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
 
-        <!-- คณะกรรมการจัดโครงการ -->
-        <div class="mb-6">
-          <label class="block item">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
-
-          <!-- Dropdown สำหรับเลือกชื่อ -->
-          <div class="mb-4">
-            <label for="select-student" class="block mb-1">เลือกชื่อจากรายการ:</label>
-            <select id="select-student" v-model="selectedStudent" class="form-select w-60">
-              <option value="" disabled>รายชื่อ</option>
-              <option v-for="student in students" :key="student.id" :value="student.id">
-                {{ student.name }}
-              </option>
-            </select>
-            <button @click="addCommitteeMember" :disabled="!selectedStudent"
-              class="bg-green-500 text-white px-4 py-2 ml-2 rounded">
-              เพิ่มคณะกรรมการ
-            </button>
-          </div>
-
-          <!-- แสดงรายการคณะกรรมการ -->
-          <div v-for="(member, index) in committee" :key="member.id"
-            class="mb-4 flex items-center justify-between border-b pb-2">
-            <div class="flex space-x-4 w-full">
-              <span class="w-10">{{ index + 1 }}</span>
-              <span class="w-32">{{ member.id }}</span>
-              <span class="w-48">{{ member.name }}</span>
-              <span class="w-48">{{ member.department }}</span>
-              <span class="w-40">{{ member.phone }}</span>
-
-              <!-- Dropdown ตำแหน่ง -->
-              <select v-model="member.position" class="form-input w-36" style="width: 30%;">
-                <option value="" disabled selected>เลือกตำแหน่ง</option>
-                <option v-for="position in positions" :key="position" :value="position">
-                  {{ position }}
+            <!-- Dropdown สำหรับเลือกชื่อ -->
+            <div class="mb-4 ml-4">
+              <div class="text-left text-sm text-gray-600 ml-3"> เลือกชื่อสมาชิกจากรายการ
+              </div>
+              <hr>
+              <!--  -->
+              <select id="select-student" v-model="selectedStudent" class=" form-input form-input-select">
+                <option value="" disabled>รายชื่อ</option>
+                <option v-for="student in students" :key="student.id" :value="student.id">
+                  {{ student.name }}
                 </option>
               </select>
-
+              <button @click="addCommitteeMember" :disabled="!selectedStudent"
+                class="bg-green-500 text-white px-6 py-2 my-4 mx-4 rounded">
+                เพิ่มคณะกรรมการ
+              </button>
             </div>
+          </div>
+          <!-- แสดงรายการคณะกรรมการ -->
+          <div v-for="(member, index) in committee" :key="member.id"
+            class="mx-2 mb-4 flex items-center justify-between border-b pb-2">
+            <table class="min-w-full table-auto border-collapse border  border-gray-400 ">
+              <t class="text-sm border border-gray-400 ">
+                <tr>
+                  <th class="px-4 pt-2 text-center">ที่</th>
+                  <th class="px-4 py-2 text-center border border-gray-400">รหัสนักศึกษา</th>
+                  <th class="px-4 py-2 text-center">ชื่อ - นามสกุล</th>
+                  <th class="px-4 py-2 text-center border border-gray-400">ภาควิชา/ชั้นปี</th>
+                  <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-400">หมายเลขโทรศัพท์
+                  </th>
+                  <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง(ในโครงการ)</th>
+                  <th class="px-4 py-2 text-center"></th>
+                </tr>
+              </t>
+              <tbody class="text-sm">
+                <tr v-for="(member, index) in committee" :key="member.id">
+                  <td class="px-4 ">{{ index + 1 }}</td>
+                  <td class="px-4  text-center border border-gray-400">{{ member.id }}</td>
+                  <td class="px-4  text-center whitespace-nowrap">{{ member.name }}</td>
+                  <td class="px-4 text-center whitespace-nowrap border border-gray-400">{{ member.department
+                  }}
+                  </td>
+                  <td class="px-4 text-center border border-gray-400">{{ member.phone }}</td>
 
-            <!-- ปุ่มลบ -->
-            <button type="button" @click="removeCommitteeMember(index)"
-              class="bg-red-500 text-white px-4 py-2 rounded mt-2 sm:mt-0">
-              ลบ
-            </button>
+                  <!-- Dropdown ตำแหน่ง -->
+                  <td class="px-4 py-1">
+                    <select v-model="member.position" class="form-input text-xs w-36">
+                      <option value="" disabled selected>เลือกตำแหน่ง</option>
+                      <option v-for="position in positions" :key="position" :value="position">
+                        {{ position }}
+                      </option>
+                    </select>
+                  </td>
+                  <!-- ปุ่มลบ -->
+                  <td class="px-2 py-2 ">
+                    <button type="button" @click="removeCommitteeMember(index)"
+                      class="bg-red-500 text-white px-3 py-2 rounded text-md">
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- รูปแบบการประเมินผล -->
-          <div class="mb-6">
+          <div class="mb-10">
+            <!-- <label class="item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+            <div class="mb-4 ml-4">
+              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
+              </div>
+            </div> -->
             <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+            <div class="my-2 ml-4">
+              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
+              </div>
+            </div>
 
+            <hr>
             <!-- รายการตัวเลือก -->
-            <div v-for="(option, key) in evaluationData" :key="key" class="mb-4">
+            <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
               <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID" v-model="selectedEvaluation"
-                class="mr-2" />
+                :disabled="selectedSkills.length >= 1" />
               <label :for="option.evaluationID">{{ option.evaluationName }}</label>
             </div>
-
-            <!-- ช่องอัพโหลดไฟล์รูปแบบการประเมินผล -->
-            <div class="mb-6">
-              <label class="block item">อัพโหลดไฟล์ตัวอย่างการประเมินผล<span
-                  class="text-red-500 ml-1">*</span></label>
-
-              <div v-if="evaluationFile" class="mb-2">
-                <a @click="openFileInNewTab(evaluationFile, 'application/pdf')" target="_blank"
-                  class="text-blue-500 underline">
-                  ดูไฟล์ที่อัปโหลด
-                </a>
-              </div>
-
-              <input id="evaluationFile" type="file" @change="handleFileChange($event, 'evaluationFile')"
-                class="form-input" />
-            </div>
-
-            <!-- ผลที่คาดว่าจะได้รับ -->
-            <div class="mb-6">
-              <label class="block item">ผลที่คาดว่าจะได้รับที่สอดคล้องกับวัตถุประสงค์</label>
-
-              <div v-for="(expectedResult, index) in expectedResults" :key="index" class="flex items-center gap-4 ml-4 mb-4">
-                <!-- ผลที่คาดว่าจะได้รับ -->
-                <div class="flex-1">
-                  <label :for="'expected-' + index" class="block mb-1">ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1 }}<span
-                      class="text-red-500 ml-1">*</span></label>
-                  <input type="text" :id="'expected-' + index" v-model="expectedResult.result" class="form-input w-full"
-                    placeholder="ผลที่คาดว่าจะได้รับ" />
-                </div>
-
-                <!-- ตัวชี้วัด (KPI) -->
-                <div class="flex-1">
-                  <label :for="'kpi-' + index" class="block mb-1">ตัวชี้วัด (KPI)<span
-                      class="text-red-500 ml-1">*</span></label>
-                  <input type="text" :id="'kpi-' + index" v-model="expectedResult.kpi" class="form-input w-full"
-                    placeholder="KPI" />
-                </div>
-
-                <!-- ค่าเป้าหมาย -->
-                <div class="flex-1">
-                  <label :for="'target-' + index" class="block mb-1 whitespace-nowrap">ค่าเป้าหมาย (%)<span
-                      class="text-red-500 ml-1">*</span></label>
-                  <input type="number" min="0" max="100" :id="'target-' + index" v-model="expectedResult.target"
-                    class="form-input w-full" placeholder="ค่าเป้าหมาย" @input="validateTarget($event, index)" />
-                </div>
-              </div>
-            </div>
-
-            <!-- ผลการดำเนินงานที่ผ่านมา -->
-            <div class="mb-6">
-              <label class="block item">
-                ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
-              </label>
-
-              <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 ml-4 mb-4">
-                <!-- ปัญหาอุปสรรค -->
-                <div class="flex items-center gap-2">
-                  <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
-                  <input :id="'problem-' + index" v-model="item.problem" type="text" class="form-input w-90"
-                    placeholder="กรอกปัญหาอุปสรรค" />
-                </div>
-
-                <!-- แนวทางการแก้ไข -->
-                <div class="flex items-center gap-2">
-                  <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:</label>
-                  <input :id="'solution-' + index" v-model="item.solution" type="text" class="form-input w-90"
-                    placeholder="กรอกแนวทางการแก้ไข" />
-                </div>
-              </div>
-            </div>
-
-            <!-- รายละเอียดงบประมาณ -->
-            <div class="mb-6">
-              <label class="block item">รายละเอียดงบประมาณ<span class="text-red-500 ml-1">*</span></label>
-
-              <div v-if="budgetDetails" class="mb-2">
-                <a @click="openFileInNewTab(budgetDetails, 'application/pdf')" target="_blank"
-                  class="text-blue-500 underline">
-                  ดูไฟล์ที่อัปโหลด
-                </a>
-              </div>
-
-              <input type="file" @change="handleFileChange($event, 'budgetDetails')" class="form-input" />
-            </div>
-
-            <!-- อัพโหลดไฟล์เพิ่มเติม -->
-            <div class="mb-6">
-              <label class="block item">อัปโหลดไฟล์เพิ่มเติม (เช่น ตารางกำหนดการจัดกิจกรรม ฯลฯ)<span
-                  class="text-red-500 ml-1">*</span></label>
-
-              <div v-if="prepareFile" class="mb-2">
-                <a @click="openFileInNewTab(prepareFile, 'application/pdf')" target="_blank"
-                  class="text-blue-500 underline">
-                  ดูไฟล์ที่อัปโหลด
-                </a>
-              </div>
-
-              <input type="file" @change="handleFileChange($event, 'prepareFile')" class="form-input" />
-            </div>
-
           </div>
-        </div>
-      </div>  
+          <p v-if="selectedSkills.length >= 1" class="text-red-500 mt-2">
+            คุณได้เลือกรูปแบบการประเมินแล้ว
+          </p>
+          <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
+          <div class="mb-6">
+            <label class="block text-gray-700 mb-2">อัพโหลดไฟล์ตัวอย่างการประเมินผล<span
+                class="text-red-500 ml-1">*</span></label>
 
-        <button type="submit" class="form-button">
-          Update Activity Document
-        </button>
+            <div v-if="evaluationFile" class="mb-2">
+              <a @click="openFileInNewTab(evaluationFile, 'application/pdf')" target="_blank"
+                class="text-blue-500 underline">
+                ดูไฟล์ตัวอย่างการประเมินผลที่อัปโหลด
+              </a>
+            </div>
+
+            <input id="evaluationFile" type="file" @change="handleFileChange($event, 'evaluationFile')"
+              class="form-input" />
+          </div>
+
+          <!-- ผลที่คาดว่าจะได้รับ -->
+          <div class="mb-8">
+            <label class="block item">ผลที่คาดว่าจะได้รับที่สอดคล้องกับวัตถุประสงค์</label>
+
+            <div v-for="(expectedResult, index) in expectedResults" :key="index"
+              class="flex items-center gap-4 ml-4 mt-4 my-2 ">
+              <!-- ผลที่คาดว่าจะได้รับ -->
+              <div class="flex-1">
+                <label :for="'expected-' + index" class="block mb-1">ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1
+                }}<span class="text-red-500 ml-1">*</span></label>
+                <input type="text" :id="'expected-' + index" v-model="expectedResults[index].result"
+                  class="form-input form-input-text w-full" placeholder="ผลที่คาดว่าจะได้รับ" :minlength="10" />
+              </div>
+
+              <!-- ตัวชี้วัด (KPI) -->
+              <div class="flex-1">
+                <label :for="'kpi-' + index" class="block mb-1">ตัวชี้วัด (KPI)<span
+                    class="text-red-500 ml-1">*</span></label>
+                <input type="text" :id="'kpi-' + index" v-model="expectedResults[index].kpi"
+                  class="form-input form-input-text w-full" placeholder="KPI" :minlength="10" />
+              </div>
+
+              <!-- ค่าเป้าหมาย -->
+              <div class="flex-1">
+                <label :for="'target-' + index" class="block mb-1 whitespace-nowrap">ค่าเป้าหมาย (%)<span
+                    class="text-red-500 ml-1">*</span></label>
+                <input type="number" min="0" max="100" :id="'target-' + index" v-model="expectedResults[index].target"
+                  class="form-input form-input-text w-full" placeholder="ค่าเป้าหมาย"
+                  @input="validateTarget($event, index)" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ผลการดำเนินงานที่ผ่านมา -->
+          <div class="mb-6">
+            <label class="block item">
+              ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
+            </label>
+
+            <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 ml-4 mb-4">
+              <!-- ปัญหาอุปสรรค -->
+              <div class="flex items-center gap-2  ml-4 mt-3 my-2 ">
+                <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
+                <input :id="'problem-' + index" v-model="item.problem" type="text"
+                  class="form-input form-input-text w-90" placeholder="กรอกปัญหาอุปสรรค" />
+              </div>
+
+              <!-- แนวทางการแก้ไข -->
+              <div class="flex items-center gap-2">
+                <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:</label>
+                <input :id="'solution-' + index" v-model="item.solution" type="text"
+                  class="form-input form-input-text w-90" placeholder="กรอกแนวทางการแก้ไข" />
+              </div>
+            </div>
+          </div>
+
+          <!-- รายละเอียดงบประมาณ -->
+          <div class="mb-6">
+            <label for="budgetDetails" class="block item">รายละเอียดงบประมาณ<span
+                class="text-red-500 ml-1">*</span></label>
+            <div v-if="budgetDetails" class="mb-2">
+              <a @click="openFileInNewTab(budgetDetails, 'application/pdf')" target="_blank"
+                class="text-blue-500 underline">
+                ดูไฟล์รายละเอียดงบประมาณที่อัปโหลด
+              </a>
+            </div>
+            <input id="budgetDetails" type="file" @change="handleFileChange($event, 'budgetDetails')"
+              class="form-input form-input-text" />
+          </div>
+
+          <!-- อัพโหลดไฟล์เพิ่มเติม -->
+          <div class="mb-6">
+            <label for="prepareFile" class="block item">อัปโหลดไฟล์เพิ่มเติม (เช่น
+              ตารางกำหนดการจัดกิจกรรม ฯลฯ)<span class="text-red-500 ml-1">*</span></label>
+            <div v-if="prepareFile" class="mb-2">
+              <a @click="openFileInNewTab(prepareFile, 'application/pdf')" target="_blank"
+                class="text-blue-500 underline">
+                ดูไฟล์เพิ่มเติมที่อัปโหลด
+              </a>
+            </div>
+
+            <input id="prepareFile" type="file" @change="handleFileChange($event, 'prepareFile')"
+              class="form-input form-input-text" />
+          </div>
+
+        </div>
+        <div class="parent-container">
+          <button type="submit" class="form-button"> Update Activity Document
+          </button>
+        </div>
       </form>
+
 
       <div v-if="showSuccessPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
         <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
@@ -1444,351 +1342,8 @@ const validateProjectNames = () => {
           </div>
         </div>
       </div>
-
-<<<<<<< HEAD
     </div>
   </div>
-=======
-
-      <!-- หลักการและเหตุผล -->
-    <div class="mb-6">
-      <label for="sustainabilityDetail" class="block text-gray-700 mb-2">หลักการและเหตุผล<span class="text-red-500 ml-1">*</span></label>
-      <textarea 
-        id="sustainabilityDetail" 
-        v-model="sustainabilityDetail" 
-        class="form-textarea w-full h-32" 
-        placeholder="กรอกหลักการและเหตุผล"
-      ></textarea>
-    </div>
-
-    <!-- วัตถุประสงค์ -->
-    <div class="mb-6">
-      <label class="block text-gray-700 mb-2">วัตถุประสงค์</label>
-      <div v-for="(objective, index) in objectives" :key="index" class="flex items-center mb-2">
-        <span class="mr-2 w-6 text-right">{{ index + 1 }}.<span class="text-red-500 ml-1">*</span></span>
-        <input 
-          type="text" 
-          v-model="objectives[index]" 
-          class="form-input flex-1" 
-          placeholder="กรอกวัตถุประสงค์"
-        />
-      </div>
-    </div>
-
-    <!-- ผู้เข้าร่วมโครงการ -->
-    <div class="mb-6">
-      <label class="block text-gray-700 mb-2">
-        ผู้เข้าร่วมโครงการ<span class="text-red-500 ml-1">*</span>
-      </label>
-
-      <div v-for="participant in participantData" :key="participant.participantID" class="flex items-center mb-2">
-        <label v-if="participant.participantName==='Student'||participant.participantName==='Staff'" class="w-48">{{ participant.participantName }} จำนวน:<span class="text-red-500 ml-1">*</span></label>
-        <label v-else class="w-48">{{ participant.participantName }} จำนวน:</label>
-        <input 
-          type="number" 
-          v-model="participant.count"
-          class="form-input w-20 mr-2 text-right"
-          style="width: 10%;"
-          min="0"
-          :value="participant.count || 0"
-        />
-        <span>คน</span>
-      </div>
-    </div>
-    
-    <!-- ลักษณะกิจกรรม (activityCharacteristic) -->
-    <div class="mb-6">
-      <label for="activityCharacteristic" class="block text-gray-700 mb-2">ลักษณะกิจกรรม<span class="text-red-500 ml-1">*</span></label>
-      <textarea 
-        id="activityCharacteristic" 
-        v-model="activityCharacteristic" 
-        class="form-textarea w-full h-32" 
-        placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม ให้เห็นภาพการจัดกิจกรรม"
-      ></textarea>
-    </div>
-
-    <!-- Code of Honor -->
-    <div class="mb-6">
-      <label for="codeOfHonor" class="block text-gray-700 mb-2">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code of Honor) ดังนี้<span class="text-red-500 ml-1">*</span></label>
-      <textarea 
-        id="codeOfHonor" 
-        v-model="codeOfHonor" 
-        class="form-textarea w-full h-22" 
-        placeholder="อธิบายความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor"
-      ></textarea>
-    </div>
-
-    <!-- ระยะเวลาดำเนินงาน -->
-    <div class="mb-6">
-      <!-- <label class="block text-gray-700 mb-2">ระยะเวลาดำเนินงาน</label> -->
-      <!-- ระยะเวลาเตรียมงาน -->
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-2">ระยะเวลาเตรียมงาน:</label>
-        <div class="flex items-center">
-          <label class="w-40">เริ่มต้น:<span class="text-red-500 ml-1">*</span></label>
-          <input 
-            type="date" 
-            v-model="prepareStart" 
-            class="form-input w-20"
-            style="width: 80%;"
-          />
-          <label class="w-40">สิ้นสุด:<span class="text-red-500 ml-1">*</span></label>
-          <input 
-            type="date" 
-            v-model="prepareEnd" 
-            class="form-input w-20"
-            style="width: 80%;" 
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- ขั้นตอนการดำเนินงาน -->
-    <div class="mb-6">
-      <label class="block text-gray-700 mb-2">ขั้นตอนการดำเนินงาน<span class="text-red-500 ml-1">*</span></label>
-      
-      <div v-if="scheduleDetails" class="mb-2">
-        <a @click="openFileInNewTab(scheduleDetails, 'application/pdf')" target="_blank" class="text-blue-500 underline">
-          ดูไฟล์ที่อัปโหลด
-        </a>
-      </div>
-
-      <input 
-        type="file" 
-        @change="handleFileChange($event, 'scheduleDetails')" 
-        class="form-input"
-      />
-    </div>
-
-    <!-- คณะกรรมการจัดโครงการ -->
-    <div class="mb-6">
-    <label class="block text-gray-700 mb-2">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
-
-    <!-- Dropdown สำหรับเลือกชื่อ -->
-    <div class="mb-4">
-      <label for="select-student" class="block mb-1">เลือกชื่อจากรายการ:</label>
-      <select 
-        id="select-student" 
-        v-model="selectedStudent" 
-        class="form-select w-60"
-      >
-        <option value="" disabled>รายชื่อ</option>
-        <option v-for="student in students" :key="student.id" :value="student.id">
-          {{ student.name }}
-        </option>
-      </select>
-      <button 
-        @click="addCommitteeMember" 
-        :disabled="!selectedStudent" 
-        class="bg-green-500 text-white px-4 py-2 ml-2 rounded"
-      >
-        เพิ่มคณะกรรมการ
-      </button>
-    </div>
-
-    <!-- แสดงรายการคณะกรรมการ -->
-    <div v-for="(member, index) in committee" :key="member.id" class="mb-4 flex items-center justify-between border-b pb-2">
-      <div class="flex space-x-4 w-full">
-        <span class="w-10">{{ index + 1 }}</span>
-        <span class="w-32">{{ member.id }}</span>
-        <span class="w-48">{{ member.name }}</span>
-        <span class="w-48">{{ member.department }}</span>
-        <span class="w-40">{{ member.phone }}</span>
-
-        <!-- Dropdown ตำแหน่ง -->
-        <select v-model="member.position" class="form-input w-36" style="width: 30%;">
-          <option value="" disabled selected>เลือกตำแหน่ง</option>
-          <option v-for="position in positions" :key="position" :value="position">
-            {{ position }}
-          </option>
-        </select>
-
-      </div>
-
-      <!-- ปุ่มลบ -->
-      <button 
-        type="button" 
-        @click="removeCommitteeMember(index)" 
-        class="bg-red-500 text-white px-4 py-2 rounded mt-2 sm:mt-0"
-      >
-        ลบ
-      </button>
-    </div>
-
-    <!-- รูปแบบการประเมินผล -->
-    <div class="mb-6">
-    <label class="block text-gray-700 mb-2">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-
-    <!-- รายการตัวเลือก -->
-    <div v-for="(option, key) in evaluationData" :key="key" class="mb-4">
-      <input 
-        type="checkbox" 
-        :id="option.evaluationID" 
-        :value="option.evaluationID" 
-        v-model="selectedEvaluation" 
-        class="mr-2"
-      />
-      <label :for="option.evaluationID">{{ option.evaluationName }}</label>
-    </div>
-
-    <!-- ช่องอัพโหลดไฟล์รูปแบบการประเมินผล -->
-    <div class="mb-6">
-      <label class="block text-gray-700 mb-2">อัพโหลดไฟล์ตัวอย่างการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-      
-      <div v-if="evaluationFile" class="mb-2">
-        <a @click="openFileInNewTab(evaluationFile, 'application/pdf')" target="_blank" class="text-blue-500 underline">
-          ดูไฟล์ที่อัปโหลด
-        </a>
-      </div>
-
-      <input 
-        id="evaluationFile" 
-        type="file" 
-        @change="handleFileChange($event, 'evaluationFile')" 
-        class="form-input"
-      />
-    </div>
-
-  <!-- ผลที่คาดว่าจะได้รับ -->
-  <div class="mb-6">
-    <label class="block text-gray-700 mb-2">ผลที่คาดว่าจะได้รับที่สอดคล้องกับวัตถุประสงค์</label>
-
-    <div v-for="(expectedResult, index) in expectedResults" :key="index" class="flex items-center gap-4 mb-4">
-      <!-- ผลที่คาดว่าจะได้รับ -->
-      <div class="flex-1">
-        <label :for="'expected-' + index" class="block mb-1">ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1 }}<span class="text-red-500 ml-1">*</span></label>
-        <input 
-          type="text" 
-          :id="'expected-' + index" 
-          v-model="expectedResult.result" 
-          class="form-input w-full"
-          placeholder="ผลที่คาดว่าจะได้รับ"
-        />
-      </div>
-
-      <!-- ตัวชี้วัด (KPI) -->
-      <div class="flex-1">
-        <label :for="'kpi-' + index" class="block mb-1">ตัวชี้วัด (KPI)<span class="text-red-500 ml-1">*</span></label>
-        <input 
-          type="text" 
-          :id="'kpi-' + index" 
-          v-model="expectedResult.kpi" 
-          class="form-input w-full"
-          placeholder="KPI"
-        />
-      </div>
-
-      <!-- ค่าเป้าหมาย -->
-      <div class="flex-1">
-        <label :for="'target-' + index" class="block mb-1 whitespace-nowrap">ค่าเป้าหมาย (%)<span class="text-red-500 ml-1">*</span></label>
-        <input 
-          type="number" 
-          min="0"
-          max="100"
-          :id="'target-' + index" 
-          v-model="expectedResult.target"
-          class="form-input w-full"
-          placeholder="ค่าเป้าหมาย"
-          @input="validateTarget($event, index)"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- ผลการดำเนินงานที่ผ่านมา -->
-<div class="mb-6">
-  <label class="block text-gray-700 mb-2">
-    ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
-  </label>
-
-  <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 mb-4">
-    <!-- ปัญหาอุปสรรค -->
-    <div class="flex items-center gap-2">
-      <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
-      <input 
-        :id="'problem-' + index" 
-        v-model="item.problem" 
-        type="text" 
-        class="form-input w-90" 
-        placeholder="กรอกปัญหาอุปสรรค"
-      />
-    </div>
-
-    <!-- แนวทางการแก้ไข -->
-    <div class="flex items-center gap-2">
-      <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:</label>
-      <input 
-        :id="'solution-' + index" 
-        v-model="item.solution" 
-        type="text" 
-        class="form-input w-90" 
-        placeholder="กรอกแนวทางการแก้ไข"
-      />
-    </div>
-  </div>
-</div>
-
-  <!-- รายละเอียดงบประมาณ -->
-  <div class="mb-6">
-      <label class="block text-gray-700 mb-2">รายละเอียดงบประมาณ<span class="text-red-500 ml-1">*</span></label>
-      
-      <div v-if="budgetDetails" class="mb-2">
-        <a @click="openFileInNewTab(budgetDetails, 'application/pdf')" target="_blank" class="text-blue-500 underline">
-          ดูไฟล์ที่อัปโหลด
-        </a>
-      </div>
-
-      <input 
-        type="file" 
-        @change="handleFileChange($event, 'budgetDetails')" 
-        class="form-input"
-      />
-    </div>
-
-    <!-- อัพโหลดไฟล์เพิ่มเติม -->
-    <div class="mb-6">
-      <label class="block text-gray-700 mb-2">อัปโหลดไฟล์เพิ่มเติม (เช่น ตารางกำหนดการจัดกิจกรรม ฯลฯ)<span class="text-red-500 ml-1">*</span></label>
-      
-      <div v-if="prepareFile" class="mb-2">
-        <a @click="openFileInNewTab(prepareFile, 'application/pdf')" target="_blank" class="text-blue-500 underline">
-          ดูไฟล์ที่อัปโหลด
-        </a>
-      </div>
-
-      <input 
-        type="file" 
-        @change="handleFileChange($event, 'prepareFile')" 
-        class="form-input"
-      />
-    </div>
-    
-  </div>
-  </div>
-
-  <button 
-    type="submit" 
-    class="form-button"
-  >
-    Update Activity Document
-  </button>
-</form>
-
-<div 
-  v-if="showSuccessPopup"
-  class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-  <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
-    <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
-    <div class="flex justify-center">
-      <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
-        OK
-      </button>
-    </div>    
-  </div>
-</div>
-
-</div>
-</div>
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
 </template>
 
 <style scoped>
@@ -1870,9 +1425,19 @@ const validateProjectNames = () => {
   border-radius: 20px;
 }
 
+.parent-container {
+  display: flex;
+  justify-content: center;
+  /* จัดตำแหน่งในแนวนอน */
+  align-items: center;
+  /* จัดตำแหน่งในแนวตั้ง */
+  /* ตั้งค่าความสูงให้เป็น 100% ของหน้าจอ */
+}
+
+/* ปุ่ม .form-button */
 .form-button {
   width: 100%;
-  padding: 10px 0;
+  padding: 12px 0;
   border: none;
   border-radius: 100px;
   background-color: #fb923c;
@@ -1880,6 +1445,8 @@ const validateProjectNames = () => {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+  text-align: center;
+  /* ทำให้ข้อความภายในปุ่มอยู่กลาง */
 }
 
 .form-input:focus {

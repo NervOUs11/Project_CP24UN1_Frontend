@@ -98,16 +98,16 @@ const filteredDocuments = computed(() =>
   <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md" />
   <div class="flex justify-center items-center min-h-screen bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
-      <h1 class="text-3xl font-bold mb-6 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
+      <h1 class="text-4xl font-bold mt-2 mb-8 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
       <table class="document-table w-full table-fixed border-collapse">
         <thead>
           <tr class="bg-orange-500 text-white">
-            <th class="px-4 py-2">No.</th>
-            <th class="px-4 py-2 text-left">Document Type</th>
-            <th class="px-4 py-2 text-left">Document Name</th>
-            <th class="px-4 py-2 text-left">Status</th>
-            <th class="px-4 py-2 text-left">Date Sent</th>
-            <th class="px-4 py-2 text-left">Date Last Edit</th>
+            <th class="px-4 py-2 text-center">No.</th>
+            <th class="px-4 py-2 text-center">Document Type</th>
+            <th class="px-4 py-2 text-center">Document Name</th>
+            <th class="px-4 py-2 text-center">Status</th>
+            <th class="px-4 py-2 text-center"> Sent Date</th>
+            <th class="px-4 py-2 text-center">Last Edited Date</th>
           </tr>
         </thead>
         <tbody v-if="documents.length === 0">
@@ -120,20 +120,19 @@ const filteredDocuments = computed(() =>
             class="hover:bg-orange-100 border-b border-gray-200"
             @click="goToDocument(doc.documentType, doc.documentID)">
             <td class="px-4 py-2 text-center font-medium">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-            <td class="px-4 py-2">{{ doc.documentType === 'ลากิจ' || doc.documentType === 'ลาป่วย' ? 'ใบคำร้องขอลากิจ/ลาป่วย':'ใบคำร้องขออนุมัติจัดกิจกรรม' }}</td>
+            <td class="px-4 py-2">{{ doc.documentType === 'ลากิจ' || doc.documentType === 'ลาป่วย' ?
+              'ใบคำร้องขอลากิจ/ลาป่วย' : 'ใบคำร้องขออนุมัติจัดกิจกรรม' }}</td>
             <td class="px-4 py-2">{{ doc.documentName }}</td>
             <td class="px-4 py-2">
-              <span
-                :class="{
-                  'text-green-500 font-bold': doc.status === 'Approve',
-                  'text-red-500 font-bold': doc.status === 'Reject',
-                  'text-orange-500 font-bold': doc.status === 'Waiting for approve',
-                  'text-blue-500 font-bold': doc.status === 'Other advisor approve',
-                }"
-              >
+              <span :class="{
+                'text-green-500 font-bold': doc.status === 'Approve',
+                'text-red-500 font-bold': doc.status === 'Reject',
+                'text-orange-500 font-bold': doc.status === 'Waiting for approve',
+                'text-blue-500 font-bold': doc.status === 'Other advisor approve',
+              }">
                 {{ doc.status }}
               </span>
-       
+
             </td>
             <td class="px-4 py-2">{{ formatDate(doc.createDate) }}</td>
             <td class="px-4 py-2">{{ formatDate(doc.editDate) }}</td>

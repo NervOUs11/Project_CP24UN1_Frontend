@@ -264,12 +264,12 @@ onMounted(async () => {
   <!-- Show the document details once data is fetched -->
   <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[900px]">
-      <h1 class="text-3xl font-bold mb-4 text-center text-orange-500">Activity Document Detail</h1>
+      <h1 class="text-3xl font-extrabold mb-4 text-center text-orange-500">Absence Document Detail</h1>
 
 
       <div class="mb-6">
         <h2 class="subhead">Document Information</h2>
-        <div class="grid grid-cols-2 gap-4 lable">
+        <div class="grid grid-cols-2 gap-4 lable ">
           <div>
             <span class="items">ชื่อนักศึกษา:</span> {{ data.Owner?.name }}
           </div>
@@ -280,7 +280,8 @@ onMounted(async () => {
             <span class="items">คณะ:</span> {{ data.Owner?.faculty }}
           </div>
           <div>
-            <span class="items">ภาควิชา/สาขาวิชา:</span><span class="whitespace-nowrap"> {{ data.Owner?.department }}</span>
+            <span class="items">ภาควิชา/สาขาวิชา:</span><span class="whitespace-nowrap"> {{ data.Owner?.department
+            }}</span>
           </div>
           <div>
             <span class="items">ชั้นปีที่:</span> {{ data.Owner?.year }}
@@ -323,59 +324,60 @@ onMounted(async () => {
           <div>
             <span class="items">ลาถึงวันที่:</span> {{ data.endTime?.date }} เวลา {{ data.endTime?.time }}
           </div>
-          <div>
+
+          <div class="mb-8">
+            <h2 class="items ">เอกสารแนบ:</h2>
+            <table class="w-auto border-collapse border border-gray-300 mx-4">
+              <tbody>
+                <tr v-if="data.file1">
+                  <td class="px-4 pt-2 pb-3 border border-white font-medium whitespace-nowrap">
+                    หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์:</td>
+                  <td class="py-2 border border-white">
+                    <a v-if="data.file1.length > 30" href="javascript:void(0);"
+                      @click="openFileInNewTab(data.file1, 'application/pdf')"
+                      class="text-orange-500 underline whitespace-nowrap">
+                      หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
+                    </a>
+                    <span v-else class="text-gray-500">No Attachment File </span>
+                  </td>
+                </tr>
+                <tr v-if="data.file2">
+                  <td class="px-4 py-2 border border-white font-medium">เอกสารแนบอื่น ๆ :</td>
+                  <td class="py-2 border border-white">
+                    <a v-if="data.file2.length > 30" href="javascript:void(0);"
+                      @click="openFileInNewTab(data.file2, 'application/pdf')" class="text-orange-500 underline">
+                      เอกสารแนบอื่น ๆ
+                    </a>
+                    <span v-else class="text-gray-500">No Attachment File </span>
+                  </td>
+                </tr>
+                <tr v-if="!data.file1 && !data.file2">
+                  <td colspan="2" class="px-4 py-2 border border-white text-center text-gray-500">No Attachment Files
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-
-      <div class="mb-8">
-        <h2 class="items mx-2">เอกสารแนบ:</h2>
-        <table class="w-auto border-collapse border border-gray-300 mx-4">
-          <tbody>
-            <tr v-if="data.file1">
-              <td class="px-4 py-2 border border-white font-medium">หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์:</td>
-              <td class="py-2 border border-white">
-                <a v-if="data.file1.length > 30" href="javascript:void(0);"
-                  @click="openFileInNewTab(data.file1, 'application/pdf')" class="text-orange-500 underline">
-                  หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
-                </a>
-                <span v-else class="text-gray-500">No Attachment File </span>
-              </td>
-            </tr>
-            <tr v-if="data.file2">
-              <td class="px-4 py-2 border border-white font-medium">เอกสารแนบอื่น ๆ :</td>
-              <td class="py-2 border border-white">
-                <a v-if="data.file2.length > 30" href="javascript:void(0);"
-                  @click="openFileInNewTab(data.file2, 'application/pdf')" class="text-orange-500 underline">
-                  เอกสารแนบอื่น ๆ
-                </a>
-                <span v-else class="text-gray-500">No Attachment File </span>
-              </td>
-            </tr>
-            <tr v-if="!data.file1 && !data.file2">
-              <td colspan="2" class="px-4 py-2 border border-white text-center text-gray-500">No Attachment Files</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="border-t border-gray-300 my-9"></div>
+      <div class="border-t border-gray-300 my-4"></div>
 
       <div class="mb-6">
         <h2 class="subhead mb-8">Progress</h2>
-        <table class="w-full border-collapse border border-gray-300 ml-2 mb-10">
+        <table class="w-auto border-collapse border border-gray-300 ml-2 mb-10">
           <thead>
             <tr class="bg-gray-200">
-              <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">ชื่อเจ้าหน้าที่</th>
-              <th class="border border-gray-300 px-4 py-2 text-left w-[40%]">ตำแหน่ง</th>
-              <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">สถานะ</th>
-              <th class="border border-gray-300 px-4 py-2 text-left w-[10%]">หมายเหตุ</th>
+              <th class="border border-gray-300 px-4 py-2 text-center w-[25%]">ชื่อเจ้าหน้าที่</th>
+              <th class="border border-gray-300 px-4 py-2 text-centert w-[40%]">ตำแหน่ง</th>
+              <th class="border border-gray-300 px-4 py-2 text-centert w-[25%]">สถานะ</th>
+              <th class="border border-gray-300 px-4 py-2 text-centert w-[10%]">หมายเหตุ</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(step, index) in sortedProgress" :key="index">
-              <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.staffName }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[40%]">{{ step.staffRole }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.status }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%] text-center">{{ step.staffName }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[40%] text-center">{{ step.staffRole }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%] text-center">{{ step.status }}</td>
               <td class="border border-gray-300 px-4 py-2 text-red-600 w-[10%]" v-if="step.comment">
                 {{ step.comment }}
               </td>
@@ -478,33 +480,25 @@ onMounted(async () => {
   </div>
 </template>
 
-
-
-
-
-
-
-
-
-
-
 <style scoped>
 .subhead {
-  font-size: 1.25rem;
+  font-size: larger;
   /* text-xl */
-  font-weight: bold;
+  font-weight: 700;
   /* font-bold */
   color: #ea580c;
   /* text-orange-600 */
-  margin-bottom: 1rem;
+  margin: 2.5rem 0 1.5rem 0;
   /* mb-4 */
 }
-.lable{
+
+.lable {
   /* mb-6 mx-2 */
-  margin: 1rem 2rem 2rem ;
+  margin: 1rem 2rem 2rem;
 }
+
 .items {
-  font-weight: bold;
+  font-weight: 700;
   font-size: medium;
   margin-bottom: 0.5rem;
 }
@@ -522,7 +516,7 @@ onMounted(async () => {
 }
 
 .button {
-  width: 50%;
+  width: 60%;
   padding: 0.7rem;
   border: none;
   border-radius: 100px;
@@ -530,6 +524,7 @@ onMounted(async () => {
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
+
 .button:hover {
   opacity: 0.9;
 }

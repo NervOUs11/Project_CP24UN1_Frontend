@@ -718,14 +718,15 @@ const positions = ref([
 
 
           <!-- วัตถุประสงค์ -->
-          <div class="col-span-2">
-            <label for="purpose" class="block item">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
+          <div class="col-span-2 lable">
+            <label for="purpose" class="block item">วัตถุประสงค์โดยภาพรวม<span
+                class="text-red-500 ml-1">*</span></label>
             <textarea id="purpose" v-model="purpose" class="form-input  w-80%" rows="4" required minlength="20"
               placeholder="ภาพรวมของวัตถุประสงค์ในการดำเนินโครงการ"></textarea>
           </div>
 
           <!-- ค่าใช้จ่าย -->
-          <div class=" flex gr-col text-left">
+          <div class=" flex gr-col text-left lable">
             <label for="expenses" class="item whitespace-nowrap" style="width: 85px;">ค่าใช้จ่าย<span
                 class=" text-red-500">*</span></label>
 
@@ -751,7 +752,7 @@ const positions = ref([
           </div>
 
           <!-- เลือกชั่วโมงกิจกรรม -->
-          <div class="layer-left">
+          <div class="lable">
             <label for="activityHours" class="block item">การเทียบค่าชั่วโมงกิจกรรม<span
                 class="text-red-500 ml-1">*</span></label>
             <select id="activityHours" v-model="isHourCount" class="form-input form-input-text ml-3"
@@ -765,176 +766,185 @@ const positions = ref([
           <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
         </div>
 
+        <div class="lable ">
+          <div class="grid grid-cols-3 gap-4 text-center ">
+            <!-- อาจารย์ที่ปรึกษา/รองคณบดี -->
+            <div>
+              <label for="advisor" class="block item ">อาจารย์ที่ปรึกษา/รองคณบดี<span
+                  class="text-red-500 ml-1">*</span></label>
+              <select id="advisor" v-model="advisor" class="form-input form-input-role" required
+                @change="selectAdvisor">
+                <option value="" disabled>เลือกอาจารย์ที่ปรึกษา/รองคณบดี</option>
+                <option v-for="advisor in advisorList" :key="advisor.staffId" :value="advisor.staffId">
+                  {{ advisor.fullName }}
+                </option>
+              </select>
+            </div>
 
-        <div class="grid grid-cols-3 gap-4 lable mb-10">
-          <!-- อาจารย์ที่ปรึกษา/รองคณบดี -->
-          <div>
-            <label for="advisor" class="block item">อาจารย์ที่ปรึกษา/รองคณบดี<span
-                class="text-red-500 ml-1">*</span></label>
-            <select id="advisor" v-model="advisor" class="form-input form-input-role" required @change="selectAdvisor">
-              <option value="" disabled>เลือกอาจารย์ที่ปรึกษา/รองคณบดี</option>
-              <option v-for="advisor in advisorList" :key="advisor.staffId" :value="advisor.staffId">
-                {{ advisor.fullName }}
-              </option>
-            </select>
-          </div>
+            <!-- นายก/ประธานชมรม -->
+            <div>
+              <label for="president" class="block item">นายก/ประธานชมรม<span class="text-red-500 ml-1">*</span></label>
+              <select id="president" v-model="president" class="form-input form-input-role" required
+                @change="selectPresident">
+                <option value="" disabled>เลือกนายก/ประธานชมรม</option>
+                <option v-for="president in presidentList" :key="president.staffId" :value="president.staffId">
+                  {{ president.fullName }}
+                </option>
+              </select>
+            </div>
 
-          <!-- นายก/ประธานชมรม -->
-          <div>
-            <label for="president" class="block item">นายก/ประธานชมรม<span class="text-red-500 ml-1">*</span></label>
-            <select id="president" v-model="president" class="form-input form-input-role" required
-              @change="selectPresident">
-              <option value="" disabled>เลือกนายก/ประธานชมรม</option>
-              <option v-for="president in presidentList" :key="president.staffId" :value="president.staffId">
-                {{ president.fullName }}
-              </option>
-            </select>
-          </div>
+            <!-- นักศึกษาผู้รับผิดชอบ -->
+            <div>
+              <label for="responsibleStudent" class=" item">นักศึกษาผู้รับผิดชอบ</label>
+              <input type="text" id="responsibleStudent" :value="responsibleStudent" class="form-input" disabled />
+            </div>
 
-          <!-- นักศึกษาผู้รับผิดชอบ -->
-          <div>
-            <label for="responsibleStudent" class=" item">นักศึกษาผู้รับผิดชอบ</label>
-            <input type="text" id="responsibleStudent" :value="responsibleStudent" class="form-input" disabled />
-          </div>
-
-          <!-- ประธานฝ่าย -->
-          <div>
-            <label for="departmentPresident" class="block item">ประธานฝ่าย<span
-                class="text-red-500 ml-1">*</span></label>
-            <select id="departmentPresident" v-model="departmentPresident" class="form-input form-input-role" required>
-              <option value="" disabled>เลือกประธานฝ่าย</option>
-              <option v-for="departmentPresident in departmentPresidentList" :key="departmentPresident.staffId"
-                :value="departmentPresident.staffId">
-                {{ departmentPresident.fullName }}
-              </option>
-            </select>
+            <!-- ประธานฝ่าย -->
+            <div>
+              <label for="departmentPresident" class="block item">ประธานฝ่าย<span
+                  class="text-red-500 ml-1">*</span></label>
+              <select id="departmentPresident" v-model="departmentPresident" class="form-input form-input-role"
+                required>
+                <option value="" disabled>เลือกประธานฝ่าย</option>
+                <option v-for="departmentPresident in departmentPresidentList" :key="departmentPresident.staffId"
+                  :value="departmentPresident.staffId">
+                  {{ departmentPresident.fullName }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
 
         <div class="lable">
-          <div class="mb-4">
-            <label for="activityHours" class="block item">ประเภทโครงการกิจกรรม</label>
-            <div v-if="isHourCount === true">
-              <div class="text-left text-sm text-gray-600 ml-3">เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการ เพียง 1
-                ด้าน</div>
-              <hr>
-              <table class="table-auto w-full border-collapse border border-gray-300 my-3">
-                <tbody>
-                  <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
-                    <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">{{ activity.activityName }}</td>
-                    <td class="border border-white px-4 py-1">
-                      <input type="number" :id="'hours-' + activity.activityID"
-                        v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
-                        style="width: 70px;" />
-                    </td>
-                    <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p v-if="activity.length = 1" class="text-red-500 mt-2">
-                คุณได้เลือกประเภทโครงการกิจกรรมครบแล้ว
-              </p>
-            </div>
+          <div class="ml-10 mb-10">
+            <div class="mb-8">
+              <label for="activityHours" class="block item">ประเภทโครงการกิจกรรม</label>
+              <div v-if="isHourCount === true">
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3">เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการ
+                  เพียง 1 ด้าน</div>
+                <hr>
+                <table class="table-auto w-auto border-collapse border border-gray-300 my-3">
+                  <tbody>
+                    <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
+                      <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">{{ activity.activityName }}</td>
+                      <td class="border border-white whitespace-nowrap ">จำนวน</td>
+                      <td class="border border-white text-right py-1">
+                        <input type="number" :id="'hours-' + activity.activityID"
+                          v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
+                          style="width: 70px;" />
+                      </td>
+                      <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-            <div v-if="isHourCount === false">
-              <hr>
-              <table class="table-auto w-full border-collapse border border-gray-300 my-3">
-                <tbody>
-                  <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
-                    <td class="border border-white pl-8 px-4  whitespace-nowrap">{{ activity.activityName }}</td>
-                    <td class="border border-white px-4">
-                      <input type="text" :id="'hours-' + activity.activityID" v-model="hoursCount[activity.activityID]"
-                        class="form-input px-10 w-24 text-right" style="width: 70px;" disabled />
-                    </td>
-                    <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- เลือกทักษะ StudentQF (checkbox) -->
-          <div class="mb-10 ">
-            <div class="item">KMUTT Student QF<span class="text-red-500 ml-1">*</span></div>
-            <span class="text-right text-sm text-gray-600 ml-2">
-              ทักษะที่ต้องการส่งเสริมในการจัดโครงการ เลือกได้สูงสุดเพียง 3 ด้าน และในสัดส่วนที่ต่างกัน</span>
-            <hr>
-            <div v-for="skill in studentQFList" :key="skill.studentQF_ID" class="my-3 mx-7 px-4 pb-1">
-              <input type="checkbox" :id="'skill-' + skill.studentQF_ID" :value="skill.studentQF_ID"
-                v-model="selectedSkills"
-                :disabled="selectedSkills.length >= 3 && !selectedSkills.includes(skill.studentQF_ID)" />
-              <label :for="'skill-' + skill.studentQF_ID">{{ skill.studentQF_Name }}</label>
-            </div>
-            <p v-if="selectedSkills.length >= 3" class="text-red-500 mt-2">
-              คุณเลือกทักษะครบแล้ว (สูงสุด 3 ทักษะ)
-            </p>
-          </div>
-
-          <!-- แสดงทักษะที่เลือก และกำหนดเปอร์เซ็นต์ -->
-          <div v-if="selectedSkills.length > 0" class="mt-4">
-            <h3>ทักษะที่เลือกและกำหนดเปอร์เซ็นต์:<span class="text-red-500 ml-1">*</span></h3>
-            <ul class="inline-list">
-              <li v-for="(skillID, index) in selectedSkills" :key="skillID" class="flex items-center mb-2">
-                <span class="mr-2">{{ getSkillName(skillID) }}</span>
-
-                <input type="number" v-model.number="percentages[skillID]" min="0" max="100"
-                  class="form-input ml-2 w-20 border p-1 rounded" placeholder="%" @input="validatePercentage" />
-              </li>
-            </ul>
-            <p v-if="!isPercentageValid" class="text-red-500 mt-2">
-              เปอร์เซ็นต์ทั้งหมดต้องรวมกันเป็น 100%
-            </p>
-          </div>
-
-          <!-- Entrepreneurial -->
-          <div class=" mb-10">
-            <div class="item">Entrepreneurial<span class="text-red-500 ml-1">*</span></div>
-            <div>
-              <div class="text-left text-sm text-gray-600 ml-3">
-                เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรมอย่างน้อย
-                1 ด้าน
               </div>
-              <hr>
-              <div v-for="option in entrepreneurialWithDescriptions" :key="option.entrepreneurialID"
-                class="my-3 mx-7 px-4 pb-1">
-                <input type="checkbox" :id="'entrepreneurial-' + option.entrepreneurialID"
-                  :value="option.entrepreneurialID" v-model="selectedEntrepreneurialOptions" />
-                <label :for="'entrepreneurial-' + option.entrepreneurialID">
-                  {{ option.entrepreneurialName }}
-                </label>
-                <p class="text-gray-600 text-sm mt-1 ml-8">{{ option.description }}</p>
+
+              <div v-if="isHourCount === false">
+                <hr>
+                <table class="table-auto w-auto border-collapse border border-gray-300 my-3">
+                  <tbody>
+                    <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
+                      <td class="border border-white pl-8 px-4  whitespace-nowrap">{{ activity.activityName }}</td>
+                      <td class="border border-white whitespace-nowrap ">จำนวน</td>
+
+                      <td class="border border-white px-4">
+                        <input type="text" :id="'hours-' + activity.activityID"
+                          v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
+                          style="width: 70px;" disabled />
+                      </td>
+                      <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
 
-          <!-- Sustainability -->
-          <div class=" mb-10">
-            <div class="item">Sustainability<span class="text-red-500 ml-1">*</span></div>
-            <div>
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรม
-              </div>
-              <hr>
-              <!-- SDGs Culture (ตัวเลือกที่ 1) -->
-              <div class="my-4 mx-7 px-4 pb-1">
-                <input type="checkbox" id="sustainability-1" :value="1" v-model="selectedSustainabilityOptions" />
-                <label for="sustainability-1">SDGs Culture</label>
-                <p class="text-gray-600 text-base mt-1 ml-20 mr-5">
-                  ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17
-                  อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน
+            <!-- เลือกทักษะ StudentQF (checkbox) -->
+            <div class="mb-8">
+              <div class="mb-8">
+                <div class="item">KMUTT Student QF<span class="text-red-500 ml-1">*</span></div>
+                <div class=" text-sm text-gray-600 ml-2">
+                  ทักษะที่ต้องการส่งเสริมในการจัดโครงการ เลือกได้สูงสุดเพียง 3 ด้าน และในสัดส่วนที่ต่างกัน</div>
+                <hr>
+                <div v-for="skill in studentQFList" :key="skill.studentQF_ID" class="my-3 mx-7 px-4 pb-1">
+                  <input type="checkbox" :id="'skill-' + skill.studentQF_ID" :value="skill.studentQF_ID"
+                    v-model="selectedSkills"
+                    :disabled="selectedSkills.length >= 3 && !selectedSkills.includes(skill.studentQF_ID)" />
+                  <label :for="'skill-' + skill.studentQF_ID">{{ skill.studentQF_Name }}</label>
+                </div>
+                <p v-if="selectedSkills.length >= 3" class="text-red-500 mt-1">
+                  คุณเลือกทักษะครบแล้ว (สูงสุด 3 ทักษะ)
                 </p>
+              </div>
 
-                <!-- แสดง Goals ที่เกี่ยวข้อง ถ้าเลือก SDGs Culture -->
+              <!-- แสดงทักษะที่เลือก และกำหนดเปอร์เซ็นต์ -->
+              <div v-if="selectedSkills.length > 0" class="mt-4">
+                <div class="item">ทักษะที่เลือกและกำหนดเปอร์เซ็นต์:<span class="text-red-500 ml-1">*</span></div>
+                <ul class="inline-list">
+                  <li v-for="(skillID, index) in selectedSkills" :key="skillID" class="flex  pl-4  items-center mb-2">
+                    <span class="mr-2 whitespace-nowrap">{{ getSkillName(skillID) }} :</span>
 
-                <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-2">
-                  <div class="text-left text-sm text-cyan-600 my-4 ml-12"> เลือก Goals
-                    ที่เกี่ยวข้องกับกิจกรรม<span class="text-red-500 ml-1">*</span>
-                  </div>
-                  <!-- Grid 4 คอลัมน์ -->
-                  <div class="grid grid-cols-2 gap-4 ml-14">
-                    <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
-                      <input type="checkbox" :id="'goal-' + goal.goalID" :value="goal.goalID" v-model="selectedGoals"
-                        class="mr-2 " />
-                      <p class="text-sm whitespace-nowrap">{{ goal.goalID }}. {{ goal.goalName }}</p>
+                    <input type="number" v-model.number="percentages[skillID]" min="1" max="100"
+                      class="form-input form-input-text ml-2 w-20 border p-1 rounded" placeholder="%"
+                      @input="validatePercentage" />
+                  </li>
+                </ul>
+                <p v-if="!isPercentageValid" class="text-red-500 mt-1">
+                  เปอร์เซ็นต์ทั้งหมดต้องรวมกันเป็น 100%
+                </p>
+              </div>
+            </div>
+            <!-- Entrepreneurial -->
+            <div class=" mb-10">
+              <div class="item">Entrepreneurial<span class="text-red-500 ml-1">*</span></div>
+              <div>
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3">
+                  เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรมอย่างน้อย
+                  1 ด้าน
+                </div>
+                <hr>
+                <div v-for="option in entrepreneurialWithDescriptions" :key="option.entrepreneurialID"
+                  class="my-3 mx-7 px-4 pb-1">
+                  <input type="checkbox" :id="'entrepreneurial-' + option.entrepreneurialID"
+                    :value="option.entrepreneurialID" v-model="selectedEntrepreneurialOptions" />
+                  <label :for="'entrepreneurial-' + option.entrepreneurialID">
+                    {{ option.entrepreneurialName }}
+                  </label>
+                  <p class="text-gray-600 text-sm mt-1 ml-8">{{ option.description }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sustainability -->
+            <div class=" mb-10">
+              <div class="item">Sustainability<span class="text-red-500 ml-1">*</span></div>
+              <div>
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3"> เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรม
+                </div>
+                <hr>
+                <!-- SDGs Culture (ตัวเลือกที่ 1) -->
+                <div class="my-4 mx-7 px-4 pb-1">
+                  <input type="checkbox" id="sustainability-1" :value="1" v-model="selectedSustainabilityOptions" />
+                  <label for="sustainability-1">SDGs Culture</label>
+                  <p class="text-gray-600 text-base mt-1 ml-20 mr-5">
+                    ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17
+                    อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน
+                  </p>
+
+                  <!-- แสดง Goals ที่เกี่ยวข้อง ถ้าเลือก SDGs Culture -->
+
+                  <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-2">
+                    <div class="text-left text-sm text-cyan-600 my-4 ml-12"> เลือก Goals
+                      ที่เกี่ยวข้องกับกิจกรรม<span class="text-red-500 ml-1">*</span>
+                    </div>
+                    <!-- Grid 4 คอลัมน์ -->
+                    <div class="grid grid-cols-2 gap-4 ml-14">
+                      <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
+                        <input type="checkbox" :id="'goal-' + goal.goalID" :value="goal.goalID" v-model="selectedGoals"
+                          class="mr-2 " />
+                        <p class="text-sm whitespace-nowrap">{{ goal.goalID }}. {{ goal.goalName }}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -951,266 +961,289 @@ const positions = ref([
                 <p class="text-gray-600 text-base mt-1 ml-20 mr-5">{{ option.description }}</p>
               </div>
             </div>
-          </div>
 
-          <!-- หลักการและเหตุผล -->
-          <div class=" mb-6">
-            <label for="sustainabilityDetail" class="block item">หลักการและเหตุผล<span
-                class="text-red-500 ml-1">*</span></label>
-            <textarea id="sustainabilityDetail" v-model="sustainabilityDetail" class="form-textarea w-full h-32"
-              placeholder="กรอกหลักการและเหตุผล" :minlength="10"></textarea>
-          </div>
+            <!-- หลักการและเหตุผล -->
+            <div class=" mb-10">
 
-          <!-- วัตถุประสงค์ -->
-          <div class=" mb-6">
-            <label class="block item">วัตถุประสงค์</label>
-            <div v-for="(objective, index) in objectives" :key="index" class="flex items-center ml-14 mb-2">
-              <span class="mr-2 w-6 text-right">{{ index + 1 }}.<span class="text-red-500 ml-1">*</span></span>
-              <input type="text" v-model="objectives[index]" class="form-input flex-1" placeholder="กรอกวัตถุประสงค์" />
+              <label for="sustainabilityDetail" class="block item">หลักการและเหตุผล<span
+                  class="text-red-500 ml-1">*</span>
+                <span class="text-left text-sm text-gray-600 ml-3"> (เขียนไม่น้อยกว่า ½ หน้ากระดาษ A4)
+                </span>
+              </label>
+              <textarea id="sustainabilityDetail" v-model="sustainabilityDetail" class="form-textarea w-full h-32"
+                placeholder="กรอกหลักการและเหตุผล" :minlength="10"></textarea>
             </div>
-          </div>
 
-          <!-- ผู้เข้าร่วมโครงการ -->
-          <div class=" mb-6">
-            <label class="block item">ผู้เข้าร่วมโครงการ</label>
-            <div v-for="participant in participantData" :key="participant.participantID"
-              class="flex items-center ml-14 mb-2">
-              <label
-                v-if="participant.participantName === 'Student' || participant.participantName === 'Staff' || participant.participantName === 'Teacher'"
-                class="w-48">
-                {{ participant.participantName }} จำนวน:<span class="text-red-500 ml-1">*</span></label>
-              <label v-else class="w-48">{{ participant.participantName }} จำนวน:</label>
-              <input type="number" v-model="participant.count" class="form-input w-20 mr-6 text-right"
-                style="width: 10%;" min="0" :value="participant.count || 0" />
-              <span>คน</span>
-            </div>
-          </div>
-
-          <!-- ลักษณะกิจกรรม (activityCharacteristic) -->
-          <div class=" mb-6">
-            <label for="activityCharacteristic" class="block item">ลักษณะกิจกรรม<span
-                class="text-red-500 ml-1">*</span></label>
-            <textarea id="activityCharacteristic" v-model="activityCharacteristic" class="form-textarea w-full h-32"
-              placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม ให้เห็นภาพการจัดกิจกรรม" :minlength="10"></textarea>
-          </div>
-
-          <!-- Code of Honor -->
-          <div class=" mb-6">
-            <label for="codeOfHonor"
-              class="block item">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code
-              of
-              Honor) ดังนี้<span class="text-red-500 ml-1">*</span></label>
-            <textarea id="codeOfHonor" v-model="codeOfHonor" class="form-textarea w-full h-22"
-              placeholder="อธิบายความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor" :minlength="10"></textarea>
-          </div>
-
-          <!-- ระยะเวลาดำเนินงาน -->
-          <div class=" mb-6">
-            <!-- ระยะเวลาเตรียมงาน -->
-            <div class="my-4">
-              <label class="block item">ระยะเวลาเตรียมงาน:</label>
-              <div class="flex items-center ml-4">
-                <label class="w-40">เริ่มต้น:<span class="text-red-500 ml-1">*</span></label>
-                <input type="date" v-model="prepareStart" class="form-input w-20" style="width: 60%;" />
-                <label class="w-40 ml-4">สิ้นสุด:<span class="text-red-500 ml-1">*</span></label>
-                <input type="date" v-model="prepareEnd" class="form-input w-20" style="width: 60%;" />
-              </div>
-              <!-- ใส่ระยะเวลาปฏิบัติงาน แบบที่ดึงตรงวันที่ด้านบนมาแสดงด้วยน่าจะดีกว่า -->
-            </div>
-          </div>
-
-          <!-- ขั้นตอนการดำเนินงาน -->
-          <div class="mb-6">
-            <label for="scheduleDetails" class="block item">ขั้นตอนการดำเนินงาน<span
-                class="text-red-500 ml-1">*</span></label>
-            <div class="my-2 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> อัปโหลดไฟล์ขั้นตอนการดำเนินงาน
-              </div>
-              <hr>
-              <input id="scheduleDetails" type="file" @change="handleFileChange($event, 'scheduleDetails')"
-                class="form-input mt-4" />
-            </div>
-          </div>
-
-          <!-- คณะกรรมการจัดโครงการ -->
-          <div class=" mb-6">
-            <label class="block item">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
-
-            <!-- Dropdown สำหรับเลือกชื่อ -->
-            <div class="mb-4 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกชื่อสมาชิกจากรายการ
-              </div>
-              <hr>
-              <!--  -->
-              <select id="select-student" v-model="selectedStudent" class=" form-input form-input-select">
-                <option value="" disabled>รายชื่อ</option>
-                <option v-for="student in students" :key="student.id" :value="student.id">
-                  {{ student.name }}
-                </option>
-              </select>
-              <button @click="addCommitteeMember" :disabled="!selectedStudent"
-                class="bg-green-500 text-white px-6 py-2 my-4 mx-4 rounded">
-                เพิ่มคณะกรรมการ
-              </button>
-            </div>
-          </div>
-          <!-- แสดงรายการคณะกรรมการ -->
-          <div v-for="(member, index) in committee" :key="member.id"
-            class="mx-2 mb-4 flex items-center justify-between border-b pb-2">
-            <table class="min-w-full table-auto border-collapse border  border-gray-400 ">
-              <t class="text-sm border border-gray-400 ">
-                <tr>
-                  <th class="px-4 pt-2 text-center">ที่</th>
-                  <th class="px-4 py-2 text-center border border-gray-400">รหัสนักศึกษา</th>
-                  <th class="px-4 py-2 text-center">ชื่อ - นามสกุล</th>
-                  <th class="px-4 py-2 text-center border border-gray-400">ภาควิชา/ชั้นปี</th>
-                  <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-400">หมายเลขโทรศัพท์
-                  </th>
-                  <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง(ในโครงการ)</th>
-                  <th class="px-4 py-2 text-center"></th>
-                </tr>
-              </t>
-              <tbody class="text-sm">
-                <tr v-for="(member, index) in committee" :key="member.id">
-                  <td class="px-4 ">{{ index + 1 }}</td>
-                  <td class="px-4  text-center border border-gray-400">{{ member.id }}</td>
-                  <td class="px-4  text-center whitespace-nowrap">{{ member.name }}</td>
-                  <td class="px-4 text-center whitespace-nowrap border border-gray-400">{{ member.department
-                  }}
-                  </td>
-                  <td class="px-4 text-center border border-gray-400">{{ member.phone }}</td>
-
-                  <!-- Dropdown ตำแหน่ง -->
-                  <td class="px-4 py-1">
-                    <select v-model="member.position" class="form-input text-xs w-36">
-                      <option value="" disabled selected>เลือกตำแหน่ง</option>
-                      <option v-for="position in positions" :key="position" :value="position">
-                        {{ position }}
-                      </option>
-                    </select>
-                  </td>
-                  <!-- ปุ่มลบ -->
-                  <td class="px-2 py-2 ">
-                    <button type="button" @click="removeCommitteeMember(index)"
-                      class="bg-red-500 text-white px-3 py-2 rounded text-md">
-                      ลบ
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- รูปแบบการประเมินผล -->
-          <div class="mb-10">
-            <!-- <label class="item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-            <div class="mb-4 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
-              </div>
-            </div> -->
-            <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-            <div class="my-2 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
+            <!-- วัตถุประสงค์ -->
+            <div class=" mb-10">
+              <label class="block item">วัตถุประสงค์</label>
+              <div v-for="(objective, index) in objectives" :key="index" class="flex items-center ml-14 mb-2">
+                <span class="mr-2 w-6 text-right">{{ index + 1 }}.<span class="text-red-500 ml-1">*</span></span>
+                <input type="text" v-model="objectives[index]" class="form-input flex-1"
+                  placeholder="กรอกวัตถุประสงค์" />
               </div>
             </div>
 
-            <hr>
-            <!-- รายการตัวเลือก -->
-            <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
-              <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID" v-model="selectedEvaluation"
-                :disabled="selectedSkills.length >= 1" />
-              <label :for="option.evaluationID">{{ option.evaluationName }}</label>
-            </div>
-          </div>
-          <p v-if="selectedSkills.length >= 1" class="text-red-500 mt-2">
-            คุณได้เลือกรูปแบบการประเมินแล้ว
-          </p>
-          <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
-          <div class="mb-6">
-            <label for="evaluationFile" class="block item">อัปโหลดไฟล์ตัวอย่างการประเมินผล<span
-                class="text-red-500 ml-1">*</span></label>
-            <input id="evaluationFile" type="file" @change="handleFileChange($event, 'evaluationFile')"
-              class="form-input" />
-          </div>
-
-          <!-- ผลที่คาดว่าจะได้รับ -->
-          <div class="mb-8">
-            <label class="block item">ผลที่คาดว่าจะได้รับที่สอดคล้องกับวัตถุประสงค์</label>
-
-            <div v-for="(expectedResult, index) in expectedResults" :key="index"
-              class="flex items-center gap-4 ml-4 mt-4 my-2 ">
-              <!-- ผลที่คาดว่าจะได้รับ -->
-              <div class="flex-1">
-                <label :for="'expected-' + index" class="block mb-1">ผลที่คาดว่าจะได้รับข้อที่ {{ index + 1
-                }}<span class="text-red-500 ml-1">*</span></label>
-                <input type="text" :id="'expected-' + index" v-model="expectedResults[index].result"
-                  class="form-input form-input-text w-full" placeholder="ผลที่คาดว่าจะได้รับ" :minlength="10" />
-              </div>
-
-              <!-- ตัวชี้วัด (KPI) -->
-              <div class="flex-1">
-                <label :for="'kpi-' + index" class="block mb-1">ตัวชี้วัด (KPI)<span
-                    class="text-red-500 ml-1">*</span></label>
-                <input type="text" :id="'kpi-' + index" v-model="expectedResults[index].kpi"
-                  class="form-input form-input-text w-full" placeholder="KPI" :minlength="10" />
-              </div>
-
-              <!-- ค่าเป้าหมาย -->
-              <div class="flex-1">
-                <label :for="'target-' + index" class="block mb-1 whitespace-nowrap">ค่าเป้าหมาย (%)<span
-                    class="text-red-500 ml-1">*</span></label>
-                <input type="number" min="0" max="100" :id="'target-' + index" v-model="expectedResults[index].target"
-                  class="form-input form-input-text w-full" placeholder="ค่าเป้าหมาย"
-                  @input="validateTarget($event, index)" />
+            <!-- ผู้เข้าร่วมโครงการ -->
+            <div class=" mb-10">
+              <label class="block item">ผู้เข้าร่วมโครงการ</label>
+              <div v-for="participant in participantData" :key="participant.participantID"
+                class="flex items-center ml-14 mb-2">
+                <label
+                  v-if="participant.participantName === 'Student' || participant.participantName === 'Staff' || participant.participantName === 'Teacher'"
+                  class="w-48">
+                  {{ participant.participantName }} จำนวน:<span class="text-red-500 ml-1">*</span></label>
+                <label v-else class="w-48">{{ participant.participantName }} จำนวน:</label>
+                <input type="number" v-model="participant.count" class="form-input w-20 mr-6 text-right"
+                  style="width: 10%;" min="0" :value="participant.count || 0" />
+                <span>คน</span>
               </div>
             </div>
-          </div>
 
-          <!-- ผลการดำเนินงานที่ผ่านมา -->
-          <div class="mb-6">
-            <label class="block item">
-              ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
-            </label>
+            <!-- ลักษณะกิจกรรม (activityCharacteristic) -->
+            <div class=" mb-6">
+              <label for="activityCharacteristic" class="block item">ลักษณะกิจกรรม<span
+                  class="text-red-500 ml-1">*</span>
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3">เขียนบรรยายรูปแบบการจัดกิจกรรม
+                  ให้เห็นภาพการจัดกิจกรรม
+                </div>
+                <hr>
+              </label>
+              <textarea id="activityCharacteristic" v-model="activityCharacteristic" class="form-textarea w-full h-32"
+                placeholder="เขียนบรรยายรูปแบบการจัดกิจกรรม ให้เห็นภาพการจัดกิจกรรม" :minlength="10"></textarea>
+            </div>
 
-            <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 ml-4 mb-4">
-              <!-- ปัญหาอุปสรรค -->
-              <div class="flex items-center gap-2  ml-4 mt-3 my-2 ">
-                <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
-                <input :id="'problem-' + index" v-model="item.problem" type="text"
-                  class="form-input form-input-text w-90" placeholder="กรอกปัญหาอุปสรรค" />
-              </div>
+            <!-- Code of Honor -->
+            <div class=" mb-6">
+              <label for="codeOfHonor"
+                class="block item">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา
+                (Code
+                of
+                Honor) ดังนี้<span class="text-red-500 ml-1">*</span>
+                <span class="text-left text-sm text-gray-600 ml-3">(อธิบาย)
+                </span>
 
-              <!-- แนวทางการแก้ไข -->
-              <div class="flex items-center gap-2">
-                <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:</label>
-                <input :id="'solution-' + index" v-model="item.solution" type="text"
-                  class="form-input form-input-text w-90" placeholder="กรอกแนวทางการแก้ไข" />
+              </label>
+              <textarea id="codeOfHonor" v-model="codeOfHonor" class="form-textarea w-full h-22"
+                placeholder="อธิบายความสอดคล้องของลักษณะกิจกรรมกับ Code of Honor" :minlength="10"></textarea>
+            </div>
+
+            <!-- ระยะเวลาดำเนินงาน -->
+            <div class=" mb-6">
+              <!-- ระยะเวลาเตรียมงาน -->
+              <div class="my-4">
+                <label class="block item">ระยะเวลาเตรียมงาน:</label>
+                <div class="flex items-center ml-4">
+                  <label class="w-40">เริ่มต้น:<span class="text-red-500 ml-1">*</span></label>
+                  <input type="date" v-model="prepareStart" class="form-input w-20" style="width: 60%;" />
+                  <label class="w-40 ml-4">สิ้นสุด:<span class="text-red-500 ml-1">*</span></label>
+                  <input type="date" v-model="prepareEnd" class="form-input w-20" style="width: 60%;" />
+                </div>
+                <!-- ใส่ระยะเวลาปฏิบัติงาน แบบที่ดึงตรงวันที่ด้านบนมาแสดงด้วยน่าจะดีกว่า -->
               </div>
             </div>
-          </div>
 
-          <!-- รายละเอียดงบประมาณ -->
-          <div class="mb-6">
-            <label for="budgetDetails" class="block item">รายละเอียดงบประมาณ<span
-                class="text-red-500 ml-1">*</span></label>
-            <input id="budgetDetails" type="file" @change="handleFileChange($event, 'budgetDetails')"
-              class="form-input form-input-text" />
-          </div>
+            <!-- ขั้นตอนการดำเนินงาน -->
+            <div class="mb-8">
+              <label for="scheduleDetails" class="block item">ขั้นตอนการดำเนินงาน<span
+                  class="text-red-500 ml-1">*</span></label>
+              <div class="my-2 ml-4">
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3"> อัปโหลดไฟล์ขั้นตอนการดำเนินงาน
+                </div>
+                <hr>
+                <input id="scheduleDetails" type="file" @change="handleFileChange($event, 'scheduleDetails')"
+                  class="form-input mt-4" />
+              </div>
+            </div>
 
-          <!-- อัพโหลดไฟล์เพิ่มเติม -->
-          <div class="mb-6">
-            <label for="prepareFile" class="block item">อัปโหลดไฟล์เพิ่มเติม (เช่น
-              ตารางกำหนดการจัดกิจกรรม ฯลฯ)<span class="text-red-500 ml-1">*</span></label>
-            <input id="prepareFile" type="file" @change="handleFileChange($event, 'prepareFile')"
-              class="form-input form-input-text" />
+            <!-- คณะกรรมการจัดโครงการ -->
+            <div class="mb-8">
+              <div class=" mb-4">
+                <label class="block item">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
+
+                <!-- Dropdown สำหรับเลือกชื่อ -->
+                <div class="mb-4 ml-4">
+                  <div class="text-left text-sm text-gray-600 mt-3 ml-3"> เลือกชื่อสมาชิกจากรายการ
+                  </div>
+                  <hr>
+                  <!--  -->
+                  <select id="select-student" v-model="selectedStudent" class=" form-input form-input-select">
+                    <option value="" disabled>รายชื่อ</option>
+                    <option v-for="student in students" :key="student.id" :value="student.id">
+                      {{ student.name }}
+                    </option>
+                  </select>
+                  <button @click="addCommitteeMember" :disabled="!selectedStudent"
+                    class="bg-green-500 text-white px-6 py-2 my-4 mx-4 rounded">
+                    เพิ่มคณะกรรมการ
+                  </button>
+                </div>
+              </div>
+              <!-- แสดงรายการคณะกรรมการ -->
+              <div v-for="(member, index) in committee" :key="member.id"
+                class="mx-2 mb-4 flex items-center justify-between border-b pb-6">
+                <table class="min-w-full table-auto border-collapse border  border-gray-400 ">
+                  <thead class="text-sm border border-gray-400 ">
+                    <tr>
+                      <th class="px-4 pt-2 text-center">ที่</th>
+                      <th class="px-4 py-2 text-center border border-gray-400">รหัสนักศึกษา</th>
+                      <th class="px-4 py-2 text-center">ชื่อ - นามสกุล</th>
+                      <th class="px-4 py-2 text-center border border-gray-400">ภาควิชา/ชั้นปี</th>
+                      <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-400">หมายเลขโทรศัพท์ </th>
+                      <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง(ในโครงการ)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-sm">
+                    <tr v-for="(member, index) in committee" :key="member.id">
+                      <td class="px-4 ">{{ index + 1 }}</td>
+                      <td class="px-4  text-center border border-gray-400">{{ member.id }}</td>
+                      <td class="px-4  text-center whitespace-nowrap">{{ member.name }}</td>
+                      <td class="px-4 text-center whitespace-nowrap border border-gray-400">{{ member.department }}</td>
+                      <td class="px-4 text-center border border-gray-400">{{ member.phone }}</td>
+
+                      <!-- Dropdown ตำแหน่ง -->
+                      <td class="px-4 pt-3">
+                        <select v-model="member.position" class="form-input text-xs w-36">
+                          <option value="" disabled selected>เลือกตำแหน่ง</option>
+                          <option v-for="position in positions" :key="position" :value="position">
+                            {{ position }}
+                          </option>
+                        </select>
+                      </td>
+
+                      <!-- ปุ่มลบ -->
+                      <td class=" ">
+                        <button type="button" @click="removeCommitteeMember(index)"
+                          class="bg-red-500 text-white px-3 py-1 rounded text-md">
+                          ลบ
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- รูปแบบการประเมินผล -->
+            <div class="mb-10">
+              <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+              <!-- <div class="my-2 ml-4">
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
+                </div>
+              </div>
+
+              <hr> -->
+              <!-- รายการตัวเลือก -->
+              <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
+                <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID"
+                  v-model="selectedEvaluation" :disabled="selectedSkills.length >= 1" />
+                <label :for="option.evaluationID">{{ option.evaluationName }}</label>
+              </div>
+            </div>
+            <p v-if="selectedSkills.length >= 1" class="text-red-500 mt-2">
+              คุณได้เลือกรูปแบบการประเมินแล้ว
+            </p>
+            <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
+            <div class="mb-8">
+              <label for="evaluationFile" class="block item">อัปโหลดไฟล์ตัวอย่างการประเมินผล<span
+                  class="text-red-500 ml-1">*</span></label>
+              <input id="evaluationFile" type="file" @change="handleFileChange($event, 'evaluationFile')"
+                class="form-input" />
+            </div>
+
+            <!-- ผลที่คาดว่าจะได้รับ -->
+            <div class="mb-8">
+              <label class="block item">ผลที่คาดว่าจะได้รับ<span class="text-red-500 ml-1">*</span>
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3">
+                  (การกำหนดผลที่คาดว่าจะได้รับหลังจากการดำเนินกิจกรรมต้องสอดคล้องกับวัตถุประสงค์ของโครงการ
+                  และต้องมีการกำหนดตัวชี้วัดด้วย)</div>
+                <hr>
+              </label>
+
+              <div v-for="(expectedResult, index) in expectedResults" :key="index"
+                class="flex items-center gap-4 ml-4 mt-4 my-2 ">
+                <!-- ผลที่คาดว่าจะได้รับ -->
+                <div class="flex-1">
+                  <label :for="'expected-' + index" class="block mb-1 text-center">ผลที่คาดว่าจะได้รับข้อที่ {{ index +
+                    1
+                  }}<span class="text-red-500 ml-1">*</span></label>
+                  <input type="text" :id="'expected-' + index" v-model="expectedResults[index].result"
+                    class="form-input form-input-text w-full" placeholder="ผลที่คาดว่าจะได้รับ" :minlength="10" />
+                </div>
+
+                <!-- ตัวชี้วัด (KPI) -->
+                <div class="flex-1">
+                  <label :for="'kpi-' + index" class="block mb-1 text-center">ตัวชี้วัด (KPI)<span
+                      class="text-red-500 ml-1">*</span></label>
+                  <input type="text" :id="'kpi-' + index" v-model="expectedResults[index].kpi"
+                    class="form-input form-input-text w-full" placeholder="KPI" :minlength="10" />
+                </div>
+
+                <!-- ค่าเป้าหมาย -->
+                <div class="flex-1">
+                  <label :for="'target-' + index" class="block mb-1 whitespace-nowrap text-center">ค่าเป้าหมาย (%)<span
+                      class="text-red-500 ml-1">*</span></label>
+                  <input type="number" min="0" max="100" :id="'target-' + index" v-model="expectedResults[index].target"
+                    class="form-input form-input-text w-full" placeholder="ค่าเป้าหมาย"
+                    @input="validateTarget($event, index)" />
+                </div>
+              </div>
+            </div>
+
+            <!-- ผลการดำเนินงานที่ผ่านมา -->
+            <div class="mb-8">
+              <label class="block item">
+                ผลการดำเนินงานที่ผ่านมาและการนำผลการประเมินโครงการ/กิจกรรมมาปรับปรุงในการจัดโครงการครั้งนี้
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3">(กรณีเป็นโครงการต่อเนื่อง)
+                </div>
+                <hr>
+              </label>
+
+              <div v-for="(item, index) in pastEvaluations" :key="index" class="flex items-center gap-4 ml-4 mb-4">
+                <!-- ปัญหาอุปสรรค -->
+                <div class="flex items-center gap-2  ml-4 mt-3 my-2 ">
+                  <label :for="'problem-' + index" class="w-40">ปัญหาข้อที่ {{ index + 1 }}:</label>
+                  <input :id="'problem-' + index" v-model="item.problem" type="text"
+                    class="form-input form-input-text w-90" placeholder="กรอกปัญหาอุปสรรค" />
+                </div>
+
+                <!-- แนวทางการแก้ไข -->
+                <div class="flex items-center gap-2">
+                  <label :for="'solution-' + index" class="w-60">แนวทางข้อที่ {{ index + 1 }}:</label>
+                  <input :id="'solution-' + index" v-model="item.solution" type="text"
+                    class="form-input form-input-text w-90" placeholder="กรอกแนวทางการแก้ไข" />
+                </div>
+              </div>
+            </div>
+
+            <!-- รายละเอียดงบประมาณ -->
+            <div class="mb-6">
+              <label for="budgetDetails" class="block item">รายละเอียดงบประมาณ<span
+                  class="text-red-500 ml-1">*</span></label>
+              <input id="budgetDetails" type="file" @change="handleFileChange($event, 'budgetDetails')"
+                class="form-input form-input-text" />
+            </div>
+
+            <!-- อัพโหลดไฟล์เพิ่มเติม -->
+            <div class="mb-6">
+              <label for="prepareFile" class="block item">อัปโหลดไฟล์เพิ่มเติม<span class="text-red-500 ml-1">*</span>
+                <span class="text-left text-sm text-gray-600 ml-3">(เช่น
+                  ตารางกำหนดการจัดกิจกรรม ฯลฯ)
+                </span>
+              </label>
+
+
+              <input id="prepareFile" type="file" @change="handleFileChange($event, 'prepareFile')"
+                class="form-input form-input-text" />
+            </div>
           </div>
         </div>
 
+        <div class="parent-container">
+          <button type="submit" class="form-button"> Sent Activity Document
+          </button>
+        </div>
 
 
-        <button type="submit" class="form-button">
-          Sent Activity Document
-        </button>
       </form>
 
       <div v-if="showSuccessPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
@@ -1231,7 +1264,7 @@ const positions = ref([
 <style scoped>
 .lable {
   /* mb-6 mx-2 */
-  margin: 1rem 1.5rem 2rem;
+  margin: 1.5rem 1.5rem 2rem;
 }
 
 .layer-left {
@@ -1305,9 +1338,20 @@ const positions = ref([
   border-radius: 10px;
 }
 
+/* ทำให้ parent container เป็น flex เพื่อจัดกลางปุ่ม */
+.parent-container {
+  display: flex;
+  justify-content: center;
+  /* จัดตำแหน่งในแนวนอน */
+  align-items: center;
+  /* จัดตำแหน่งในแนวตั้ง */
+  /* ตั้งค่าความสูงให้เป็น 100% ของหน้าจอ */
+}
+
+/* ปุ่ม .form-button */
 .form-button {
   width: 100%;
-  padding: 10px 0;
+  padding: 12px 0;
   border: none;
   border-radius: 100px;
   background-color: #fb923c;
@@ -1315,7 +1359,10 @@ const positions = ref([
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+  text-align: center;
+  /* ทำให้ข้อความภายในปุ่มอยู่กลาง */
 }
+
 
 .form-input:focus {
   border-color: #fb923c;

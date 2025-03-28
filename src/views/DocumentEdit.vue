@@ -56,18 +56,12 @@ const showSuccessPopup = ref(false);
 const successMessage = ref("");
 const showSuccess = (type) => {
   if (type === "add") {
-<<<<<<< HEAD
-    successMessage.value = "Added Document Successfully!";  } else if (type === "edit") {
-      successMessage.value = "Edited Successfully!";  } else if (type === "delete") {
-        successMessage.value = "Deleted Successfully!";  }
-=======
     successMessage.value = "Added Document Successfully!";
   } else if (type === "edit") {
     successMessage.value = "Edited Successfully!";
   } else if (type === "delete") {
     successMessage.value = "Deleted Successfully!";
   }
->>>>>>> eab2ecdb6e2f1b27ace88e56209a83331accac30
   showSuccessPopup.value = true;
 };
 const redirectToTracking = () => {
@@ -94,55 +88,55 @@ onMounted(async () => {
     email: localStorage.getItem("email")
   }
 
-    const studentID = localStorage.getItem("studentID");
-    const role = "Student";
-    const documentData = await fetchDocumentDetail(studentID, role);
-    
-    if (documentData) {
-        console.log(documentData)
-        type.value = documentData.DocumentType || '';
-        detail.value = documentData.detail || '';
- 
-        attachmentFile1.value = documentData.file1 || null;
-        attachmentFile2.value = documentData.file2 || null;
+  const studentID = localStorage.getItem("studentID");
+  const role = "Student";
+  const documentData = await fetchDocumentDetail(studentID, role);
 
-        starttime.value = documentData.startTime || '';
-        endtime.value = documentData.endTime || '';
+  if (documentData) {
+    console.log(documentData)
+    type.value = documentData.DocumentType || '';
+    detail.value = documentData.detail || '';
 
-        // ตรวจสอบว่า starttime และ endtime เป็นวันเดียวกันหรือไม่
-        const startDate = new Date(starttime.value).toDateString();
-        const endDate = new Date(endtime.value).toDateString();
+    attachmentFile1.value = documentData.file1 || null;
+    attachmentFile2.value = documentData.file2 || null;
 
-        // ถ้า startDate และ endDate เป็นวันเดียวกัน ให้เลือก leaveType = "oneDay"
-        if (startDate === endDate) {
-            leaveType.value = 'oneDay';
-            oneDayDate.value = starttime.value.split('T')[0]; // ตั้งค่า oneDayDate ให้เป็นวันที่ของ starttime
-            const startTimeHour = new Date(starttime.value).getHours();
-            const endTimeHour = new Date(endtime.value).getHours();
-            
-            // เช็คช่วงเวลา
-            if ((startTimeHour === 2 && endTimeHour === 5) || (startTimeHour === 9 && endTimeHour === 12)) {
-                oneDaySession.morning = true;
-                oneDaySession.afternoon = false;
-            } else if ((startTimeHour === 6 && endTimeHour === 10) || (startTimeHour === 13 && endTimeHour === 17)) {
-                oneDaySession.morning = false;
-                oneDaySession.afternoon = true;
-            } else if ((startTimeHour === 2 && endTimeHour === 10) || (startTimeHour === 9 && endTimeHour === 17)) {
-                oneDaySession.morning = true;
-                oneDaySession.afternoon = true;
-            } else {
-                oneDaySession.morning = false;
-                oneDaySession.afternoon = false;
-            }
-        } else {
-            leaveType.value = 'multipleDays';
-            starttime.value = documentData.startTime.split('T')[0]; // ตั้งค่า starttime เป็นวันที่ของ startTime
-            endtime.value = documentData.endTime.split('T')[0]; // ตั้งค่า endtime เป็นวันที่ของ endTime
-            
-        }
+    starttime.value = documentData.startTime || '';
+    endtime.value = documentData.endTime || '';
+
+    // ตรวจสอบว่า starttime และ endtime เป็นวันเดียวกันหรือไม่
+    const startDate = new Date(starttime.value).toDateString();
+    const endDate = new Date(endtime.value).toDateString();
+
+    // ถ้า startDate และ endDate เป็นวันเดียวกัน ให้เลือก leaveType = "oneDay"
+    if (startDate === endDate) {
+      leaveType.value = 'oneDay';
+      oneDayDate.value = starttime.value.split('T')[0]; // ตั้งค่า oneDayDate ให้เป็นวันที่ของ starttime
+      const startTimeHour = new Date(starttime.value).getHours();
+      const endTimeHour = new Date(endtime.value).getHours();
+
+      // เช็คช่วงเวลา
+      if ((startTimeHour === 2 && endTimeHour === 5) || (startTimeHour === 9 && endTimeHour === 12)) {
+        oneDaySession.morning = true;
+        oneDaySession.afternoon = false;
+      } else if ((startTimeHour === 6 && endTimeHour === 10) || (startTimeHour === 13 && endTimeHour === 17)) {
+        oneDaySession.morning = false;
+        oneDaySession.afternoon = true;
+      } else if ((startTimeHour === 2 && endTimeHour === 10) || (startTimeHour === 9 && endTimeHour === 17)) {
+        oneDaySession.morning = true;
+        oneDaySession.afternoon = true;
+      } else {
+        oneDaySession.morning = false;
+        oneDaySession.afternoon = false;
+      }
+    } else {
+      leaveType.value = 'multipleDays';
+      starttime.value = documentData.startTime.split('T')[0]; // ตั้งค่า starttime เป็นวันที่ของ startTime
+      endtime.value = documentData.endTime.split('T')[0]; // ตั้งค่า endtime เป็นวันที่ของ endTime
+
     }
+  }
 
-    documentID.value = documentData.DocumentID
+  documentID.value = documentData.DocumentID
 });
 
 // function convertToISOWithTimezone(dateString, time) {
@@ -345,7 +339,7 @@ const handleEditDocument = async () => {
       throw new Error("กรุณาเลือกประเภทการลา");
     }
 
-    if(detail.value.trim().length === 0){
+    if (detail.value.trim().length === 0) {
       alert('กรุณากรอกเหตุผลและรายละเอียดการลา')
       throw new Error("กรุณากรอกเหตุผลและรายละเอียดการลา");
     }
@@ -387,7 +381,8 @@ const handleEditDocument = async () => {
           </div>
 
           <div class="mb-3">
-            <label for="studentId" class="block text-gray-700 mb-1">รหัสประจำตัวนักศึกษา: {{ userData.studentId }}</label>
+            <label for="studentId" class="block text-gray-700 mb-1">รหัสประจำตัวนักศึกษา: {{ userData.studentId
+            }}</label>
           </div>
 
           <div class="mb-3">
@@ -411,15 +406,18 @@ const handleEditDocument = async () => {
           </div>
 
           <div class="mb-3">
-            <label for="studentStatus" class="block text-gray-700 mb-1">สถานะนักศึกษา: {{ userData.studentStatus }}</label>
+            <label for="studentStatus" class="block text-gray-700 mb-1">สถานะนักศึกษา: {{ userData.studentStatus
+            }}</label>
           </div>
 
           <div class="mb-3">
-            <label for="currentGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยประจำภาค: {{ userData.currentGPA }}</label>
+            <label for="currentGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยประจำภาค: {{ userData.currentGPA
+            }}</label>
           </div>
 
           <div class="mb-3">
-            <label for="cumulativeGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยสะสม: {{ userData.cumulativeGPA }}</label>
+            <label for="cumulativeGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยสะสม: {{ userData.cumulativeGPA
+            }}</label>
           </div>
 
           <div class="mb-3">
@@ -436,12 +434,7 @@ const handleEditDocument = async () => {
         <div class="grid grid-cols-2 gap-4 mb-4">
           <div class="mb-3">
             <label for="type" class="block text-gray-700 mb-1">เรื่อง<span class="text-red-500 ml-1">*</span></label>
-            <select 
-              id="type" 
-              v-model="type"
-              class="form-input"
-              required
-            >
+            <select id="type" v-model="type" class="form-input" required>
               <option value="" disabled>เลือกประเภทการลา</option>
               <option value="ลากิจ">ขออนุญาตลากิจ</option>
               <option value="ลาป่วย">ขออนุญาตลาป่วย</option>
@@ -453,13 +446,9 @@ const handleEditDocument = async () => {
           </div>
 
           <div class="mb-3">
-            <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา<span class="text-red-500 ml-1">*</span></label>
-            <select 
-              id="leaveType" 
-              v-model="leaveType"
-              class="form-input"
-              required
-            >
+            <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา<span
+                class="text-red-500 ml-1">*</span></label>
+            <select id="leaveType" v-model="leaveType" class="form-input" required>
               <option value="" disabled>เลือกประเภทการลา</option>
               <option value="oneDay">ลา 1 วัน</option>
               <option value="multipleDays">ลาหลายวัน</option>
@@ -469,35 +458,22 @@ const handleEditDocument = async () => {
           <!-- ถ้าเลือกลา 1 วัน -->
           <div v-if="leaveType === 'oneDay'">
             <div class="mb-3">
-              <label for="oneDayDate" class="block text-gray-700 mb-1">เลือกวันที่<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="date" 
-                id="oneDayDate" 
-                v-model="oneDayDate"
-                class="form-input"
-                :min="today"
-                required
-              />
+              <label for="oneDayDate" class="block text-gray-700 mb-1">เลือกวันที่<span
+                  class="text-red-500 ml-1">*</span></label>
+              <input type="date" id="oneDayDate" v-model="oneDayDate" class="form-input" :min="today" required />
             </div>
 
             <div class="mb-3">
-              <label for="oneDaySession" class="block text-gray-700 mb-1">ช่วงเวลา<span class="text-red-500 ml-1">*</span></label>
-              
+              <label for="oneDaySession" class="block text-gray-700 mb-1">ช่วงเวลา<span
+                  class="text-red-500 ml-1">*</span></label>
+
               <div class="flex items-center space-x-4">
                 <label class="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    v-model="oneDaySession.morning" 
-                    class="form-checkbox"
-                  />
+                  <input type="checkbox" v-model="oneDaySession.morning" class="form-checkbox" />
                   <span class="ml-2">เช้า</span>
                 </label>
                 <label class="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    v-model="oneDaySession.afternoon" 
-                    class="form-checkbox"
-                  />
+                  <input type="checkbox" v-model="oneDaySession.afternoon" class="form-checkbox" />
                   <span class="ml-2">บ่าย</span>
                 </label>
               </div>
@@ -508,43 +484,27 @@ const handleEditDocument = async () => {
           <div v-if="leaveType === 'multipleDays'" class="grid grid-cols-2 gap-4 mb-4">
             <!-- วันที่เริ่มต้น -->
             <div class="mb-3">
-              <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="date" 
-                id="starttime" 
-                v-model="starttime"
-                class="form-input"
-                :min="today"
-                required
-              />
+              <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่<span
+                  class="text-red-500 ml-1">*</span></label>
+              <input type="date" id="starttime" v-model="starttime" class="form-input" :min="today" required />
             </div>
 
             <!-- วันที่สิ้นสุด -->
             <div class="mb-3">
-              <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่<span class="text-red-500 ml-1">*</span></label>
-              <input 
-                type="date" 
-                id="endtime" 
-                v-model="endtime"
-                class="form-input"
-                :min="getNextDay(starttime)"
-                required
-              />
+              <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่<span
+                  class="text-red-500 ml-1">*</span></label>
+              <input type="date" id="endtime" v-model="endtime" class="form-input" :min="getNextDay(starttime)"
+                required />
             </div>
           </div>
 
           <div class="mb-3 col-span-2">
-            <label for="detail" class="block text-gray-700 mb-1">โดยมีเหตุผลและรายละเอียด<span class="text-red-500 ml-1">*</span></label>
-            <textarea 
-              id="detail" 
-              v-model="detail"
-              class="form-input detail-input"
-              maxlength="500"
-              required
-              @input="updateRemainingCharacters"
-            ></textarea>
+            <label for="detail" class="block text-gray-700 mb-1">โดยมีเหตุผลและรายละเอียด<span
+                class="text-red-500 ml-1">*</span></label>
+            <textarea id="detail" v-model="detail" class="form-input detail-input" maxlength="500" required
+              @input="updateRemainingCharacters"></textarea>
             <div class="text-right text-sm text-gray-600">
-              ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }} 
+              ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }}
             </div>
           </div>
 
@@ -555,20 +515,16 @@ const handleEditDocument = async () => {
 
             <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
             <div v-if="attachmentFile1">
-              <p class="text-sm text-gray-600">ไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์ที่อัปโหลดแล้ว: 
-                <a target="_blank" class="text-blue-500 underline" @click="openFileInNewTab(attachmentFile1, 'application/pdf')" >
+              <p class="text-sm text-gray-600">ไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์ที่อัปโหลดแล้ว:
+                <a target="_blank" class="text-blue-500 underline"
+                  @click="openFileInNewTab(attachmentFile1, 'application/pdf')">
                   ดูไฟล์เดิม
                 </a>
               </p>
             </div>
 
             <!-- Input อัปโหลดไฟล์ -->
-            <input 
-              type="file" 
-              id="attachmentFile1" 
-              @change="handleFile1Change" 
-              class="form-input"
-            />
+            <input type="file" id="attachmentFile1" @change="handleFile1Change" class="form-input" />
           </div>
 
           <div class="mb-3">
@@ -576,41 +532,33 @@ const handleEditDocument = async () => {
 
             <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
             <div v-if="attachmentFile2">
-              <p class="text-sm text-gray-600">ไฟล์หลักฐานอื่นๆที่อัปโหลดแล้ว: 
-                <a target="_blank" class="text-blue-500 underline" @click="openFileInNewTab(attachmentFile2, 'application/pdf')" >
+              <p class="text-sm text-gray-600">ไฟล์หลักฐานอื่นๆที่อัปโหลดแล้ว:
+                <a target="_blank" class="text-blue-500 underline"
+                  @click="openFileInNewTab(attachmentFile2, 'application/pdf')">
                   ดูไฟล์เดิม
                 </a>
               </p>
             </div>
 
-            <input 
-              type="file" 
-              id="attachmentFile2" 
-              @change="handleFile2Change"
-              class="form-input"
-            />
+            <input type="file" id="attachmentFile2" @change="handleFile2Change" class="form-input" />
           </div>
         </div>
-        <button 
-          type="submit" 
-          class="form-button"
-        >
-          Update Absence Document
-        </button>
+        <div class="parent-container">
+          <button type="submit" class="form-button"> update Absence Document
+          </button>
+        </div>
       </form>
 
-    <div 
-      v-if="showSuccessPopup"
-      class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
-        <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
-        <div class="flex justify-center">
-          <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
-            OK
-          </button>
-        </div>    
+      <div v-if="showSuccessPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
+          <h2 class="text-lg font-bold mb-4 text-center text-black">{{ successMessage }}</h2>
+          <div class="flex justify-center">
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-3xl" @click="redirectToTracking">
+              OK
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
 
     </div>
   </div>
@@ -630,9 +578,19 @@ const handleEditDocument = async () => {
   border-radius: 20px;
 }
 
+.parent-container {
+  display: flex;
+  justify-content: center;
+  /* จัดตำแหน่งในแนวนอน */
+  align-items: center;
+  /* จัดตำแหน่งในแนวตั้ง */
+  /* ตั้งค่าความสูงให้เป็น 100% ของหน้าจอ */
+}
+
+/* ปุ่ม .form-button */
 .form-button {
   width: 100%;
-  padding: 10px 0;
+  padding: 12px 0;
   border: none;
   border-radius: 100px;
   background-color: #fb923c;
@@ -640,6 +598,8 @@ const handleEditDocument = async () => {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
+  text-align: center;
+  /* ทำให้ข้อความภายในปุ่มอยู่กลาง */
 }
 
 .form-input:focus {
