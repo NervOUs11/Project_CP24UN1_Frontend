@@ -50,6 +50,30 @@ const activityData = ref([]);
 const hoursCount = ref({});
 const isHourCount = ref(false);
 
+const selectedActivity = ref(null);
+
+const handleHour = (activityID) => {
+  if (!hoursCount.value[activityID]) {
+    selectedActivity.value = null;
+  } else {
+    selectedActivity.value = activityID;
+    Object.keys(hoursCount.value).forEach((key) => {
+      if (parseInt(key) !== activityID) {
+        hoursCount.value[key] = 0;
+      }
+    });
+  }
+};
+
+watch(isHourCount, (newValue) => {
+  if (!newValue) {
+    Object.keys(hoursCount.value).forEach((key) => {
+      hoursCount.value[key] = 0;
+    });
+    selectedActivity.value = null;
+  }
+});
+
 const entrepreneurialData = ref([]);
 const sustainabilityData = ref([]);
 
@@ -611,12 +635,6 @@ const positions = ref([
 
       <form @submit.prevent="addDoc">
         <div class="grid grid-cols-2 gap-4 lable ">
-          <!-- <div class="flex items-center gap-2">
-            <label for="agencyCode" class="text-gray-700">ที่<span class="text-red-500 ml-1">*</span></label>
-            <input type="text" v-model="prefix" class="form-input w-24 text-left" placeholder="รหัสหน่วยงาน" required />
-            <span class="text-gray-700 font-bold">มจธ.</span>
-            <input type="text" v-model="suffix" class="form-input w-24 text-left" placeholder="ปีที่เบิกงบ" required />
-          </div> -->
           <div class="w-full mt-6">
             <table class="w-[900px] border border-white border-spacing-2">
               <tbody>
@@ -822,44 +840,68 @@ const positions = ref([
           </div>
         </div>
 
-        <div class="lable">
+        <div class="label">
           <div class="ml-3 mb-10">
             <div class="mb-8">
-              <label for="activityHours" class="block item">ประเภทโครงการกิจกรรม<span
-                  class="text-red-500 ml-1">*</span></label>
+              <label for="activityHours" class="block item">
+                ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span>
+              </label>
+
               <div v-if="isHourCount === true">
-                <div class="text-left text-sm text-gray-600 mt-3 ml-3">เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการ
-                  เพียง 1 ด้าน</div>
-                <hr>
+                <div class="text-left text-sm text-gray-600 mt-3 ml-3">
+                  เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการเพียง 1 ด้าน
+                </div>
+                <hr />
                 <table class="table-auto w-auto border-collapse border border-gray-300 my-3">
                   <tbody>
-                    <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
-                      <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">{{ activity.activityName }}</td>
-                      <td class="border border-white whitespace-nowrap ">จำนวน</td>
+                    <tr
+                      v-for="activity in activityData"
+                      :key="activity.activityID"
+                      class="hover:bg-gray-50"
+                    >
+                      <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">
+                        {{ activity.activityName }}
+                      </td>
+                      <td class="border border-white whitespace-nowrap">จำนวน</td>
                       <td class="border border-white text-right py-1">
-                        <input type="number" :id="'hours-' + activity.activityID"
-                          v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
-                          style="width: 70px;" />
+                        <input
+                          type="number"
+                          :id="'hours-' + activity.activityID"
+                          v-model="hoursCount[activity.activityID]"
+                          class="form-input px-10 w-24 text-right"
+                          style="width: 70px"
+                          :disabled="selectedActivity !== null && selectedActivity !== activity.activityID"
+                          @input="handleHour(activity.activityID)"
+                        />
                       </td>
                       <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
                     </tr>
                   </tbody>
                 </table>
-
               </div>
 
               <div v-if="isHourCount === false">
-                <hr>
+                <hr />
                 <table class="table-auto w-auto border-collapse border border-gray-300 my-3">
                   <tbody>
-                    <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
-                      <td class="border border-white pl-8 px-4  whitespace-nowrap">{{ activity.activityName }}</td>
-                      <td class="border border-white whitespace-nowrap ">จำนวน</td>
-
+                    <tr
+                      v-for="activity in activityData"
+                      :key="activity.activityID"
+                      class="hover:bg-gray-50"
+                    >
+                      <td class="border border-white pl-8 px-4 whitespace-nowrap">
+                        {{ activity.activityName }}
+                      </td>
+                      <td class="border border-white whitespace-nowrap">จำนวน</td>
                       <td class="border border-white px-4">
-                        <input type="text" :id="'hours-' + activity.activityID"
-                          v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
-                          style="width: 70px;" disabled />
+                        <input
+                          type="text"
+                          :id="'hours-' + activity.activityID"
+                          v-model="hoursCount[activity.activityID]"
+                          class="form-input px-10 w-24 text-right"
+                          style="width: 70px"
+                          disabled
+                        />
                       </td>
                       <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
                     </tr>

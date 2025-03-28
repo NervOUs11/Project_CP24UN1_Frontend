@@ -187,20 +187,17 @@ onMounted(async () => {
     goalData.value = await fetchAllGoal();
     evaluationData.value = await fetchAllEvaluation();
 
-    // participantData.value = await fetchAllParticipant();
     const allParticipants = await fetchAllParticipant();
 
-
     activity.value = await fetchAllActivity();
-    // activityData.value.forEach(activity => { 
-    //   hoursCount.value[activity.activityID] = 0;  
-    // });
 
     entrepreneurialData.value = await fetchAllEntrepreneurial();
     sustainabilityData.value = await fetchAllSustainability();
     facultyData.value = await fetchAllFaculty();
     activityData.value = await fetchActivityDocument(docId, userid, role)
     if (activityData.value) {
+      console.log(activityData.value.activity)
+      console.log(activity.value)
       documentId.value = activityData.value.DocumentID;
       agencyCode.value = activityData.value.code;
       const parts = agencyCode.value.split(".");
@@ -658,6 +655,34 @@ const handleEditDocument = async () => {
     const prepareEnd1 = convertToISOWithTimezone(prepareEnd.value)
     agencyCode.value = `${prefix.value}มจธ.${suffix.value}`;
 
+    let totalPercentage = Object.values(percentages.value).reduce((sum, val) => sum + (val || 0), 0);
+    if (totalPercentage !== 100) {
+      alert("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
+      throw new Error("StudentQF เปอร์เซ็นต์รวมกันต้องครบ 100%");
+    }
+
+    const hasPresident = committee.value.some(member => member.position === "ประธานโครงการ");
+    if (!hasPresident) {
+      alert("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
+      throw new Error("คณะกรรมการจัดโครงการต้องมีประธานโครงการอย่างน้อย 1 คน");
+    }
+
+    if (objectives.value.some(obj => obj.trim() === '')) {
+      alert("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
+      throw new Error("กรุณากรอกวัตถุประสงค์ให้ครบทุกข้อ");
+    }
+
+    const uniqueObjectives = new Set(objectives.value.map(obj => obj.trim()));
+    if (uniqueObjectives.size !== objectives.value.length) {
+      alert("วัตถุประสงค์ต้องไม่ซ้ำกัน");
+      throw new Error("วัตถุประสงค์ต้องไม่ซ้ำกัน");
+    }
+
+    if (!validateProjectNames()) {
+      alert("กรอกชื่อโครงการให้ถูกต้อง");
+      throw new Error("กรอกชื่อโครงการให้ถูกต้อง");
+    }
+
     if (agencyCode.value.trim().length === 0) {
       alert("กรุณากรอกรหัสหน่วยงาน");
       throw new Error("กรุณากรอกรหัสหน่วยงาน");
@@ -747,6 +772,37 @@ const getProjectName = computed(() =>
   projectNameEng.value ? `${projectNameThai.value} (${projectNameEng.value})` : projectNameThai.value
 );
 
+const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
+const engRegex = /^[A-Za-z\s]+$/;
+
+const isThaiValid = computed(() => projectNameThai.value === "" || thaiRegex.test(projectNameThai.value));
+const isEngValid = computed(() => projectNameEng.value === "" || engRegex.test(projectNameEng.value));
+
+const validateProjectNames = () => {
+  const thaiRegex = /^[\u0E00-\u0E7F\s]+$/;
+  const engRegex = /^[A-Za-z\s]+$/;
+
+  const cleanThaiName = projectNameThai.value ? projectNameThai.value.trim() : "";
+  const cleanEngName = projectNameEng.value ? projectNameEng.value.trim() : "";
+
+  if (!thaiRegex.test(cleanThaiName)) {
+    alert("ชื่อโครงการ (ภาษาไทย) ต้องเป็นภาษาไทยเท่านั้น");
+    return false;
+  }
+
+  if (!engRegex.test(cleanEngName)) {
+    alert("ชื่อโครงการ (ภาษาอังกฤษ) ต้องเป็นภาษาอังกฤษเท่านั้น");
+    return false;
+  }
+
+  return true;
+};
+
+const getActivityHour = (activityName) => {
+  const activityItem = activityData.value.activity.find(item => item.activityName === activityName);
+  return activityItem ? activityItem.countHour : 0; // คืนค่า countHour ถ้าพบ, ถ้าไม่พบคืน 0
+};
+
 </script>
 
 
@@ -757,162 +813,145 @@ const getProjectName = computed(() =>
 
 
       <form @submit.prevent="handleEditDocument">
-        <div class="grid grid-cols-2 gap-4 lable">
-          <div class="flex items-center gap-4 mt-8">
-            <div class="items-center gap-2">
-              <label for="agencyCode" class="item">ที่<span class="text-red-500 ml-1">*</span> <a
-                  class="text-gray-400 text-sm ml-3 mt-1">ตัวอย่าง: สนทศ.มจธ.1/2567</a>
-              </label>
-              <div class="flex">
-                <input type="text" v-model="prefix" class="form-input w-24 text-left" placeholder="รหัสหน่วยงาน" />
-                <p class="text-gray-700 ">มจธ.</p>
-                <input type="text" v-model="suffix" class="form-input w-24 text-left" placeholder="ลำดับที่เอกสาร" />
-              </div>
+        <div class="grid grid-cols-2 gap-4 label">
+          <!-- รหัสหน่วยงาน + ลำดับที่เอกสาร -->
+          <div class="items-center gap-2">
+            <label for="agencyCode" class="item">ที่<span class="text-red-500 ml-1">*</span> 
+              <a class="text-gray-400 text-sm ml-3 mt-1">ตัวอย่าง: สนทศ.มจธ.1/2567</a>
+            </label>
+            <div class="flex">
+              <input type="text" v-model="prefix" class="form-input w-24 text-left" placeholder="รหัสหน่วยงาน" />
+              <p class="text-gray-700 ">มจธ.</p>
+              <input type="text" v-model="suffix" class="form-input w-24 text-left" placeholder="ลำดับที่เอกสาร" />
             </div>
           </div>
 
-          <!-- กลุ่ม ชื่อหน่วยงาน + วันที่เขียน -->
-          <div class=" mt-8 layer-rt flex items-center justify-between gap-4">
-            <div class="flex-1">
-              <label for="agencyName" class="block item mb-1">ชื่อหน่วยงาน<span
-                  class="text-red-500 ml-1">*</span></label>
-              <select id="agencyName" v-model="agencyName" class="ml-3 form-input form-input-select" required>
-                <option value="">-- เลือกหน่วยงาน --</option>
-                <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
-                  {{ agency }}
-                </option>
-              </select>
-            </div>
-
-            <!-- ชื่อโครงการ -->
-            <div class="layer-left">
-              <label class="block item mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
-              <input type="text" v-model="projectNameThai" class="form-input form-input-text" required minlength="5"
-                placeholder="ชื่อโครงการ" />
-              <p v-if="!isThaiValid" class="text-red-500 text-sm">ต้องเป็นภาษาไทยเท่านั้น</p>
-            </div>
-
-            <div class="layer-rt">
-              <label class="block item mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
-              <input type="text" v-model="projectNameEng" class="form-input form-input-text" required minlength="5"
-                placeholder="Project name" />
-
-              <!-- เนื่องด้วย -->
-              <div class="layer-left">
-                <label for="reason" class="block item">เนื่องด้วย</label>
-                <input type="text" id="reason" :value="reason" class="form-input  form-input-text" disabled />
-              </div>
-
-              <!-- จัดโครงการ -->
-              <div class="layer-rt">
-                <label for="organizeProject" class="block item">จัดโครงการ</label>
-                <input type="text" id="organizeProject" :value="getProjectName" class="form-input  form-input-text "
-                  disabled />
-              </div>
-
-              <!-- วันที่จัดกิจกรรม -->
-              <div class="layer-left flex items-center">
-                <label for="startDate" class="item whitespace-nowrap">ระหว่างวันที่<span
-                    class="text-red-500 ml-1">*</span></label>
-                <input type="date" id="startDate" v-model="startDate" class="form-input  form-input-date" :min="today"
-                  required />
-              </div>
-
-              <div class="layer-rt flex items-center">
-                <label for="endDate" class="item whitespace-nowrap">ถึงวันที่<span
-                    class="text-red-500 ml-1">*</span></label>
-                <input type="date" id="endDate" v-model="endDate" class="form-input form-input-date" :min="startDate"
-                  required />
-              </div>
-
-              <!-- ณ สถานที่ -->
-              <div class="layer-left">
-                <label for="location" class="block item">ณ สถานที่<span class="text-red-500 ml-1">*</span></label>
-                <input type="text" id="location" v-model="location" class="form-input form-input-text" minlength="10"
-                  placeholder="ชื่ออาคาร/สถานที่ ชั้นที่/ห้องที่" required />
-              </div>
-
-              <!-- ประเภทกิจกรรม -->
-              <div class="layer-rt">
-                <label for="type" class="block item">ประเภทโครงการกิจกรรม<span
-                    class="text-red-500 ml-1">*</span></label>
-                <select id="type" v-model="type" class="form-input form-input-select" style="margin-top: 10px;"
-                  required>
-                  <option value="">เลือกประเภทที่ตรงกับกิจกรรม</option>
-                  <option v-for="option in typeOptions" :key="option" :value="option">
-                    {{ option }}
-                  </option>
-                </select>
-              </div>
-
-              <!-- วัตถุประสงค์ -->
-              <div class="col-span-2">
-                <label for="purpose" class="block item">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
-                <textarea id="purpose" v-model="purpose" class="form-input detail-input w-full" rows="4" required
-                  placeholder="วัตถุประสงค์โดยภาพรวมของโครงการที่จัด" minlength="20"></textarea>
-              </div>
-
-              <!-- ค่าใช้จ่าย -->
-              <div class="mb-3">
-                <label for="expenses" class="item whitespace-nowrap mr-2" style="width: 85px;">ค่าใช้จ่ายในโครงการ<span
-                    class="text-red-500">*</span></label>
-                <div class="text-left text-sm text-gray-600 my-2 ml-4">จำนวนต้องมากกว่า 1 บาท</div>
-                <hr>
-                <table class="w-full border border-white rounded-lg whitespace-nowrap ml-5">
-                  <tbody> <!-- Wrap the <tr> inside <tbody> -->
-                    <tr>
-                      <td class="p-2 border  border-white">เป็นจำนวนเงิน</td>
-                      <td class="p-2 border  border-white">
-                        <input type="number" id="expenses" v-model.number="expenses"
-                          class="input-field my-4 py-2 ml-6 w-60 border border-gray-300 text-right rounded-3xl" required
-                          :max="9999999" maxlength="7" @input="limitExpensesLength" />
-                      </td>
-                      <td class="p-2 border  border-white">บาท</td>
-                      <td class="p-2 border w-auto 0  border-white">{{ expensesThaiText }}<span>ถ้วน</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-
-              </div>
-
-              <div class="my-2 mt-4">
-
-              </div>
-
-              <!-- เลือกชั่วโมงกิจกรรม -->
-              <div class="mb-3">
-                <label for="activityHours" class="block item">การเทียบค่าชั่วโมงกิจกรรม<span
-                    class="text-red-500 ml-1">*</span></label>
-                <select id="activityHours" v-model="isHourCount" class="form-input" @change="handleActivityHoursChange"
-                  required>
-                  <option :value="false">ไม่นับชั่วโมง</option>
-                  <option :value="true">นับชั่วโมง</option>
-                </select>
-              </div>
-              <br>
-              <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
-
-              <div v-if="isHourCount === true">
-                <div class="text-left text-sm text-gray-600 ml-3">เลือกประเภทที่ตรงกับกิจกรรที่จัด เพียง 1 ด้าน
-                </div>
-                <hr>
-                <table class="table-auto w-full border-collapse border border-gray-300 my-3">
-                  <tbody>
-                    <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
-                      <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">{{ activity.activityName }}
-                      </td>
-                      <td class="border border-white px-4 py-1">
-                        <input type="number" :id="'hours-' + activity.activityID"
-                          v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
-                          style="width: 70px;" />
-                      </td>
-                      <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <!-- ชื่อหน่วยงาน + วันที่ -->
+          <div class="flex-1">
+            <label for="agencyName" class="block item mb-1">ชื่อหน่วยงาน<span class="text-red-500 ml-1">*</span></label>
+            <select id="agencyName" v-model="agencyName" class="ml-3 form-input form-input-select" required>
+              <option value="">-- เลือกหน่วยงาน --</option>
+              <option v-for="(agency, index) in filteredAgencies" :key="index" :value="agency">
+                {{ agency }}
+              </option>
+            </select>
           </div>
+
+          <!-- ชื่อโครงการ (ภาษาไทย) -->
+          <div class="layer-left">
+            <label class="block item mb-1">ชื่อโครงการ (ภาษาไทย)<span class="text-red-500 ml-1">*</span></label>
+            <input type="text" v-model="projectNameThai" class="form-input form-input-text" required minlength="5" placeholder="ชื่อโครงการ" />
+            <p v-if="!isThaiValid" class="text-red-500 text-sm">ต้องเป็นภาษาไทยเท่านั้น</p>
+          </div>
+
+          <!-- ชื่อโครงการ (ภาษาอังกฤษ) -->
+          <div class="layer-rt">
+            <label class="block item mb-1">ชื่อโครงการ (ภาษาอังกฤษ)<span class="text-red-500 ml-1">*</span></label>
+            <input type="text" v-model="projectNameEng" class="form-input form-input-text" required minlength="5" placeholder="Project name" />
+            <p v-if="!isEngValid" class="text-red-500 text-sm">ต้องเป็นภาษาอังกฤษเท่านั้น</p>
+          </div>
+
+          <!-- เนื่องด้วย -->
+          <div class="layer-left">
+            <label for="reason" class="block item">เนื่องด้วย</label>
+            <input type="text" id="reason" v-model="reason" class="form-input form-input-text" disabled />
+          </div>
+
+          <!-- จัดโครงการ -->
+          <div class="layer-rt">
+            <label for="organizeProject" class="block item">จัดโครงการ</label>
+            <input type="text" id="organizeProject" v-model="getProjectName" class="form-input form-input-text" disabled />
+          </div>
+
+          <!-- วันที่จัดกิจกรรม -->
+          <div class="layer-left flex items-center">
+            <label for="startDate" class="item whitespace-nowrap">ระหว่างวันที่<span class="text-red-500 ml-1">*</span></label>
+            <input type="date" id="startDate" v-model="startDate" class="form-input form-input-date" :min="today" required />
+          </div>
+
+          <div class="layer-rt flex items-center">
+            <label for="endDate" class="item whitespace-nowrap">ถึงวันที่<span class="text-red-500 ml-1">*</span></label>
+            <input type="date" id="endDate" v-model="endDate" class="form-input form-input-date" :min="startDate" required />
+          </div>
+
+          <!-- ณ สถานที่ -->
+          <div class="layer-left">
+            <label for="location" class="block item">ณ สถานที่<span class="text-red-500 ml-1">*</span></label>
+            <input type="text" id="location" v-model="location" class="form-input form-input-text" minlength="10" placeholder="ชื่ออาคาร/สถานที่ ชั้นที่/ห้องที่" required />
+          </div>
+
+          <!-- ประเภทกิจกรรม -->
+          <div class="layer-rt">
+            <label for="type" class="block item">ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span></label>
+            <select id="type" v-model="type" class="form-input form-input-select" style="margin-top: 10px;" required>
+              <option value="">เลือกประเภทที่ตรงกับกิจกรรม</option>
+              <option v-for="option in typeOptions" :key="option" :value="option">
+                {{ option }}
+              </option>
+            </select>
+          </div>
+
+          <!-- วัตถุประสงค์ -->
+          <div class="col-span-2">
+            <label for="purpose" class="block item">วัตถุประสงค์<span class="text-red-500 ml-1">*</span></label>
+            <textarea id="purpose" v-model="purpose" class="form-input detail-input w-full" rows="4" required placeholder="วัตถุประสงค์โดยภาพรวมของโครงการที่จัด" minlength="20"></textarea>
+          </div>
+
+        </div>
+
+      <!-- ค่าใช้จ่าย -->
+      <div class="mb-3">
+          <label for="expenses" class="item whitespace-nowrap mr-2" style="width: 85px;">ค่าใช้จ่ายในโครงการ<span class="text-red-500">*</span></label>
+          <div class="text-left text-sm text-gray-600 my-2 ml-4">จำนวนต้องมากกว่า 1 บาท</div>
+          <hr>
+          <table class="w-full border border-white rounded-lg whitespace-nowrap ml-5">
+            <tbody>
+              <tr>
+                <td class="p-2 border  border-white">เป็นจำนวนเงิน</td>
+                <td class="p-2 border  border-white">
+                  <input type="number" id="expenses" v-model.number="expenses" class="input-field my-4 py-2 ml-6 w-60 border border-gray-300 text-right rounded-3xl" required :max="9999999" maxlength="7" @input="limitExpensesLength" />
+                </td>
+                <td class="p-2 border  border-white">บาท</td>
+                <td class="p-2 border w-auto 0  border-white">{{ expensesThaiText }}<span>ถ้วน</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- เลือกชั่วโมงกิจกรรม -->
+        <div class="mb-10">
+          <label for="activityHours" class="block item">การเทียบค่าชั่วโมงกิจกรรม<span class="text-red-500 ml-1">*</span></label>
+          <select id="activityHours" style="width: 35%;" v-model="isHourCount" class="form-input" @change="handleActivityHoursChange" required>
+            <option :value="false">ไม่นับชั่วโมง</option>
+            <option :value="true">นับชั่วโมง</option>
+          </select>
+        </div>
+
+        <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
+        <div v-if="isHourCount === true">
+          <div class="text-left text-sm text-gray-600 ml-3">เลือกประเภทที่ตรงกับกิจกรรที่จัด เพียง 1 ด้าน</div>
+          <hr>
+          <table class="table-auto w-full border-collapse border border-gray-300 my-3">
+            <tbody>
+              <tr v-for="activity in activity" :key="activity.activityID" class="hover:bg-gray-50">
+                <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">
+                  {{ activity.activityName }} <!-- แสดงชื่อกิจกรรม -->
+                </td>
+                <td class="border border-white px-4 py-2 text-center">จำนวน</td>
+                <td class="border border-white px-4 py-1">
+                  <input 
+                    type="number" 
+                    :id="'hours-' + activity.activityID" 
+                    v-model="hoursCount[activity.activityID]" 
+                    class="form-input px-10 w-24 text-right" 
+                    style="width: 70px;" 
+                    :placeholder="getActivityHour(activity.activityName)"
+                  />
+                </td>
+                <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="grid grid-cols-3 gap-4 lable mb-10">
@@ -1147,66 +1186,55 @@ const getProjectName = computed(() =>
           </div>
 
           <!-- คณะกรรมการจัดโครงการ -->
-          <div class=" mb-6">
+          <div class="mb-6">
             <label class="block item">คณะกรรมการจัดโครงการ<span class="text-red-500 ml-1">*</span></label>
 
             <!-- Dropdown สำหรับเลือกชื่อ -->
             <div class="mb-4 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกชื่อสมาชิกจากรายการ
-              </div>
+              <div class="text-left text-sm text-gray-600 ml-3"> เลือกชื่อสมาชิกจากรายการ</div>
               <hr>
-              <!--  -->
-              <select id="select-student" v-model="selectedStudent" class=" form-input form-input-select">
+              <select id="select-student" v-model="selectedStudent" class="form-input form-input-select">
                 <option value="" disabled>รายชื่อ</option>
                 <option v-for="student in students" :key="student.id" :value="student.id">
                   {{ student.name }}
                 </option>
               </select>
-              <button @click="addCommitteeMember" :disabled="!selectedStudent"
-                class="bg-green-500 text-white px-6 py-2 my-4 mx-4 rounded">
+              <button @click="addCommitteeMember" :disabled="!selectedStudent" class="bg-green-500 text-white px-6 py-2 my-4 mx-4 rounded">
                 เพิ่มคณะกรรมการ
               </button>
             </div>
           </div>
+
           <!-- แสดงรายการคณะกรรมการ -->
-          <div v-for="(member, index) in committee" :key="member.id"
-            class="mx-2 mb-4 flex items-center justify-between border-b pb-2">
-            <table class="min-w-full table-auto border-collapse border  border-gray-400 ">
-              <t class="text-sm border border-gray-400 ">
+          <div>
+            <table v-if="committee && committee.length > 0" class="min-w-50% table-auto border-collapse border border-gray-400 text-sm mb-8">
+              <thead class="border border-gray-400">
                 <tr>
                   <th class="px-4 pt-2 text-center">ที่</th>
                   <th class="px-4 py-2 text-center border border-gray-400">รหัสนักศึกษา</th>
-                  <th class="px-4 py-2 text-center">ชื่อ - นามสกุล</th>
+                  <th class="px-4 py-2 border-gray-400">ชื่อ - นามสกุล</th>
                   <th class="px-4 py-2 text-center border border-gray-400">ภาควิชา/ชั้นปี</th>
-                  <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-400">หมายเลขโทรศัพท์
-                  </th>
+                  <th class="px-4 pt-2 text-center whitespace-nowrap border border-gray-400">หมายเลขโทรศัพท์</th>
                   <th class="px-4 py-2 text-center whitespace-nowrap">ตำแหน่ง(ในโครงการ)</th>
-                  <th class="px-4 py-2 text-center"></th>
                 </tr>
-              </t>
+              </thead>
               <tbody class="text-sm">
-                <tr v-for="(member, index) in committee" :key="member.id">
-                  <td class="px-4 ">{{ index + 1 }}</td>
-                  <td class="px-4  text-center border border-gray-400">{{ member.id }}</td>
-                  <td class="px-4  text-center whitespace-nowrap">{{ member.name }}</td>
-                  <td class="px-4 text-center whitespace-nowrap border border-gray-400">{{ member.department
-                  }}
-                  </td>
+                <tr v-for="(member, index) in committee" :key="member.id" class="hover:bg-gray-50">
+                  <td class="px-4 text-center">{{ index + 1 }}</td>
+                  <td class="px-4 text-center border border-gray-400">{{ member.id }}</td>
+                  <td class="px-4 text-center whitespace-nowrap border-gray-400">{{ member.name }}</td>
+                  <td class="px-4 text-center whitespace-nowrap border border-gray-400">{{ member.department }}</td>
                   <td class="px-4 text-center border border-gray-400">{{ member.phone }}</td>
-
-                  <!-- Dropdown ตำแหน่ง -->
-                  <td class="px-4 py-1">
-                    <select v-model="member.position" class="form-input text-xs w-36">
+                  <td class="px-4 pt-3">
+                    <select v-model="member.position" class="form-input text-xs w-36" style="margin-bottom: 10px;">
                       <option value="" disabled selected>เลือกตำแหน่ง</option>
                       <option v-for="position in positions" :key="position" :value="position">
                         {{ position }}
                       </option>
                     </select>
                   </td>
-                  <!-- ปุ่มลบ -->
-                  <td class="px-2 py-2 ">
-                    <button type="button" @click="removeCommitteeMember(index)"
-                      class="bg-red-500 text-white px-3 py-2 rounded text-md">
+                  <td class="px-4 text-center">
+                    <button type="button" @click="removeCommitteeMember(index)" class="bg-red-500 text-white px-3 py-1 rounded text-md">
                       ลบ
                     </button>
                   </td>
@@ -1214,6 +1242,7 @@ const getProjectName = computed(() =>
               </tbody>
             </table>
           </div>
+
 
           <!-- รูปแบบการประเมินผล -->
           <div class="mb-10">
