@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted, toRaw, watchEffect } from 'vue';
+import { ref, reactive, computed, onMounted, toRaw, watch } from 'vue';
 import { editActivityDocument } from '../functions/editActivityDocument'
 import { fetchAllStaff } from '../functions/fetchAllStaff';
 import { fetchAllStudent } from '../functions/fetchAllStudent';
@@ -142,6 +142,7 @@ const projectNameThai = ref("");
 const projectNameEng = ref("");
 const prefix = ref("");
 const suffix = ref("");
+
 onMounted(async () => {
   let userid = null
   const role = localStorage.getItem("role")
@@ -229,14 +230,18 @@ onMounted(async () => {
       prepareFile.value = activityData.value.prepareFile;
 
       // activity ที่นับชั่วโมงกิจกรรม
-      if (activityData.value.activity.length > 0) {
+      if (activityData.value.length > 0) {
         isHourCount.value = true;
-        hoursCount.value = activityData.value.activity.reduce((acc, activity) => {
-          acc[activity.activityName] = activity.countHour;
-          hoursCount.value = acc
+        hoursCount.value = activityData.value.reduce((acc, activity) => {
+          acc[activity.activityName] = activity.countHour ?? 0;
           return acc;
         }, {});
       }
+
+      activity.value = activityData.value.map(item => ({
+        ...item,
+        countHour: item.countHour ?? 0
+      }));
 
       // ผู้เข้าร่วมโครงการ
       const activityParticipants = activityData.value.participant;
@@ -333,12 +338,52 @@ onMounted(async () => {
       prepareEnd.value = formatDate(activityData.value.prepareEnd)
       activityCharacteristic.value = activityData.value.activityCharacteristic
       codeOfHonor.value = activityData.value.codeOfHonor;
+      initializeHoursCount();
     }
   }
   catch (error) {
     console.log(error)
   }
 });
+
+const selectedActivity = ref(null);
+
+// ฟังก์ชันตั้งค่า hoursCount ให้ตรงกับ activityData
+const initializeHoursCount = () => {
+  activityData.value.activity.forEach((item) => {
+    hoursCount.value[item.activityName] = item.countHour || 0;
+  });
+};
+
+const updateHours = (activityName, value) => {
+  const hours = value ? parseInt(value, 10) : 0; // ถ้าค่าว่างให้เป็น 0
+
+  if (hours > 0) {
+    selectedActivity.value = activityName;
+    Object.keys(hoursCount.value).forEach((key) => {
+      if (key !== activityName) {
+        hoursCount.value[key] = 0;
+      }
+    });
+  } else {
+    selectedActivity.value = null;
+  }
+
+  hoursCount.value[activityName] = hours;
+};
+
+// เมื่อ `isHourCount` เปลี่ยน → รีเซ็ตค่าทุกช่องเป็น `0`
+watch(isHourCount, (newValue) => {
+  if (!newValue) {
+    Object.keys(hoursCount.value).forEach((key) => {
+      hoursCount.value[key] = 0;
+    });
+    selectedActivity.value = null;
+  }
+});
+
+// ใช้ watch เพื่อตรวจสอบการเปลี่ยนแปลงของ activityData
+watch(activityData, initializeHoursCount, { deep: true });
 
 const positions = ref([
   "ประธานโครงการ",
@@ -798,11 +843,6 @@ const validateProjectNames = () => {
   return true;
 };
 
-const getActivityHour = (activityName) => {
-  const activityItem = activityData.value.activity.find(item => item.activityName === activityName);
-  return activityItem ? activityItem.countHour : 0; // คืนค่า countHour ถ้าพบ, ถ้าไม่พบคืน 0
-};
-
 </script>
 
 
@@ -927,25 +967,28 @@ const getActivityHour = (activityName) => {
           </select>
         </div>
 
-        <!-- แสดงรายการกิจกรรม และช่องกรอกชั่วโมง ถ้า isHourCount เป็น true -->
-        <div v-if="isHourCount === true">
-          <div class="text-left text-sm text-gray-600 ml-3">เลือกประเภทที่ตรงกับกิจกรรที่จัด เพียง 1 ด้าน</div>
-          <hr>
+        <!-- แสดงรายการกิจกรรม -->
+        <div>
+          <div class="text-left text-sm text-gray-600 ml-3">
+            เลือกประเภทที่ตรงกับกิจกรรมที่จัด เพียง 1 ด้าน
+          </div>
+          <hr />
           <table class="table-auto w-full border-collapse border border-gray-300 my-3">
             <tbody>
-              <tr v-for="activity in activity" :key="activity.activityID" class="hover:bg-gray-50">
+              <tr v-for="item in activity" :key="item.activityID" class="hover:bg-gray-50">
                 <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">
-                  {{ activity.activityName }} <!-- แสดงชื่อกิจกรรม -->
+                  {{ item.activityName }}
                 </td>
                 <td class="border border-white px-4 py-2 text-center">จำนวน</td>
                 <td class="border border-white px-4 py-1">
-                  <input 
-                    type="number" 
-                    :id="'hours-' + activity.activityID" 
-                    v-model="hoursCount[activity.activityID]" 
-                    class="form-input px-10 w-24 text-right" 
-                    style="width: 70px;" 
-                    :placeholder="getActivityHour(activity.activityName)"
+                  <input
+                    type="number"
+                    :id="'hours-' + item.activityID"
+                    v-model="hoursCount[item.activityName]"
+                    @input="updateHours(item.activityName, $event.target.value)"
+                    class="form-input px-10 w-24 text-right"
+                    style="width: 70px;"
+                    :disabled="!isHourCount || (selectedActivity && selectedActivity !== item.activityName)"
                   />
                 </td>
                 <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
@@ -953,6 +996,7 @@ const getActivityHour = (activityName) => {
             </tbody>
           </table>
         </div>
+
 
         <div class="grid grid-cols-3 gap-4 lable mb-10">
           <!-- อาจารย์ที่ปรึกษา/รองคณบดี -->
