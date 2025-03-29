@@ -48,7 +48,7 @@ const participant = computed(() => {
 // กำหนดตัวแปรเพื่อเก็บข้อมูลกิจกรรมที่ดึงจาก backend
 const activityData = ref([]);
 const hoursCount = ref({});
-const isHourCount = ref(false);
+const isHourCount = ref(null);
 
 const selectedActivity = ref(null);
 
@@ -782,9 +782,9 @@ const positions = ref([
                 class="text-red-500 ml-1">*</span></label>
             <select id="activityHours" v-model="isHourCount" class="form-input form-input-text ml-3"
               @change="handleActivityHoursChange" required>
-              <option value="">รูปแบบการนับชั่วโมงกิจกรรม</option>
-              <option :value="false">ไม่นับชั่วโมง</option>
-              <option :value="true">นับชั่วโมง</option>
+              <option :value="null">รูปแบบการนับชั่วโมงกิจกรรม</option>
+              <option :value="false">กิจกรรมไม่นับหน่วยชั่วโมง</option>
+              <option :value="true">กิจกรรมเลือกเข้าร่วม</option>
             </select>
           </div>
           <br>

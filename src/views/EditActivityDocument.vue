@@ -231,7 +231,7 @@ onMounted(async () => {
 
       if (activityData.value.activity.length > 0) {
         isHourCount.value = true;
-        hoursCount.value = activityData.value.reduce((acc, activity) => {
+        hoursCount.value = activityData.value.activity.reduce((acc, activity) => {
           acc[activity.activityName] = activity.countHour ?? 0;
           return acc;
         }, {});
