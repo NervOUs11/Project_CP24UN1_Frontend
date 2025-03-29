@@ -229,8 +229,7 @@ onMounted(async () => {
       evaluationFile.value = activityData.value.evaluationFile;
       prepareFile.value = activityData.value.prepareFile;
 
-      // activity ที่นับชั่วโมงกิจกรรม
-      if (activityData.value.length > 0) {
+      if (activityData.value.activity.length > 0) {
         isHourCount.value = true;
         hoursCount.value = activityData.value.reduce((acc, activity) => {
           acc[activity.activityName] = activity.countHour ?? 0;
