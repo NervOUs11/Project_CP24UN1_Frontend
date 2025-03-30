@@ -564,7 +564,7 @@ const handleEditDocument = async () => {
                 </a>
               </div>
 
-              <input id="attachmentFile1" type="file" @change="handleFileChange($event, 'attachmentFile1')"
+              <input id="attachmentFile1" type="file" @change="handleFile1Change($event, 'attachmentFile1')"
                 class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
             </div>
           </div>
@@ -586,7 +586,7 @@ const handleEditDocument = async () => {
                 </a>
               </div>
 
-              <input id="attachmentFile2" type="file" @change="handleFileChange($event, 'attachmentFile2')"
+              <input id="attachmentFile2" type="file" @change="handleFile2Change($event, 'attachmentFile2')"
                 class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
             </div>
           </div>
