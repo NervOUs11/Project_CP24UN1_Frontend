@@ -847,7 +847,7 @@ const validateProjectNames = () => {
 
 <template>
   <div class="flex justify-center items-center min-h-screen bg-blue-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px] ">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px] ">
       <h1 class="text-3xl font-extrabold mb-4 underline text-center text-red-500">Edit Activity Document</h1>
 
 

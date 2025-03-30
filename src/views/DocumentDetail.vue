@@ -338,7 +338,7 @@ onMounted(async () => {
                       class="text-orange-500 underline whitespace-nowrap">
                       หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
                     </a>
-                    <span v-else class="text-gray-500">No Attachment File </span>
+                    <span v-else class="text-gray-500 whitespace-nowrap">No Attachment File </span>
                   </td>
                 </tr>
                 <tr v-if="data.file2">
@@ -348,7 +348,7 @@ onMounted(async () => {
                       @click="openFileInNewTab(data.file2, 'application/pdf')" class="text-orange-500 underline">
                       เอกสารแนบอื่น ๆ
                     </a>
-                    <span v-else class="text-gray-500">No Attachment File </span>
+                    <span v-else class="text-gray-500 whitespace-nowrap">No Attachment File </span>
                   </td>
                 </tr>
                 <tr v-if="!data.file1 && !data.file2">
@@ -392,10 +392,10 @@ onMounted(async () => {
         <div v-if="canShowButtons" class="mt-4 flex justify-center gap-4">
           <!-- ถ้าเป็น staff และสามารถ approve ได้ จะมีปุ่ม approve และ reject -->
           <template v-if="canApprove">
-            <button class=" button bg-green-500 hover:bg-green-300" @click="openApprovePopup()">
+            <button class=" button bg-green-500 hover:bg-green-300 text-white" @click="openApprovePopup()">
               Approve
             </button>
-            <button class="button bg-red-500 hover:bg-red-400 " @click="openRejectPopup()">
+            <button class="button bg-red-500 hover:bg-red-400 text-white" @click="openRejectPopup()">
               Reject
             </button>
           </template>
@@ -420,10 +420,10 @@ onMounted(async () => {
             class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
             placeholder="Enter your comment here..." rows="4" maxlength="400"></textarea>
           <div class="mt-4 flex justify-end gap-2">
-            <button class="button bg-gray-500" @click="closeRejectPopup">
+            <button class="button bg-gray-500 text-white" @click="closeRejectPopup">
               Cancel
             </button>
-            <button class="button bg-red-500" @click="handleReject">
+            <button class="button bg-red-500 text-white" @click="handleReject">
               Reject
             </button>
           </div>
@@ -435,10 +435,10 @@ onMounted(async () => {
         <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
           <h2 class="text-lg font-bold mb-4 text-center">Are you sure to delete?</h2>
           <div class="flex justify-end gap-2">
-            <button class="button bg-gray-500" @click="closeDeletePopup">
+            <button class="button bg-gray-500 text-white" @click="closeDeletePopup">
               Cancel
             </button>
-            <button class="button bg-red-500" @click="handleDelete">
+            <button class="button bg-red-500 text-white" @click="handleDelete">
               Delete
             </button>
           </div>
@@ -450,10 +450,10 @@ onMounted(async () => {
         <div class="bg-white p-6 rounded shadow-md w-[400px]" style="border-radius: 20px;">
           <h2 class="text-lg font-bold mb-4 text-center">Are you sure to approve?</h2>
           <div class="flex justify-end gap-2">
-            <button class="button bg-gray-500" @click="closeApprovePopup">
+            <button class="button bg-gray-500 text-white" @click="closeApprovePopup">
               Cancel
             </button>
-            <button class="button bg-green-500" @click="handleApprove">
+            <button class="button bg-green-500 text-white" @click="handleApprove">
               Approve
             </button>
           </div>

@@ -385,7 +385,7 @@ const convertNumberToThaiText = (num) => {
 
   <!-- Show the document details once data is fetched -->
   <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-3xl font-extrabold mb-4 text-center text-blue-500">Activity Document Detail</h1>
 
 
@@ -569,9 +569,15 @@ const convertNumberToThaiText = (num) => {
           <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
         </div>
 
-        <div class="lable  pb-4">
-          <span class="items">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
+        <div class="lable pb-4">
+          <span class="items">วัตถุประสงค์:</span>
+          <ul>
+            <li v-for="(item, index) in sustainabilityProposeArray" :key="index">
+              {{ item }}
+            </li>
+          </ul>
         </div>
+
 
         <div class="lable  pb-4">
           <span class="items">ผู้เข้าร่วมโครงการ:</span>
