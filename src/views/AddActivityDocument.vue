@@ -636,7 +636,7 @@ const positions = ref([
 <template>
   <div class="flex justify-center items-center min-h-screen bg-blue-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px] ">
-      <h1 class="text-3xl font-extrabold mb-4 text-center text-blue-500">Add Activity Document</h1>
+      <h1 class="text-3xl font-extrabold mb-4 underline text-center text-blue-500">Add Activity Document</h1>
 
       <form @submit.prevent="addDoc">
         <div class="grid grid-cols-2 gap-4 lable ">
@@ -777,7 +777,7 @@ const positions = ref([
             </table>
           </div>
 
-          <div class="mb-3 mt-4">
+          <div class="mb-2 mt-4">
 
           </div>
 
@@ -831,7 +831,7 @@ const positions = ref([
 
             <!-- ประธานฝ่าย -->
             <div>
-              <label for="departmentPresident" class="block item">ประธานฝ่าย<span
+              <label for="departmentPresident" class="block item">ประธานฝ่าย/อุปนายก<span
                   class="text-red-500 ml-1">*</span></label>
               <select id="departmentPresident" v-model="departmentPresident" class="form-input form-input-role"
                 required>
@@ -845,80 +845,67 @@ const positions = ref([
           </div>
         </div>
 
-        <div class="label">
+        <div class="lable">
           <div class="ml-3 mb-10">
             <div class="mb-8">
-              <label for="activityHours" class="block item">
-                ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span>
-              </label>
+              <div v-if="isHourCount === true || isHourCount === false">
+                <label for="activityHours" class="block item">
+                  ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span>
+                </label>
 
-              <div v-if="isHourCount === true">
-                <div class="text-left text-sm text-gray-600 mt-3 ml-3">
-                  เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการเพียง 1 ด้าน
+                <div v-if="isHourCount === true">
+                  <div class="text-left text-sm text-gray-600 mt-3 ml-3">
+                    เลือกประเภทโครงการกิจกรรมที่สอดคล้องกับโครงการเพียง 1 ด้าน
+                  </div>
+                  <hr />
+                  <table class="table-auto w-full border-collapse border border-gray-300 my-3">
+                    <tbody>
+                      <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
+                        <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">
+                          {{ activity.activityName }}
+                        </td>
+                        <td class="border border-white whitespace-nowrap">จำนวน</td>
+                        <td class="border border-white text-right py-1">
+                          <input type="number" :id="'hours-' + activity.activityID"
+                            v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
+                            style="width: 70px"
+                            :disabled="selectedActivity !== null && selectedActivity !== activity.activityID"
+                            @input="handleHour(activity.activityID)" />
+                        </td>
+                        <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
-                <hr />
-                <table class="table-auto w-auto border-collapse border border-gray-300 my-3">
-                  <tbody>
-                    <tr
-                      v-for="activity in activityData"
-                      :key="activity.activityID"
-                      class="hover:bg-gray-50"
-                    >
-                      <td class="border border-white pl-8 px-4 pb-1 whitespace-nowrap">
-                        {{ activity.activityName }}
-                      </td>
-                      <td class="border border-white whitespace-nowrap">จำนวน</td>
-                      <td class="border border-white text-right py-1">
-                        <input
-                          type="number"
-                          :id="'hours-' + activity.activityID"
-                          v-model="hoursCount[activity.activityID]"
-                          class="form-input px-10 w-24 text-right"
-                          style="width: 70px"
-                          :disabled="selectedActivity !== null && selectedActivity !== activity.activityID"
-                          @input="handleHour(activity.activityID)"
-                        />
-                      </td>
-                      <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
 
-              <div v-if="isHourCount === false">
-                <hr />
-                <table class="table-auto w-auto border-collapse border border-gray-300 my-3">
-                  <tbody>
-                    <tr
-                      v-for="activity in activityData"
-                      :key="activity.activityID"
-                      class="hover:bg-gray-50"
-                    >
-                      <td class="border border-white pl-8 px-4 whitespace-nowrap">
-                        {{ activity.activityName }}
-                      </td>
-                      <td class="border border-white whitespace-nowrap">จำนวน</td>
-                      <td class="border border-white px-4">
-                        <input
-                          type="text"
-                          :id="'hours-' + activity.activityID"
-                          v-model="hoursCount[activity.activityID]"
-                          class="form-input px-10 w-24 text-right"
-                          style="width: 70px"
-                          disabled
-                        />
-                      </td>
-                      <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div v-if="isHourCount === false">
+                  <hr />
+                  <table class="table-auto w-full border-collapse border border-gray-300 my-3">
+                    <tbody>
+                      <tr v-for="activity in activityData" :key="activity.activityID" class="hover:bg-gray-50">
+                        <td class="border border-white pl-8 px-4 whitespace-nowrap">
+                          {{ activity.activityName }}
+                        </td>
+                        <td class="border border-white whitespace-nowrap">จำนวน</td>
+                        <td class="border border-white px-4">
+                          <input type="text" :id="'hours-' + activity.activityID"
+                            v-model="hoursCount[activity.activityID]" class="form-input px-10 w-24 text-right"
+                            style="width: 70px" disabled />
+                        </td>
+                        <td class="border border-white whitespace-nowrap px-4 py-2">หน่วยชั่วโมง</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
             <!-- เลือกทักษะ StudentQF (checkbox) -->
             <div class="mb-8">
               <div class="mb-8">
-                <div class="item">KMUTT Student QF<span class="text-red-500 ml-1">*</span></div>
+                <div class="item whitespace-nowrap">
+                  การเทียบค่ากิจกรรมตามคุณลักษณะที่พึงประสงค์ของมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี (KMUTT Student
+                  QF)<span class="text-red-500 ml-1">*</span></div>
                 <div class=" text-sm text-gray-600 ml-2">
                   ทักษะที่ต้องการส่งเสริมในการจัดโครงการ เลือกได้สูงสุดเพียง 3 ด้าน และในสัดส่วนที่ต่างกัน</div>
                 <hr>
@@ -950,8 +937,12 @@ const positions = ref([
                 </p>
               </div>
             </div>
-            <!-- Entrepreneurial -->
-            <div class=" mb-10">
+          </div>
+          <!-- Entrepreneurial -->
+          <div class="pb-4 lable">
+            <div class="item pb-1">ความสอดคล้องกับเป้าหมายของมหาวิทยาลัย</div>
+            <div class="lable">
+
               <div class="item">Entrepreneurial<span class="text-red-500 ml-1">*</span></div>
               <div>
                 <div class="text-left text-sm text-gray-600 mt-3 ml-3">
@@ -969,55 +960,58 @@ const positions = ref([
                   <p class="text-gray-600 text-sm mt-1 ml-8">{{ option.description }}</p>
                 </div>
               </div>
-            </div>
 
-            <!-- Sustainability -->
-            <div class=" mb-10">
-              <div class="item">Sustainability<span class="text-red-500 ml-1">*</span></div>
-              <div>
-                <div class="text-left text-sm text-gray-600 mt-3 ml-3"> เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรม
-                </div>
-                <hr>
-                <!-- SDGs Culture (ตัวเลือกที่ 1) -->
-                <div class="my-4 mx-7 px-4 pb-1">
-                  <input type="checkbox" id="sustainability-1" :value="1" v-model="selectedSustainabilityOptions" />
-                  <label for="sustainability-1">SDGs Culture</label>
-                  <p class="text-gray-600 text-base mt-1 ml-20 mr-5">
-                    ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17
-                    อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน
-                  </p>
 
-                  <!-- แสดง Goals ที่เกี่ยวข้อง ถ้าเลือก SDGs Culture -->
+              <!-- Sustainability -->
+              <div class=" mb-10">
+                <div class="item">Sustainability<span class="text-red-500 ml-1">*</span></div>
+                <div>
+                  <div class="text-left text-sm text-gray-600 mt-3 ml-3"> เลือกเฉพาะหัวข้อที่เกี่ยวข้องกับกิจกรรม
+                  </div>
+                  <hr>
+                  <!-- SDGs Culture (ตัวเลือกที่ 1) -->
+                  <div class="my-4 mx-7 px-4 pb-1">
+                    <input type="checkbox" id="sustainability-1" :value="1" v-model="selectedSustainabilityOptions" />
+                    <label for="sustainability-1">SDGs Culture</label>
+                    <p class="text-gray-600 text-base mt-1 ml-20 mr-5">
+                      ส่งเสริมให้เกิดวัฒนธรรมของความยั่งยืน คือ มีแนวคิดของความยั่งยืนตาม SDGs Goal 17
+                      อยู่ในทุกกระบวนการของการทำกิจกรรม สอดคล้องกับด้านใด โปรดระบุอย่างน้อย 1 ด้าน
+                    </p>
 
-                  <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-2">
-                    <div class="text-left text-sm text-cyan-600 my-4 ml-12"> เลือก Goals
-                      ที่เกี่ยวข้องกับกิจกรรม<span class="text-red-500 ml-1">*</span>
-                    </div>
-                    <!-- Grid 4 คอลัมน์ -->
-                    <div class="grid grid-cols-2 gap-4 ml-14">
-                      <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
-                        <input type="checkbox" :id="'goal-' + goal.goalID" :value="goal.goalID" v-model="selectedGoals"
-                          class="mr-2 " />
-                        <p class="text-sm whitespace-nowrap">{{ goal.goalID }}. {{ goal.goalName }}</p>
+                    <!-- แสดง Goals ที่เกี่ยวข้อง ถ้าเลือก SDGs Culture -->
+
+                    <div v-if="selectedSustainabilityOptions.includes(1)" class="mt-2">
+                      <div class="text-left text-sm text-cyan-600 my-4 ml-12"> เลือก Goals
+                        ที่เกี่ยวข้องกับกิจกรรม<span class="text-red-500 ml-1">*</span>
+                      </div>
+                      <!-- Grid 4 คอลัมน์ -->
+                      <div class="grid grid-cols-2 gap-4 ml-14">
+                        <div v-for="goal in goalData" :key="goal.goalID" class="flex items-center">
+                          <input type="checkbox" :id="'goal-' + goal.goalID" :value="goal.goalID"
+                            v-model="selectedGoals" class="mr-2 " />
+                          <p class="text-sm whitespace-nowrap">{{ goal.goalID }}. {{ goal.goalName }}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- ตัวเลือกที่ 2-4 -->
-              <div v-for="option in sustainabilityWithDescriptions.filter(opt => opt.sustainabilityID !== 1)"
-                :key="option.sustainabilityID" class="my-4 mx-7 px-4 pb-1">
-                <input type="checkbox" :id="'sustainability-' + option.sustainabilityID"
-                  :value="option.sustainabilityID" v-model="selectedSustainabilityOptions" />
-                <label :for="'sustainability-' + option.sustainabilityID">
-                  {{ option.sustainabilityName }}
-                </label>
-                <p class="text-gray-600 text-base mt-1 ml-20 mr-5">{{ option.description }}</p>
+                <!-- ตัวเลือกที่ 2-4 -->
+                <div v-for="option in sustainabilityWithDescriptions.filter(opt => opt.sustainabilityID !== 1)"
+                  :key="option.sustainabilityID" class="my-4 mx-7 px-4 pb-1">
+                  <input type="checkbox" :id="'sustainability-' + option.sustainabilityID"
+                    :value="option.sustainabilityID" v-model="selectedSustainabilityOptions" />
+                  <label :for="'sustainability-' + option.sustainabilityID">
+                    {{ option.sustainabilityName }}
+                  </label>
+                  <p class="text-gray-600 text-base mt-1 ml-20 mr-5">{{ option.description }}</p>
+                </div>
               </div>
             </div>
+          </div>
 
-            <!-- หลักการและเหตุผล -->
+          <!-- หลักการและเหตุผล -->
+          <div class="lable">
             <div class=" mb-10">
 
               <label for="sustainabilityDetail" class="block item">หลักการและเหตุผล<span
@@ -1099,15 +1093,17 @@ const positions = ref([
             </div>
 
             <!-- ขั้นตอนการดำเนินงาน -->
-            <div class="mb-8">
-              <label for="scheduleDetails" class="block item">ขั้นตอนการดำเนินงาน<span
-                  class="text-red-500 ml-1">*</span></label>
-              <div class="my-2 ml-4">
-                <div class="text-left text-sm text-gray-600 mt-3 ml-3"> อัปโหลดไฟล์ขั้นตอนการดำเนินงาน
-                </div>
-                <hr>
+            <div class=" pb-6">
+              <label for="scheduleDetails" class="item ">
+                ขั้นตอนการดำเนินงาน <span class="text-red-500 ml-1">*</span>
+              </label>
+
+              <div class="my-4 p-4 bg-gray-50 rounded-lg shadow-sm">
+                <p class="text-sm text-gray-600 mb-2">📂 อัปโหลดไฟล์ขั้นตอนการดำเนินงาน</p>
+                <hr class="border-gray-300 mb-3">
+
                 <input id="scheduleDetails" type="file" @change="handleFileChange($event, 'scheduleDetails')"
-                  class="form-input mt-4" />
+                  class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
               </div>
             </div>
 
@@ -1180,27 +1176,42 @@ const positions = ref([
             </div>
             <!-- รูปแบบการประเมินผล -->
             <div class="mb-10">
-              <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-
-              <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
-                <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID"
-                  v-model="selectedEvaluation" />
-                <label :for="option.evaluationID">{{ option.evaluationName }}</label>
+            <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
+            <div class="mt-4 ml-4">
+              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
               </div>
             </div>
 
-            <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
-            <div class="mb-8">
-              <label for="evaluationFile" class="block item">อัปโหลดไฟล์ตัวอย่างการประเมินผล<span
-                  class="text-red-500 ml-1">*</span></label>
-              <input id="evaluationFile" type="file" @change="handleFileChange($event, 'evaluationFile')"
-                class="form-input" />
+            <hr>
+            <!-- รายการตัวเลือก -->
+            <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
+              <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID" v-model="selectedEvaluation"
+              :disabled="selectedEvaluation.length >= 1 && !selectedEvaluation.includes(option.evaluationID)"/>
+              <label :for="option.evaluationID">{{ option.evaluationName }}</label>
             </div>
+          </div>
+          <p v-if="selectedSkills.length >= 1" class="text-red-500 mt-2">
+            คุณได้เลือกรูปแบบการประเมินแล้ว
+          </p>
+
+            <!-- ตัวอย่างการประเมินผล -->
+             <div class="pb-10">
+            <label for="evaluationFile" class="item ">ตัวอย่างการประเมินผล
+              <span class="text-red-500 pb-6 ml-1">*</span>
+            </label>
+            <!-- ช่องอัพโหลดไฟล์ตัวอย่างการประเมินผล -->
+            <div class="my-4 pb-6 bg-gray-50 rounded-lg shadow-sm">
+              <p class="text-sm text-gray-600 mb-2">📂 อัปโหลดไฟล์ตัวอย่างการประเมินผล</p>
+              <hr class="border-gray-300 mb-3">
+
+              <input id="evaluationFile" type="file" @change="handleFileChange($event, 'evaluationFile')"
+                class="form-input form-input-text  w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
+            </div></div>
 
             <!-- ผลที่คาดว่าจะได้รับ -->
             <div class="mb-8">
               <label class="block item">ผลที่คาดว่าจะได้รับ<span class="text-red-500 ml-1">*</span>
-                <div class="text-left text-sm text-gray-600 mt-3 ml-3">
+                <div class="text-left whitespace-nowrap text-sm text-gray-600 mt-3 ml-3">
                   (การกำหนดผลที่คาดว่าจะได้รับหลังจากการดำเนินกิจกรรมต้องสอดคล้องกับวัตถุประสงค์ของโครงการ
                   และต้องมีการกำหนดตัวชี้วัดด้วย)</div>
                 <hr>
@@ -1266,21 +1277,33 @@ const positions = ref([
             <div class="mb-6">
               <label for="budgetDetails" class="block item">รายละเอียดงบประมาณ<span
                   class="text-red-500 ml-1">*</span></label>
-              <input id="budgetDetails" type="file" @change="handleFileChange($event, 'budgetDetails')"
-                class="form-input form-input-text" />
+              <div class="my-4 pb-6 bg-gray-50 rounded-lg shadow-sm">
+                <p class="text-sm text-gray-600 mb-2">📂 อัปโหลดไฟล์รายละเอียดงบประมาณ</p>
+                <hr class="border-gray-300 mb-3">
+
+              
+
+                <input id="budgetDetails" type="file" @change="handleFileChange($event, 'budgetDetails')"
+                  class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
+              </div>
             </div>
 
             <!-- อัพโหลดไฟล์เพิ่มเติม -->
             <div class="mb-6">
-              <label for="prepareFile" class="block item">อัปโหลดไฟล์เพิ่มเติม<span class="text-red-500 ml-1">*</span>
+              <label for="prepareFile" class="block item">ไฟล์เพิ่มเติม<span class="text-red-500 ml-1">*</span>
                 <span class="text-left text-sm text-gray-600 ml-3">(เช่น
                   ตารางกำหนดการจัดกิจกรรม ฯลฯ)
                 </span>
               </label>
 
+              <div class="my-4 pb-6 bg-gray-50 rounded-lg shadow-sm">
+                <p class="text-sm text-gray-600 mb-2">📂 อัปโหลดไฟล์เพิ่มเติม</p>
+                <hr class="border-gray-300 mb-3">
 
-              <input id="prepareFile" type="file" @change="handleFileChange($event, 'prepareFile')"
-                class="form-input form-input-text" />
+               
+                <input id="prepareFile" type="file" @change="handleFileChange($event, 'prepareFile')"
+                  class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
+              </div>
             </div>
           </div>
         </div>

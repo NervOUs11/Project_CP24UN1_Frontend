@@ -455,7 +455,7 @@ const addDoc = async () => {
           </div>
 
           <div class="lable">
-            <label for="attachmentFile2" class="block item">หลักฐานอื่นๆ</label>
+            <label for="attachmentFile2" class="block item">หลักฐานอื่น ๆ</label>
             <input type="file" id="attachmentFile2" @change="handleFile2Change" class="form-input form-input-text" />
           </div>
         </div>

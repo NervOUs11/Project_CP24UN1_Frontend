@@ -263,7 +263,7 @@ onMounted(async () => {
 
   <!-- Show the document details once data is fetched -->
   <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[900px]">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px]">
       <h1 class="text-3xl font-extrabold mb-4 text-center text-orange-500">Absence Document Detail</h1>
 
 

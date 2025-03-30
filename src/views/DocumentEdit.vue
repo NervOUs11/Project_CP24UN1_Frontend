@@ -369,184 +369,236 @@ const handleEditDocument = async () => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center min-h-screen bg-orange-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
-      <h1 class="text-2xl font-bold mb-4 text-center text-orange-500">Edit Absence Document</h1>
+  <div class="flex justify-center items-center min-h-screen bg-blue-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-[1000px] ">
+      <h1 class="text-3xl font-extrabold mb-4 underline text-center text-red-500">Edit Absence Document</h1>
 
       <form @submit.prevent="handleEditDocument">
-        <!-- ใส่ฟอร์มต่าง ๆ ที่ต้องการให้ผู้ใช้กรอก เช่น เรื่องการลา, วันที่, รายละเอียด, ไฟล์แนบ -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div class="mb-3">
-            <label for="name" class="block text-gray-700 mb-1">ชื่อ: {{ userData.name }}</label>
+        <div class="grid grid-cols-2 gap-4 lable ">
+          <div class="w-full mt-7">
+            <table class="w-[900px] border border-white border-spacing-2">
+              <tbody>
+                <!-- ที่ -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="agencyCode" class="block item">ชื่อ</label>
+                    <div class="flex items-center gap-2">
+                      <input type="text" v-model="userData.name" class="form-input form-input-text " disabled />
+                    </div>
+                  </td>
+                  <!-- ชื่อหน่วยงาน -->
+                  <td class="p-3 border border-white">
+                    <label for="agencyName" class="block item whitespace-nowrap">รหัสประจำตัวนักศึกษา</label>
+                    <div class="flex items-center gap-2">
+                      <input type="text" v-model="userData.studentId" class="form-input form-input-text" disabled />
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- คณะ -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="faculty" class="block item">คณะ </label>
+                    <input type="text" v-model="userData.faculty" class="form-input form-input-text" disabled />
+                  </td>
+
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="department" class="block item">ภาควิชา/สาขาวิชา </label>
+                    <input type="text" v-model="userData.department" class="form-input form-input-text" disabled />
+                  </td>
+                </tr>
+
+                <!-- ชั้นปี -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="classLevel" class="block item">ชั้นปีที่ </label>
+                    <input type="text" v-model="userData.classLevel" class="form-input form-input-text" disabled />
+                  </td>
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="studyLevel" class="block item">ระดับการศึกษา </label>
+                    <input type="text" v-model="userData.studyLevel" class="form-input form-input-text" disabled />
+                  </td>
+                </tr>
+
+                <!-- ประเภทหลักสูตร -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="programType" class="block item">ประเภทหลักสูตร </label>
+                    <input type="text" v-model="userData.programType" class="form-input form-input-text" disabled />
+                  </td>
+
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="studentStatus" class="block item">สถานะนักศึกษา </label>
+                    <input type="text" v-model="userData.studentStatus" class="form-input form-input-text" disabled />
+                  </td>
+                </tr>
+
+                <!-- คะแนนเฉลี่ยประจำภาค -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="currentGPA" class="block item">คะแนนเฉลี่ยประจำภาค </label>
+                    <input type="text" v-model="userData.currentGPA" class="form-input form-input-text" disabled />
+                  </td>
+
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="cumulativeGPA" class="block item">คะแนนเฉลี่ยสะสม </label>
+                    <input type="text" v-model="userData.cumulativeGPA" class="form-input form-input-text" disabled />
+                  </td>
+                </tr>
+
+                <!-- ข้อมูลการติดต่อ -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="contact" class="block item">ข้อมูลการติดต่อนักศึกษา </label>
+                    <input type="text" v-model="userData.tel" class="form-input form-input-text" disabled />
+                  </td>
+
+                  <td class="p-3 border border-white w-1/2">
+                    <label for="email" class="block item">อีเมล </label>
+                    <input type="email" v-model="userData.email" class="form-input form-input-text w-full" disabled />
+                  </td>
+                </tr>
+
+                <!-- ฟอร์มการกรอกข้อมูลการลา -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white">
+                    <label for="type" class="block item">เรื่อง<span class="text-red-500 ml-1">*</span></label>
+                    <select v-model="type" class="form-input form-input-text w-full" required>
+                      <option value="" disabled>เลือกประเภทการลา</option>
+                      <option value="ลากิจ">ขออนุญาตลากิจ</option>
+                      <option value="ลาป่วย">ขออนุญาตลาป่วย</option>
+                    </select>
+                  </td>
+
+                  <td class="p-3 border border-white">
+                    <label for="advisor" class="block item">อาจารย์ที่ปรึกษา </label>
+                    <input type="text" v-model="userData.advisor" class="form-input form-input-text w-full" disabled />
+                  </td>
+                </tr>
+
+                <!-- ประเภทวันลา -->
+                <tr class="border border-white">
+                  <td class="p-3 border border-white">
+                    <label for="leaveType" class="block item">ประเภทวันลา<span
+                        class="text-red-500 ml-1">*</span></label>
+                    <select v-model="leaveType" class="form-input form-input-text w-full" required>
+                      <option value="" disabled>เลือกประเภทวันลา</option>
+                      <option value="oneDay">การลา 1 วัน</option>
+                      <option value="multipleDays">การลาหลายวัน</option>
+                    </select>
+                  </td>
+                </tr>
+
+                <!-- วันที่เลือกลา 1 วัน -->
+                <tr v-if="leaveType === 'oneDay'" class="border border-white">
+                  <td class="p-3 border border-white">
+                    <label for="oneDayDate" class="block item">เลือกวันที่ <span
+                        class="text-red-500 ml-1">*</span></label>
+                    <input type="date" v-model="oneDayDate" class="form-input input-date" :min="today" required />
+                  </td>
+
+                  <td class="p-3 pl-4 border border-white">
+                    <label for="oneDaySession" class="block item">ช่วงเวลา
+                      <span class="text-red-500 ml-1">*</span></label>
+                    <div class="flex pl-16 items-center space-x-4">
+                      <label class="flex items-center">
+                        <input type="checkbox" v-model="oneDaySession.morning" class="form-checkbox" />
+                        <span class="ml-2">เช้า</span>
+                      </label>
+                      <label class="flex items-center">
+                        <input type="checkbox" v-model="oneDaySession.afternoon" class="form-checkbox" />
+                        <span class="ml-2">บ่าย</span>
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- ถ้าเลือก ลาหลายวัน -->
+                <tr v-if="leaveType === 'multipleDays'" class="border border-white">
+                  <td class="p-3 border border-white" colspan="2">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                      <!-- วันที่เริ่มต้น -->
+                      <div class="my-2">
+                        <label for="starttime">
+                          <span class="item">ระหว่างวันที่</span><span class="text-red-500 ml-1">*</span></label>
+                        <input type="date" id="starttime" v-model="starttime" class="form-input input-date" :min="today"
+                          required />
+                      </div>
+
+                      <!-- วันที่สิ้นสุด -->
+                      <div class="my-2">
+                        <label for="endtime">
+                          <span class="item">ถึงวันที่</span><span class="text-red-500 ml-1">*</span></label>
+                        <input type="date" id="endtime" v-model="endtime" class="form-input input-date"
+                          :min="getNextDay(starttime)" required />
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <div class="mb-3">
-            <label for="studentId" class="block text-gray-700 mb-1">รหัสประจำตัวนักศึกษา: {{ userData.studentId
-            }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="faculty" class="block text-gray-700 mb-1">คณะ: {{ userData.faculty }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="department" class="block text-gray-700 mb-1">ภาควิชา/สาขาวิชา: {{ userData.department }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="classLevel" class="block text-gray-700 mb-1">ชั้นปีที่: {{ userData.classLevel }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="studyLevel" class="block text-gray-700 mb-1">ระดับการศึกษา: {{ userData.studyLevel }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="programType" class="block text-gray-700 mb-1">ประเภทหลักสูตร: {{ userData.programType }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="studentStatus" class="block text-gray-700 mb-1">สถานะนักศึกษา: {{ userData.studentStatus
-            }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="currentGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยประจำภาค: {{ userData.currentGPA
-            }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="cumulativeGPA" class="block text-gray-700 mb-1">คะแนนเฉลี่ยสะสม: {{ userData.cumulativeGPA
-            }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="contact" class="block text-gray-700 mb-1">ข้อมูลการติดต่อนักศึกษา: {{ userData.tel }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="email" class="block text-gray-700 mb-1">อีเมล: {{ userData.email }}</label>
-          </div>
-
-        </div>
-
-        <!-- ฟอร์มการกรอกข้อมูลการลา -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div class="mb-3">
-            <label for="type" class="block text-gray-700 mb-1">เรื่อง<span class="text-red-500 ml-1">*</span></label>
-            <select id="type" v-model="type" class="form-input" required>
-              <option value="" disabled>เลือกประเภทการลา</option>
-              <option value="ลากิจ">ขออนุญาตลากิจ</option>
-              <option value="ลาป่วย">ขออนุญาตลาป่วย</option>
-            </select>
-          </div>
-
-          <div class="mb-3" style="margin-top: 30px;">
-            <label for="email" class="block text-gray-700 mb-1">อาจารย์ที่ปรึกษา: {{ userData.advisor }}</label>
-          </div>
-
-          <div class="mb-3">
-            <label for="leaveType" class="block text-gray-700 mb-1">ประเภทการลา<span
+          <div class="lable col-span-2">
+            <label for="detail" class="block item">โดยมีเหตุผลและรายละเอียด<span
                 class="text-red-500 ml-1">*</span></label>
-            <select id="leaveType" v-model="leaveType" class="form-input" required>
-              <option value="" disabled>เลือกประเภทการลา</option>
-              <option value="oneDay">ลา 1 วัน</option>
-              <option value="multipleDays">ลาหลายวัน</option>
-            </select>
-          </div>
-
-          <!-- ถ้าเลือกลา 1 วัน -->
-          <div v-if="leaveType === 'oneDay'">
-            <div class="mb-3">
-              <label for="oneDayDate" class="block text-gray-700 mb-1">เลือกวันที่<span
-                  class="text-red-500 ml-1">*</span></label>
-              <input type="date" id="oneDayDate" v-model="oneDayDate" class="form-input" :min="today" required />
-            </div>
-
-            <div class="mb-3">
-              <label for="oneDaySession" class="block text-gray-700 mb-1">ช่วงเวลา<span
-                  class="text-red-500 ml-1">*</span></label>
-
-              <div class="flex items-center space-x-4">
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="oneDaySession.morning" class="form-checkbox" />
-                  <span class="ml-2">เช้า</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" v-model="oneDaySession.afternoon" class="form-checkbox" />
-                  <span class="ml-2">บ่าย</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- ถ้าเลือก ลาหลายวัน -->
-          <div v-if="leaveType === 'multipleDays'" class="grid grid-cols-2 gap-4 mb-4">
-            <!-- วันที่เริ่มต้น -->
-            <div class="mb-3">
-              <label for="starttime" class="block text-gray-700 mb-1">ระหว่างวันที่<span
-                  class="text-red-500 ml-1">*</span></label>
-              <input type="date" id="starttime" v-model="starttime" class="form-input" :min="today" required />
-            </div>
-
-            <!-- วันที่สิ้นสุด -->
-            <div class="mb-3">
-              <label for="endtime" class="block text-gray-700 mb-1">ถึงวันที่<span
-                  class="text-red-500 ml-1">*</span></label>
-              <input type="date" id="endtime" v-model="endtime" class="form-input" :min="getNextDay(starttime)"
-                required />
-            </div>
-          </div>
-
-          <div class="mb-3 col-span-2">
-            <label for="detail" class="block text-gray-700 mb-1">โดยมีเหตุผลและรายละเอียด<span
-                class="text-red-500 ml-1">*</span></label>
-            <textarea id="detail" v-model="detail" class="form-input detail-input" maxlength="500" required
+            <textarea id="detail" v-model="detail" class="form-input detail-input " minlength="5" maxlength="1000"
+              placeholder="กรุณาระบุรายวิชา section ที่ต้องการลา พร้อมอธิบายเหตุผล" required
               @input="updateRemainingCharacters"></textarea>
             <div class="text-right text-sm text-gray-600">
               ตัวอักษรที่สามารถใส่ได้ {{ remainingCharacters }}
             </div>
           </div>
+          <!-- รายละเอียดงบประมาณ -->
+          <div class="my-3">
+            <label for="attachmentFile1" class="item ">หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
+            </label>
+            <div class="my-4 pb-6 bg-gray-50 rounded-lg shadow-sm">
+              <p class="text-sm text-gray-600 mb-2">📂 อัปโหลดไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์</p>
+              <hr class="border-gray-300 mb-3">
 
-          <div class="mb-3">
-            <label for="attachmentFile1" class="block text-gray-700 mb-1">
-              หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
+              <div v-if="attachmentFile1" class="mb-3">
+                <a @click="openFileInNewTab(attachmentFile1, 'application/pdf')" target="_blank"
+                  class="text-blue-600 hover:text-blue-800 underline">
+                  🔗 ดูไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์ที่อัปโหลดแล้ว
+                </a>
+              </div>
+
+              <input id="attachmentFile1" type="file" @change="handleFileChange($event, 'attachmentFile1')"
+                class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
+            </div>
+          </div>
+
+          <!-- อัพโหลดไฟล์เพิ่มเติม -->
+          <div class="my-3 ">
+            <label for="attachmentFile2" class="item ">หลักฐานอื่น ๆ
+              <span class="text-red-500 pb-6 ml-1">*</span>
             </label>
 
-            <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
-            <div v-if="attachmentFile1">
-              <p class="text-sm text-gray-600">ไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์ที่อัปโหลดแล้ว:
-                <a target="_blank" class="text-blue-500 underline"
-                  @click="openFileInNewTab(attachmentFile1, 'application/pdf')">
-                  ดูไฟล์เดิม
+            <div class="my-4 pb-6 bg-gray-50 rounded-lg shadow-sm">
+              <p class="text-sm text-gray-600 mt-4">📂 อัปโหลดไฟล์หลักฐานอื่น ๆ</p>
+              <hr class="border-gray-300 mb-3">
+
+              <div v-if="attachmentFile2" class="mb-3">
+                <a @click="openFileInNewTab(attachmentFile2, 'application/pdf')" target="_blank"
+                  class="text-blue-600 hover:text-blue-800 underline">
+                  🔗 ดูไฟล์หลักฐานอื่น ๆ ที่อัปโหลดแล้ว
                 </a>
-              </p>
+              </div>
+
+              <input id="attachmentFile2" type="file" @change="handleFileChange($event, 'attachmentFile2')"
+                class="form-input form-input-text w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300" />
             </div>
-
-            <!-- Input อัปโหลดไฟล์ -->
-            <input type="file" id="attachmentFile1" @change="handleFile1Change" class="form-input" />
-          </div>
-
-          <div class="mb-3">
-            <label for="attachmentFile2" class="block text-gray-700 mb-1">หลักฐานอื่นๆ</label>
-
-            <!-- แสดงไฟล์ที่มีอยู่แล้ว -->
-            <div v-if="attachmentFile2">
-              <p class="text-sm text-gray-600">ไฟล์หลักฐานอื่นๆที่อัปโหลดแล้ว:
-                <a target="_blank" class="text-blue-500 underline"
-                  @click="openFileInNewTab(attachmentFile2, 'application/pdf')">
-                  ดูไฟล์เดิม
-                </a>
-              </p>
-            </div>
-
-            <input type="file" id="attachmentFile2" @change="handleFile2Change" class="form-input" />
           </div>
         </div>
-        <div class="parent-container">
-          <button type="submit" class="form-button"> update Absence Document
-          </button>
+
+        <div>
+          <div class="parent-container">
+            <button type="submit" class="form-button"> Sent Absence Document
+            </button>
+          </div>
         </div>
+
       </form>
 
       <div v-if="showSuccessPopup" class="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
@@ -565,6 +617,11 @@ const handleEditDocument = async () => {
 </template>
 
 <style scoped>
+.lable {
+  /* mb-6 mx-2 */
+  margin: 1rem 1.5rem 2rem;
+}
+
 .form-input {
   width: 100%;
   padding: 8px 16px;

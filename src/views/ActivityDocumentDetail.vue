@@ -443,26 +443,31 @@ const convertNumberToThaiText = (num) => {
           </div>
 
           <div>
-            <div class="flex items-center whitespace-nowrap w-full">
+            <div class="flex items-center whitespace-nowrap w-full mb-4">
               <span class="items">การเทียบค่าชั่วโมงกิจกรรม:&nbsp;
                 <span class="no-style">{{ activityStatus }}</span>
               </span>
             </div>
 
-            <table class="table-auto w-full border-collapse border border-white whitespace-nowrap mb-3">
-              <tbody>
-                <tr v-for="(activity, index) in activityData.activity" :key="index" class="hover:bg-gray-50">
-                  <td class="border border-white pl-4 py-2"> {{ index + 1 }}. </td>
-                  <td class="border border-white px-4 py-2">{{ activity.activityName }}</td>
-                  <td class="border border-white px-4 py-2 text-center">จำนวน</td>
-                  <td class="border border-white px-4 py-2 text-center">{{ activity.countHour }}</td>
-                  <td class="border border-white px-4 py-2 text-center">หน่วยชั่วโมง</td>
-                </tr>
-              </tbody>
-            </table>
+            <div>
+              <label for="activityHours" class="block items">
+                ประเภทโครงการกิจกรรม<span class="text-red-500 ml-1">*</span>
+              </label>
 
+              <table class="table-auto w-full border-collapse border border-white whitespace-nowrap ml-10">
+                <tbody>
+                  <tr v-for="(activity, index) in activityData.activity" :key="index" class="hover:bg-gray-50">
+                    <td class="border border-white pl-4 py-2"> {{ index + 1 }}. </td>
+                    <td class="border border-white px-4 py-2">{{ activity.activityName }}</td>
+                    <td class="border border-white px-4 py-2 text-center">จำนวน</td>
+                    <td class="border border-white px-4 py-2 text-center">{{ activity.countHour }}</td>
+                    <td class="border border-white px-4 py-2 text-center">หน่วยชั่วโมง</td>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
           </div>
-
         </div>
 
         <div class="lable">
@@ -486,8 +491,10 @@ const convertNumberToThaiText = (num) => {
         </div>
 
         <div class="lable">
-          <span class="items">KMUTT Student QF:</span>
-          <table class="table-auto w-auto border-collapse border border-white whitespace-nowrap mb-3">
+          <div class="items whitespace-nowrap">
+                  การเทียบค่ากิจกรรมตามคุณลักษณะที่พึงประสงค์ของมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี (KMUTT Student
+                  QF)<span class="text-red-500 ml-1">*</span></div>          
+                  <table class="table-auto w-auto border-collapse border border-white whitespace-nowrap ml-5 mb-3">
             <tbody>
               <tr v-for="(studentQF, index) in activityData.studentQF" :key="index" class="hover:bg-gray-50">
                 <td class="border border-white pl-4 py-2"> {{ index + 1 }}. </td>
@@ -499,7 +506,9 @@ const convertNumberToThaiText = (num) => {
           </table>
         </div>
 
-        <div class="lable">
+        <div class="py-3 lable">
+            <div class="items pb-1">ความสอดคล้องกับเป้าหมายของมหาวิทยาลัย</div>
+            <div class="lable">
           <span class="items">Entrepreneurial:</span>
           <table class="table-auto border-collapse border w-20%  border-gray-300 mb-3 ml-3">
             <tbody>
@@ -552,19 +561,19 @@ const convertNumberToThaiText = (num) => {
               </tbody>
             </table>
           </ul>
-        </div>
+        </div></div>
 
 
-        <div class="lable col-span-2">
+        <div class="lable pb-4 col-span-2">
           <label class="block items">หลักการและเหตุผล:</label>
-          <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
+          <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <span class="items">วัตถุประสงค์:</span> {{ activityData.sustainabilityPropose }}
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <span class="items">ผู้เข้าร่วมโครงการ:</span>
           <table class="table-sub ml-4">
             <tbody>
@@ -579,28 +588,28 @@ const convertNumberToThaiText = (num) => {
           </table>
         </div>
 
-        <div class="lable col-span-2">
+        <div class="lable col-span-2  pb-4">
           <label class="items">ลักษณะกิจกรรม:</label>
-          <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.activityCharacteristic }}</div>
+          <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.activityCharacteristic }}</div>
         </div>
 
-        <div class="lable col-span-2">
+        <div class="lable  pb-4 col-span-2">
           <label class="items whitespace-nowrap">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code
             of Honor)
             ดังนี้:</label>
-          <div class=" w-full ml-4 mt-2" rows="4" readonly>{{ activityData.codeOfHonor }}</div>
+          <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.codeOfHonor }}</div>
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <span class="items">ระยะเวลาเตรียมงาน:</span> {{ activityData.prepareStart }} ถึงวันที่ {{
             activityData.prepareEnd }}
         </div>
-        <div class="lable">
+        <div class="lable  pb-4">
           <span class="items">ระยะเวลาปฏิบัติงาน:</span> {{ activityData.startTime }} ถึงวันที่ {{ activityData.endTime
           }}
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <h2 class="items">ขั้นตอนการดำเนินงาน:</h2>
           <table class="w-auto border-collapse border border-white mx-4">
             <tbody>
@@ -618,7 +627,7 @@ const convertNumberToThaiText = (num) => {
           </table>
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <label class="font-bold ">คณะกรรมการจัดโครงการ:</label>
           <table class="table mx-4 my-4 w-90% text-sm">
             <thead class="bg-gray-100  whitespace-nowrap">
@@ -637,7 +646,8 @@ const convertNumberToThaiText = (num) => {
                 <td class="border border-gray-300 px-4 py-2 text-center">{{ index + 1 }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ committee.studentID }}</td>
                 <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.name }}</td>
-                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.departmentName }} ชั้นปีที่ {{ committee.year }}</td>
+                <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.departmentName }} ชั้นปีที่
+                  {{ committee.year }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ committee.tel }}</td>
                 <td class="border border-gray-300 px-4 py-2 whitespace-nowrap">{{ committee.position }}</td>
               </tr>
@@ -645,7 +655,7 @@ const convertNumberToThaiText = (num) => {
           </table>
         </div>
 
-        <div class="lable">
+        <div class="lable  ">
           <span class="items">รูปแบบการประเมินผล:</span>
           <ul class="list-none pl-6 text-gray-700 ml-4 my-2">
             <li v-for="(evaluation, index) in (activityData.evaluation)" :key="index" class="py-1">
@@ -656,7 +666,7 @@ const convertNumberToThaiText = (num) => {
           </ul>
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <h2 class="items">รายละเอียดรูปแบบการประเมินผล:</h2>
           <table class="w-auto border-collapse border border-white mx-4">
             <tbody>
@@ -674,7 +684,7 @@ const convertNumberToThaiText = (num) => {
           </table>
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <span class="items">ผลที่คาดว่าจะได้รับ:</span>
           <table class="table mx-8 my-4">
             <thead class="bg-gray-100">
@@ -720,7 +730,7 @@ const convertNumberToThaiText = (num) => {
           </div>
         </div>
 
-        <div class="lable">
+        <div class="lable  pb-4">
           <h2 class="items mb-2">รายละเอียดงบประมาณ</h2>
           <table class="w-auto border-collapse border border-white mx-4">
             <tbody>
@@ -737,8 +747,8 @@ const convertNumberToThaiText = (num) => {
           </table>
         </div>
 
-        <div class="lable">
-          <h2 class="items mb-2">ไฟล์เพิ่มเติม</h2>
+        <div class="lable  pb-10">
+          <h2 class="items mb-4">ไฟล์เพิ่มเติม</h2>
           <table class="w-auto border-collapse border border-white mx-4">
             <tbody>
               <tr v-for="(file, index) in [activityData.prepareFile]" :key="index">
