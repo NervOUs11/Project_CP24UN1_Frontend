@@ -197,8 +197,6 @@ onMounted(async () => {
     facultyData.value = await fetchAllFaculty();
     activityData.value = await fetchActivityDocument(docId, userid, role)
     if (activityData.value) {
-      console.log(activityData.value.activity)
-      console.log(activity.value)
       documentId.value = activityData.value.DocumentID;
       agencyCode.value = activityData.value.code;
       const parts = agencyCode.value.split(".");
@@ -229,6 +227,8 @@ onMounted(async () => {
       evaluationFile.value = activityData.value.evaluationFile;
       prepareFile.value = activityData.value.prepareFile;
 
+      console.log(activityData.value.activity);
+      
       if (activityData.value.activity.length > 0) {
         isHourCount.value = true;
         hoursCount.value = activityData.value.activity.reduce((acc, activity) => {
@@ -237,7 +237,7 @@ onMounted(async () => {
         }, {});
       }
 
-      activity.value = activityData.value.map(item => ({
+      activity.value = activityData.value.activity.map(item => ({
         ...item,
         countHour: item.countHour ?? 0
       }));
@@ -860,7 +860,7 @@ const validateProjectNames = () => {
             </label>
             <div class="flex">
               <input type="text" v-model="prefix" class="form-input w-24 text-left" placeholder="รหัสหน่วยงาน" />
-              <p class="text-gray-700 ">มจธ.</p>
+              <p class="text-gray-700 " style="margin-top: 17px;">มจธ.</p>
               <input type="text" v-model="suffix" class="form-input w-24 text-left" placeholder="ลำดับที่เอกสาร" />
             </div>
           </div>
@@ -1289,11 +1289,6 @@ const validateProjectNames = () => {
 
           <!-- รูปแบบการประเมินผล -->
           <div class="mb-10">
-            <!-- <label class="item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
-            <div class="mb-4 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
-              </div>
-            </div> -->
             <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
             <div class="my-2 ml-4">
               <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
@@ -1304,7 +1299,7 @@ const validateProjectNames = () => {
             <!-- รายการตัวเลือก -->
             <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
               <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID" v-model="selectedEvaluation"
-                :disabled="selectedSkills.length >= 1" />
+              :disabled="selectedEvaluation.length >= 1 && !selectedEvaluation.includes(option.evaluationID)"/>
               <label :for="option.evaluationID">{{ option.evaluationName }}</label>
             </div>
           </div>

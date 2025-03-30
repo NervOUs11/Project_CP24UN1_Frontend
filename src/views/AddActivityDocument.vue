@@ -465,10 +465,15 @@ const addDoc = async () => {
         }
       });
 
+    // activity.value = activityData.value.map(activity => {
+    //   const hour = hoursCount.value[activity.activityID] || 0;
+    //   return hour > 0 ? [activity.activityID, hour] : null;
+    // }).filter(Boolean);
+
     activity.value = activityData.value.map(activity => {
       const hour = hoursCount.value[activity.activityID] || 0;
-      return hour > 0 ? [activity.activityID, hour] : null;
-    }).filter(Boolean);
+      return [activity.activityID, hour];
+    });
 
     sustainabilityPropose.value = objectives.value.map((objective, index) => `${index + 1}${objective}`).join('');
     const startTime = convertToISOWithTimezone(startDate.value)
