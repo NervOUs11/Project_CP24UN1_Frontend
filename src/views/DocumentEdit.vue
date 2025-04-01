@@ -572,7 +572,6 @@ const handleEditDocument = async () => {
           <!-- อัพโหลดไฟล์เพิ่มเติม -->
           <div class="my-3 ">
             <label for="attachmentFile2" class="item ">หลักฐานอื่น ๆ
-              <span class="text-red-500 pb-6 ml-1">*</span>
             </label>
 
             <div class="my-4 pb-6 bg-gray-50 rounded-lg shadow-sm">

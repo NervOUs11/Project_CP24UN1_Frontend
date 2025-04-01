@@ -328,8 +328,8 @@ onMounted(async () => {
       entrepreneurialData.value = activityData.value.entrepreneurial
       sustainabilityData.value = activityData.value.sustainability
       sustainabilityProposeArray.value = activityData.value.sustainabilityPropose.match(/\d[^0-9]+/g).map(item => item.replace(/^(\d)/, '$1. '));;
-      activityData.value.startTime = activityData.value.startTime ? formatDateTime(activityData.value.startTime) : "N/A";
-      activityData.value.endTime = activityData.value.endTime ? formatDateTime(activityData.value.endTime) : "N/A";
+      activityData.value.startTime = activityData.value.startTime ? formatDate(activityData.value.startTime) : "N/A";
+      activityData.value.endTime = activityData.value.endTime ? formatDate(activityData.value.endTime) : "N/A";
       activityData.value.prepareStart = activityData.value.prepareStart ? formatDate(activityData.value.prepareStart) : "N/A";
       activityData.value.prepareEnd = activityData.value.prepareEnd ? formatDate(activityData.value.prepareEnd) : "N/A";
       activityData.value.createDate = activityData.value.createDate ? formatDateTime(activityData.value.createDate) : "N/A";
