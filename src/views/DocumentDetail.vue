@@ -319,10 +319,10 @@ onMounted(async () => {
           </div>
 
           <div>
-            <span class="items">วันที่เริ่มลา:</span> {{ data.startTime?.date }} เวลา {{ data.startTime?.time }}
+            <span class="items pr-2">วันที่เริ่มลา:</span> {{ data.startTime?.date }}<span class="items px-4">เวลา</span>{{ data.startTime?.time }}
           </div>
           <div>
-            <span class="items">ลาถึงวันที่:</span> {{ data.endTime?.date }} เวลา {{ data.endTime?.time }}
+            <span class="items pr-2">ลาถึงวันที่:</span> {{ data.endTime?.date }} <span class="items px-4">เวลา</span>  {{ data.endTime?.time }}
           </div>
 
           <div class="mb-8">
@@ -402,7 +402,7 @@ onMounted(async () => {
 
           <!-- ถ้าเป็น student และ allProgress เป็น Approve ทั้งหมด ให้ซ่อนปุ่ม Edit และ Delete -->
           <template v-else-if="!allApproved()">
-            <button v-if="hasRejectedStatus()" class="form-button bg-blue-500" @click="handleEdit">
+            <button v-if="hasRejectedStatus()" class="button bg-blue-500 text-white mx-2" @click="handleEdit">
               Edit
             </button>
             <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
@@ -482,7 +482,7 @@ onMounted(async () => {
 
 <style scoped>
 .subhead {
-  font-size: larger;
+  font-size: 1.5rem;
   /* text-xl */
   font-weight: 700;
   /* font-bold */
@@ -499,7 +499,7 @@ onMounted(async () => {
 
 .items {
   font-weight: 700;
-  font-size: medium;
+  font-size: 1.125rem;
   margin-bottom: 0.5rem;
 }
 
