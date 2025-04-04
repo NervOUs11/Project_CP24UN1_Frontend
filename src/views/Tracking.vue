@@ -120,7 +120,7 @@ const goToActivityDocument = (documentID) => {
       <h1 class="text-4xl font-bold mt-2 mb-8 text-center text-orange-500">{{ firstName }}'s Tracking Document</h1>
 
     <div class="mb-4 flex flex-wrap gap-4 items-center">
-      <input type="date" v-model="filterDate" class="border p-2 rounded" />
+      <input type="text" v-model="filterName" placeholder="Search by name" class="border p-2 rounded w-64" />
 
       <select v-model="filterType" class="border p-2 rounded">
         <option value="">All Types</option>
@@ -135,7 +135,8 @@ const goToActivityDocument = (documentID) => {
         <option value="Reject">Reject</option>
       </select>
 
-      <input type="text" v-model="filterName" placeholder="Search by name" class="border p-2 rounded w-64" />
+      <input type="date" v-model="filterDate" class="border p-2 rounded" />
+      
       <div class=" text-center text-xs inline-flex">
         <button @click="clearFilters" class="form-button">
           Clear Filter
