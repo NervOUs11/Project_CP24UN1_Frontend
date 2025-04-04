@@ -384,13 +384,13 @@ const convertNumberToThaiText = (num) => {
   </div>
 
   <!-- Show the document details once data is fetched -->
-  <div v-else class="flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
+  <div v-else class="w-full flex justify-center items-center min-h-screen pt-[8vh] bg-orange-100">
     <div class="bg-white p-6 rounded-lg shadow-lg w-[1100px]">
       <h1 class="text-3xl font-extrabold mb-4 text-center text-blue-500">Activity Document Detail</h1>
 
 
       <div class="lable">
-        <h2 class="subhead">Document Information</h2>
+        <div class="subhead ">Document Information</div>
         <div class="grid grid-cols-2 gap-4 lable ">
           <div>
             <span class="items">ที่:</span> {{ activityData.code }}
@@ -419,7 +419,7 @@ const convertNumberToThaiText = (num) => {
           </div>
           <div class="col-span-2">
             <label class="block items">วัตถุประสงค์โดยภาพรวม:</label>
-            <span class=" w-full ml-3" rows="4" readonly>{{ activityData.propose }}</span>
+            <span class=" w-full ml-10 underline" rows="4" readonly>{{ activityData.propose }}</span>
           </div>
 
           <!-- ค่าใช้จ่าย -->
@@ -492,87 +492,89 @@ const convertNumberToThaiText = (num) => {
 
         <div class="lable">
           <div class="items whitespace-nowrap">
-                  การเทียบค่ากิจกรรมตามคุณลักษณะที่พึงประสงค์ของมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี (KMUTT Student
-                  QF)<span class="text-red-500 ml-1">*</span></div>          
-                  <table class="table-auto w-auto border-collapse border border-white whitespace-nowrap ml-5 mb-3">
+            การเทียบค่ากิจกรรมตามคุณลักษณะที่พึงประสงค์ของมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี (KMUTT Student
+            QF)<span class="text-red-500 ml-1">*</span></div>
+          <table class="table-auto w-auto border-collapse border border-white whitespace-nowrap mx-10 my-3">
             <tbody>
               <tr v-for="(studentQF, index) in activityData.studentQF" :key="index" class="hover:bg-gray-50">
-                <td class="border border-white pl-4 py-2"> {{ index + 1 }}. </td>
-                <td class="border border-white px-4 py-2"> {{ studentQF.name }} </td>
-                <td class="border border-white px-4 py-2 text-center">{{ studentQF.percentage }}</td>
-                <td class="border border-white px-4 py-2 text-center">%</td>
+                <td class="border border-white pl-4 py-3"> {{ index + 1 }}. </td>
+                <td class="border border-white px-4 "> {{ studentQF.name }} </td>
+                <td class="border border-white pl-14 "> จำนวน </td>
+                <td class="border border-white px-6 text-center">{{ studentQF.percentage }}</td>
+                <td class="border border-white px-2 text-center">%</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div class="py-3 lable">
-            <div class="items pb-1">ความสอดคล้องกับเป้าหมายของมหาวิทยาลัย</div>
-            <div class="lable">
-          <span class="items">Entrepreneurial:</span>
-          <table class="table-auto border-collapse border w-20%  border-gray-300 mb-3 ml-3">
-            <tbody>
-              <tr v-for="(entrepreneurial, index) in selectedEntrepreneurial" :key="index">
-                <td class="border border-white px-4 py-3">&#x2611; {{ entrepreneurial.entrepreneurialName.join(', ')
-                }} <br>
-                  <div class="pt-2 pl-7 text-sm">{{selectedEntrepreneurial.map(e => e.description).join(' ')}}</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-        </div>
-
-        <!-- Sustainability and Goals -->
-        <div class="lable">
-          <span class="items">Sustainability:</span>
-          <ul class="list-disc pl-6 text-gray-700">
-            <!-- SDGs Culture -->
-            <table class="table-auto border-collapse border w-80% border-white mb-8 ml-2">
+          <div class="items pb-1">ความสอดคล้องกับเป้าหมายของมหาวิทยาลัย</div>
+          <div class="lable">
+            <span class="items">Entrepreneurial:</span>
+            <table class="table-auto border-collapse border w-20%  border-gray-300 mb-3 ml-3">
               <tbody>
-                <!-- SDGs Culture -->
-                <tr v-if="(activityData.sustainability || []).some(item => item.sustainability === 'SDGs Culture')">
-                  <td class="border border-white pt-3" colspan="2">
-                    &#x2611;<span class="font-bold"> SDGs Culture</span>
-                    <div class="mt-2 ml-7">
-                      <!-- แสดงคำอธิบายของ SDGs Culture -->
-                      {{ sustainabilityDescriptions['SDGs Culture'] }}
-                    </div>
-                    <div v-for="(goal, index) in (activityData.sustainability || [])
-                      .filter(item => item.sustainability === 'SDGs Culture')
-                      .map(item => item.goal)" :key="index">
-                      <div class="border border-white px-16 py-3">&#x2611; {{ goal }}</div>
-                    </div>
+                <tr v-for="(entrepreneurial, index) in selectedEntrepreneurial" :key="index">
+                  <td class="border border-white px-4 py-3">&#x2611; {{ entrepreneurial.entrepreneurialName.join(', ')
+                  }} <br>
+                    <div class="pt-2 pl-7 text-sm">{{selectedEntrepreneurial.map(e => e.description).join(' ')}}</div>
                   </td>
-                </tr>
-
-                <!-- Other Sustainability Items -->
-                <tr v-for="(item, index) in (activityData.sustainability || [])
-                  .filter(item => item.sustainability !== 'SDGs Culture')" :key="index">
-                  <td class="border border-white pt-3">
-                    &#x2611; <span class="font-bold"> {{ item.sustainability }}</span>
-                    <div class="mt-2 ml-7">
-                      <!-- แสดงคำอธิบายของ Other Sustainability -->
-                      {{ sustainabilityDescriptions[item.sustainability] || 'ไม่มีคำอธิบาย' }}
-                    </div>
-                  </td>
-                  <td class="border border-white px-4 py-3"></td>
                 </tr>
               </tbody>
             </table>
-          </ul>
-        </div></div>
+
+          </div>
+
+          <!-- Sustainability and Goals -->
+          <div class="lable">
+            <span class="items">Sustainability:</span>
+            <ul class="list-disc pl-6 text-gray-700">
+              <!-- SDGs Culture -->
+              <table class="table-auto border-collapse border w-80% border-white mb-8 ml-2">
+                <tbody>
+                  <!-- SDGs Culture -->
+                  <tr v-if="(activityData.sustainability || []).some(item => item.sustainability === 'SDGs Culture')">
+                    <td class="border border-white pt-3" colspan="2">
+                      &#x2611;<span class="font-bold"> SDGs Culture</span>
+                      <div class="mt-2 ml-7">
+                        <!-- แสดงคำอธิบายของ SDGs Culture -->
+                        {{ sustainabilityDescriptions['SDGs Culture'] }}
+                      </div>
+                      <div v-for="(goal, index) in (activityData.sustainability || [])
+                        .filter(item => item.sustainability === 'SDGs Culture')
+                        .map(item => item.goal)" :key="index">
+                        <div class="border border-white px-16 py-3">&#x2611; {{ goal }}</div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Other Sustainability Items -->
+                  <tr v-for="(item, index) in (activityData.sustainability || [])
+                    .filter(item => item.sustainability !== 'SDGs Culture')" :key="index">
+                    <td class="border border-white pt-3">
+                      &#x2611; <span class="font-bold"> {{ item.sustainability }}</span>
+                      <div class="mt-2 ml-7">
+                        <!-- แสดงคำอธิบายของ Other Sustainability -->
+                        {{ sustainabilityDescriptions[item.sustainability] || 'ไม่มีคำอธิบาย' }}
+                      </div>
+                    </td>
+                    <td class="border border-white px-4 py-3"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </ul>
+          </div>
+        </div>
 
 
         <div class="lable pb-4 col-span-2">
           <label class="block items">หลักการและเหตุผล:</label>
-          <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
+          <div class=" w-full ml-8 underline underline-offset-2 mt-2" rows="4" readonly>{{ activityData.sustainabilityDetail }}</div>
         </div>
 
         <div class="lable pb-4">
           <span class="items">วัตถุประสงค์:</span>
           <ul>
-            <li v-for="(item, index) in sustainabilityProposeArray" :key="index">
+            <li v-for="(item, index) in sustainabilityProposeArray" :key="index" class="ml-10 my-3">
               {{ item }}
             </li>
           </ul>
@@ -584,8 +586,9 @@ const convertNumberToThaiText = (num) => {
           <table class="table-sub ml-4">
             <tbody>
               <tr v-for="(participant, index) in activityData.participant" :key="index" class="hover:bg-gray-100">
-                <td class="border border-white pl-4 pr-2 py-2"> {{ index + 1 }}. </td>
-                <td class="border border-white  py-2 whitespace-nowrap"> {{ participant.participantName }}</td>
+                <td class="border font-medium border-white pl-6 pr-2 py-3"> {{ index + 1 }}. </td>
+                <td class="border font-medium border-white  py-2 whitespace-nowrap"> {{ participant.participantName }}
+                </td>
                 <td class="border border-white px-7 "> จำนวน</td>
                 <td class="border  border-white px-2">{{ participant.count }}</td>
                 <td class="border border-white px-6 "> คน</td>
@@ -596,22 +599,22 @@ const convertNumberToThaiText = (num) => {
 
         <div class="lable col-span-2  pb-4">
           <label class="items">ลักษณะกิจกรรม:</label>
-          <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.activityCharacteristic }}</div>
+          <div class=" w-full ml-8 mt-2 underline underline-offset-2" rows="4" readonly>{{ activityData.activityCharacteristic }}</div>
         </div>
 
         <div class="lable  pb-4 col-span-2">
-          <label class="items whitespace-nowrap">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code
+          <label class="items whitespace-nowrap ">ลักษณะกิจกรรมที่จัดขึ้นสอดคล้องกับหลักเกียรติและศักดิ์ของนักศึกษา(Code
             of Honor)
             ดังนี้:</label>
-          <div class=" w-full ml-6 mt-2" rows="4" readonly>{{ activityData.codeOfHonor }}</div>
+          <div class=" w-full ml-8 mt-2 underline underline-offset-2" rows="4" readonly>{{ activityData.codeOfHonor }}</div>
         </div>
 
         <div class="lable  pb-4">
-          <span class="items">ระยะเวลาเตรียมงาน:</span> {{ activityData.prepareStart }} ถึงวันที่ {{
+          <span class="items  pr-2">ระยะเวลาเตรียมงาน:</span> {{ activityData.prepareStart }}<span class="items px-4">ถึงวันที่</span>  {{
             activityData.prepareEnd }}
         </div>
         <div class="lable  pb-4">
-          <span class="items">ระยะเวลาปฏิบัติงาน:</span> {{ activityData.startTime }} ถึงวันที่ {{ activityData.endTime
+          <span class="items pr-2">ระยะเวลาปฏิบัติงาน:</span> {{ activityData.startTime }}<span class="items px-4"> ถึงวันที่ </span>{{ activityData.endTime
           }}
         </div>
 
@@ -624,7 +627,7 @@ const convertNumberToThaiText = (num) => {
                 <td class="px-4 py-2">
                   <a href="javascript:void(0);"
                     @click="openFileInNewTab(activityData.scheduleDetails, 'application/pdf')"
-                    class="text-orange-500 underline">
+                    class="text-orange-500 underline underline-offset-2">
                     Click to open file in new tab.
                   </a>
                 </td>
@@ -777,17 +780,17 @@ const convertNumberToThaiText = (num) => {
         <h2 class="subhead mb-8">Progress</h2>
         <table class="w-auto border-collapse border border-gray-300 ml-2 mb-10">
           <thead>
-            <tr class="bg-gray-200">
-              <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">ชื่อเจ้าหน้าที่</th>
-              <th class="border border-gray-300 px-4 py-2 text-left w-[40%]">ตำแหน่ง</th>
-              <th class="border border-gray-300 px-4 py-2 text-left w-[25%]">สถานะ</th>
-              <th class="border border-gray-300 px-4 py-2 text-left w-[10%]">หมายเหตุ</th>
+            <tr class="bg-gray-200 text-center">
+              <th class="border border-gray-300 px-4 py-2  w-[25%]">ชื่อเจ้าหน้าที่</th>
+              <th class="border border-gray-300 px-4 py-2  w-[40%]">ตำแหน่ง</th>
+              <th class="border border-gray-300 px-4 py-2  w-[25%]">สถานะ</th>
+              <th class="border border-gray-300 px-4 py-2  w-[10%]">หมายเหตุ</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="text-center">
             <tr v-for="(step, index) in sortedProgress" :key="index">
               <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.staffName }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[40%]">{{ step.staffRole }}</td>
+              <td class="border border-gray-300 px-4 py-2 text-left w-[40%]">{{ step.staffRole }}</td>
               <td class="border border-gray-300 px-4 py-2 w-[25%]">{{ step.status }}</td>
               <td class="border border-gray-300 px-4 py-2 text-red-600 w-[10%]" v-if="step.comment">
                 {{ step.comment }}
@@ -892,7 +895,7 @@ const convertNumberToThaiText = (num) => {
 
 <style scoped>
 .subhead {
-  font-size: larger;
+  font-size: 1.5rem;
   /* text-xl */
   font-weight: 700;
   /* font-bold */
@@ -906,10 +909,14 @@ const convertNumberToThaiText = (num) => {
   /* mb-6 mx-2 */
   margin: 1rem 2rem 2rem;
 }
+.sublable {
+  /* mb-6 mx-2 */
+  margin: 1rem 2rem 2rem;
+}
 
 .items {
   font-weight: 700;
-  font-size: medium;
+  font-size: 1.1rem;
   margin-right: 0.15rem;
   margin-bottom: 0.5rem;
 }

@@ -319,10 +319,10 @@ onMounted(async () => {
           </div>
 
           <div>
-            <span class="items">วันที่เริ่มลา:</span> {{ data.startTime?.date }} เวลา {{ data.startTime?.time }}
+            <span class="items pr-2">วันที่เริ่มลา:</span> {{ data.startTime?.date }}<span class="items px-4">เวลา</span>{{ data.startTime?.time }}
           </div>
           <div>
-            <span class="items">ลาถึงวันที่:</span> {{ data.endTime?.date }} เวลา {{ data.endTime?.time }}
+            <span class="items pr-2">ลาถึงวันที่:</span> {{ data.endTime?.date }} <span class="items px-4">เวลา</span>  {{ data.endTime?.time }}
           </div>
 
           <div class="mb-8">
@@ -366,18 +366,18 @@ onMounted(async () => {
         <h2 class="subhead mb-8">Progress</h2>
         <table class="w-auto border-collapse border border-gray-300 ml-2 mb-10">
           <thead>
-            <tr class="bg-gray-200">
-              <th class="border border-gray-300 px-4 py-2 text-center w-[25%]">ชื่อเจ้าหน้าที่</th>
-              <th class="border border-gray-300 px-4 py-2 text-centert w-[40%]">ตำแหน่ง</th>
-              <th class="border border-gray-300 px-4 py-2 text-centert w-[25%]">สถานะ</th>
-              <th class="border border-gray-300 px-4 py-2 text-centert w-[10%]">หมายเหตุ</th>
+            <tr class="bg-gray-200 text-center">
+              <th class="border border-gray-300 px-4 py-2  w-[25%]">ชื่อเจ้าหน้าที่</th>
+              <th class="border border-gray-300 px-4 py-2  w-[40%]">ตำแหน่ง</th>
+              <th class="border border-gray-300 px-4 py-2  w-[25%]">สถานะ</th>
+              <th class="border border-gray-300 px-4 py-2  w-[10%]">หมายเหตุ</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="text-center">
             <tr v-for="(step, index) in sortedProgress" :key="index">
-              <td class="border border-gray-300 px-4 py-2 w-[25%] text-center">{{ step.staffName }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[40%] text-center">{{ step.staffRole }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[25%] text-center">{{ step.status }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%] ">{{ step.staffName }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[40%] ">{{ step.staffRole }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%] ">{{ step.status }}</td>
               <td class="border border-gray-300 px-4 py-2 text-red-600 w-[10%]" v-if="step.comment">
                 {{ step.comment }}
               </td>
@@ -402,7 +402,7 @@ onMounted(async () => {
 
           <!-- ถ้าเป็น student และ allProgress เป็น Approve ทั้งหมด ให้ซ่อนปุ่ม Edit และ Delete -->
           <template v-else-if="!allApproved()">
-            <button v-if="hasRejectedStatus()" class="form-button bg-blue-500" @click="handleEdit">
+            <button v-if="hasRejectedStatus()" class="button bg-blue-500 text-white mx-2" @click="handleEdit">
               Edit
             </button>
             <button class="button bg-red-500 text-white mx-2" @click="openDeletePopup">
@@ -482,7 +482,7 @@ onMounted(async () => {
 
 <style scoped>
 .subhead {
-  font-size: larger;
+  font-size: 1.5rem;
   /* text-xl */
   font-weight: 700;
   /* font-bold */
@@ -499,7 +499,7 @@ onMounted(async () => {
 
 .items {
   font-weight: 700;
-  font-size: medium;
+  font-size: 1.125rem;
   margin-bottom: 0.5rem;
 }
 
