@@ -40,7 +40,8 @@ const doLogin = async () => {
 }
 </script>
 <template>
-    <div class="flex justify-center items-center min-h-screen bg-orange-100">
+    <!-- <div class="flex justify-center items-center min-h-screen bg-orange-100"> -->
+      <div class="flex justify-center items-center min-h-screen bg-container">
         <div class="bg-white p-8 rounded-lg shadow-lg text-center w-1/3">
             <h1 class="text-orange-500 text-4xl font-bold mb-8">K-MUTTRACK</h1>
             <div v-if="message" :class="{ 'bg-red-100 text-red-700 border-red-500': messageType === 'error', 'bg-green-100 text-green-700 border-green-500': messageType === 'success'}" 
@@ -91,6 +92,29 @@ html, body, #app {
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
+
+.bg-container {
+    background: url('/images/bg-image.jpg') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+}
+
+.bg-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(82, 82, 82, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 0;
+}
+
+.bg-container > div {
+    position: relative;
+    z-index: 10;
 }
 </style>
   

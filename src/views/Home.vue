@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar.vue';
 <template>
   <Navbar class="fixed top-0 left-0 w-full z-50 h-[4vh] p-2 shadow-md" />
 
-  <div class="app mt-16 w-full h-[80vh] bg-[#ffe5b4] flex justify-center items-center">
+  <div class="app mt-16 w-full h-[80vh] flex justify-center items-center bg-container">
     <div class="button-container flex justify-center w-4/5 max-w-[800px]">
       <router-link :to="{ name: 'adddocument' }" class="large-button flex justify-center items-center w-full">
         <button
@@ -49,5 +49,28 @@ body,
   display: inline-block;
   text-align: center;
   margin-left: 20px;
+}
+
+.bg-container {
+    background: url('/images/bg-image.jpg') no-repeat center center fixed;
+    background-size: cover;
+    position: relative;
+}
+
+.bg-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(82, 82, 82, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 0;
+}
+
+.bg-container > div {
+    position: relative;
+    z-index: 10;
 }
 </style>
