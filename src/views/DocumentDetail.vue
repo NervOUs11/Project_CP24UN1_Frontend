@@ -366,18 +366,18 @@ onMounted(async () => {
         <h2 class="subhead mb-8">Progress</h2>
         <table class="w-auto border-collapse border border-gray-300 ml-2 mb-10">
           <thead>
-            <tr class="bg-gray-200">
-              <th class="border border-gray-300 px-4 py-2 text-center w-[25%]">ชื่อเจ้าหน้าที่</th>
-              <th class="border border-gray-300 px-4 py-2 text-centert w-[40%]">ตำแหน่ง</th>
-              <th class="border border-gray-300 px-4 py-2 text-centert w-[25%]">สถานะ</th>
-              <th class="border border-gray-300 px-4 py-2 text-centert w-[10%]">หมายเหตุ</th>
+            <tr class="bg-gray-200 text-center">
+              <th class="border border-gray-300 px-4 py-2  w-[25%]">ชื่อเจ้าหน้าที่</th>
+              <th class="border border-gray-300 px-4 py-2  w-[40%]">ตำแหน่ง</th>
+              <th class="border border-gray-300 px-4 py-2  w-[25%]">สถานะ</th>
+              <th class="border border-gray-300 px-4 py-2  w-[10%]">หมายเหตุ</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="text-center">
             <tr v-for="(step, index) in sortedProgress" :key="index">
-              <td class="border border-gray-300 px-4 py-2 w-[25%] text-center">{{ step.staffName }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[40%] text-center">{{ step.staffRole }}</td>
-              <td class="border border-gray-300 px-4 py-2 w-[25%] text-center">{{ step.status }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%] ">{{ step.staffName }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[40%] ">{{ step.staffRole }}</td>
+              <td class="border border-gray-300 px-4 py-2 w-[25%] ">{{ step.status }}</td>
               <td class="border border-gray-300 px-4 py-2 text-red-600 w-[10%]" v-if="step.comment">
                 {{ step.comment }}
               </td>
