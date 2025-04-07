@@ -475,16 +475,16 @@ const convertNumberToThaiText = (num) => {
 
             <tbody>
               <tr>
-                <td class="items">อาจารย์ที่ปรึกษา/รองคณบดี:</td>
-                <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[0]?.staffName }}</td>
+                <td class="items">นักศึกษาผู้รับผิดชอบโครงการ:</td>
+                <td class="p-4" v-if="activityData.Owner">{{ activityData.Owner?.name }}</td>
               </tr>
               <tr>
                 <td class="items">นายก/ประธานชมรม:</td>
                 <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[1]?.staffName }}</td>
               </tr>
               <tr>
-                <td class="items">ประธานฝ่าย:</td>
-                <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[2]?.staffName }}</td>
+                <td class="items">อาจารย์ที่ปรึกษา/รองคณบดี:</td>
+                <td class="p-4" v-if="activityData.allProgress">{{ activityData.allProgress[0]?.staffName }}</td>
               </tr>
             </tbody>
           </table>

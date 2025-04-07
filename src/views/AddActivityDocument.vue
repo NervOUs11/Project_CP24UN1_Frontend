@@ -1178,15 +1178,14 @@ const positions = ref([
             <div class="mb-10">
             <label class="block item">รูปแบบการประเมินผล<span class="text-red-500 ml-1">*</span></label>
             <div class="mt-4 ml-4">
-              <div class="text-left text-sm text-gray-600 ml-3"> เลือกได้สูงสุดเพียง 1 รูปแบบ
+              <div class="text-left text-sm text-gray-600 ml-3"> เลือกรูปแบบการประเมินผล อย่างน้อย 1 รูปแบบ
               </div>
             </div>
 
             <hr>
             <!-- รายการตัวเลือก -->
             <div v-for="(option, key) in evaluationData" :key="key" class="my-3 mx-7 px-4 pb-1">
-              <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID" v-model="selectedEvaluation"
-              :disabled="selectedEvaluation.length >= 1 && !selectedEvaluation.includes(option.evaluationID)"/>
+              <input type="checkbox" :id="option.evaluationID" :value="option.evaluationID" v-model="selectedEvaluation" />
               <label :for="option.evaluationID">{{ option.evaluationName }}</label>
             </div>
           </div>
