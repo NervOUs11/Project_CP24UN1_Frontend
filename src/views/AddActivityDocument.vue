@@ -213,36 +213,67 @@ const limitExpensesLength = () => {
     expenses.value = parseInt(expenses.value.toString().slice(0, 7));
   }
 };
-// ฟังก์ชันแปลงตัวเลขเป็นข้อความภาษาไทย
+
 const convertNumberToThaiText = (num) => {
-  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
-  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน']
+  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า']
 
-  if (isNaN(num) || num === 0) return 'ศูนย์บาท';
+  if (isNaN(num) || parseFloat(num) === 0) return 'ศูนย์บาทถ้วน'
 
-  let bahtText = '';
-  const numStr = num.toString();
-  const len = numStr.length;
+  const toText = (numberStr) => {
+    let text = ''
+    const len = numberStr.length
+    for (let i = 0; i < len; i++) {
+      const digit = parseInt(numberStr[i])
+      const position = len - i - 1
 
-  for (let i = 0; i < len; i++) {
-    const digit = parseInt(numStr[i]);
-    const position = len - i - 1;
-
-    if (digit !== 0) {
-      if (position === 1 && digit === 1) {
-        bahtText += 'สิบ';
-      } else if (position === 1 && digit === 2) {
-        bahtText += 'ยี่สิบ';
-      } else if (position === 0 && digit === 1 && len > 1) {
-        bahtText += 'เอ็ด';
-      } else {
-        bahtText += numbers[digit] + units[position];
+      if (digit !== 0) {
+        if (position === 1 && digit === 1) {
+          text += 'สิบ'
+        } else if (position === 1 && digit === 2) {
+          text += 'ยี่สิบ'
+        } else if (position === 0 && digit === 1 && len > 1) {
+          text += 'เอ็ด'
+        } else {
+          text += numbers[digit] + units[position]
+        }
       }
     }
+    return text
   }
 
-  return bahtText + 'บาท';
-};
+  const [bahtPart, satangPartRaw = ''] = parseFloat(num).toFixed(2).split('.')
+  const satangPart = parseInt(satangPartRaw)
+
+  const bahtText = toText(bahtPart) + 'บาท'
+  const satangText = satangPart === 0 ? 'ถ้วน' : toText(satangPartRaw) + 'สตางค์'
+
+  return bahtText + satangText
+}
+
+// ตรวจ input ให้รับแค่ตัวเลขและทศนิยม 1 จุด
+const handleExpensesInput = () => {
+  expenses.value = expenses.value.replace(/[^0-9.]/g, '')
+  const parts = expenses.value.split('.')
+  if (parts.length > 2) {
+    expenses.value = parts[0] + '.' + parts[1]
+  }
+}
+
+// เติม .00 อัตโนมัติเมื่อ blur
+const formatExpenses = () => {
+  const num = parseFloat(expenses.value)
+  if (!isNaN(num)) {
+    expenses.value = num.toFixed(2)
+  }
+}
+
+// แสดงข้อความภาษาไทย
+const thaiText = computed(() => {
+  const num = parseFloat(expenses.value)
+  return isNaN(num) ? '' : convertNumberToThaiText(num)
+})
+
 
 // คำนวณข้อความภาษาไทยของค่าใช้จ่าย
 const expensesThaiText = computed(() => {
@@ -464,11 +495,6 @@ const addDoc = async () => {
           return [[item.sustainabilityID, null]];
         }
       });
-
-    // activity.value = activityData.value.map(activity => {
-    //   const hour = hoursCount.value[activity.activityID] || 0;
-    //   return hour > 0 ? [activity.activityID, hour] : null;
-    // }).filter(Boolean);
 
     activity.value = activityData.value.map(activity => {
       const hour = hoursCount.value[activity.activityID] || 0;
@@ -761,17 +787,25 @@ const positions = ref([
                 class=" text-red-500">*</span></label>
 
             <table class="w-full border border-white rounded-lg whitespace-nowrap ml-5">
-              <tbody> <!-- Wrap the <tr> inside <tbody> -->
+              <tbody>
                 <tr>
                   <td class="p-2 border  border-white">เป็นจำนวนเงิน</td>
                   <td class="p-2 border border-white">
-                    <input type="number" id="expenses" v-model.number="expenses" class="form-input w-40 mr-1 text-right"
-                      required :max="9999999" maxlength="7" @input="limitExpensesLength"
-                      style="width: auto; min-width: 150px; max-width: 100px;" />
+                    <input
+                      type="text"
+                      id="expenses"
+                      v-model="expenses"
+                      class="form-input w-40 mr-1 text-right"
+                      required
+                      maxlength="10"
+                      @input="handleExpensesInput"
+                      @blur="formatExpenses"
+                      style="width: auto; min-width: 150px;"
+                    />
                   </td>
 
                   <td class="p-2 border  border-white">บาท</td>
-                  <td class="p-2 border w-auto 0  border-white">( {{ expensesThaiText }}<span>ถ้วน )</span></td>
+                  <td class="p-2 border w-auto 0  border-white">( {{ thaiText }}<span> )</span></td>
                 </tr>
               </tbody>
             </table>

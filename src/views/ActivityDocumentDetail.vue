@@ -345,34 +345,46 @@ const expensesThaiText = computed(() => {
   return convertNumberToThaiText(expenses.value);
 });
 const convertNumberToThaiText = (num) => {
-  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
-  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน']
+  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า']
 
-  if (isNaN(num) || num === 0) return 'ศูนย์บาท';
+  if (isNaN(num) || parseFloat(num) === 0) return 'ศูนย์บาทถ้วน'
 
-  let bahtText = '';
-  const numStr = num.toString();
-  const len = numStr.length;
+  const toText = (numberStr) => {
+    let text = ''
+    const len = numberStr.length
+    for (let i = 0; i < len; i++) {
+      const digit = parseInt(numberStr[i])
+      const position = len - i - 1
 
-  for (let i = 0; i < len; i++) {
-    const digit = parseInt(numStr[i]);
-    const position = len - i - 1;
-
-    if (digit !== 0) {
-      if (position === 1 && digit === 1) {
-        bahtText += 'สิบ';
-      } else if (position === 1 && digit === 2) {
-        bahtText += 'ยี่สิบ';
-      } else if (position === 0 && digit === 1 && len > 1) {
-        bahtText += 'เอ็ด';
-      } else {
-        bahtText += numbers[digit] + units[position];
+      if (digit !== 0) {
+        if (position === 1 && digit === 1) {
+          text += 'สิบ'
+        } else if (position === 1 && digit === 2) {
+          text += 'ยี่สิบ'
+        } else if (position === 0 && digit === 1 && len > 1) {
+          text += 'เอ็ด'
+        } else {
+          text += numbers[digit] + units[position]
+        }
       }
     }
+    return text
   }
 
-  return bahtText + 'บาท';
-};
+  const [bahtPart, satangPartRaw = ''] = parseFloat(num).toFixed(2).split('.')
+  const satangPart = parseInt(satangPartRaw)
+
+  const bahtText = toText(bahtPart) + 'บาท'
+  const satangText = satangPart === 0 ? 'ถ้วน' : toText(satangPartRaw) + 'สตางค์'
+
+  return bahtText + satangText
+}
+
+const thaiText = computed(() => {
+  const num = parseFloat(expenses.value)
+  return isNaN(num) ? '' : convertNumberToThaiText(num)
+})
 
 </script>
 
@@ -430,12 +442,11 @@ const convertNumberToThaiText = (num) => {
                   <td class="items whitespace-nowrap" style="width: 85px;">ค่าใช้จ่าย:</td>
                   <td class=" border border-white">เป็นจำนวนเงิน</td>
                   <td class="p-2 border border-white  w-auto mx-1 text-right">
-
-                    {{ activityData.payment }}
+                    {{ parseFloat(activityData.payment).toFixed(2) }}
                   </td>
                   <td class="border border-white">บาท</td>
                   <td class="border border-white">
-                    ( {{ expensesThaiText }}ถ้วน )
+                    ( {{ thaiText }} )
                   </td>
                 </tr>
               </tbody>

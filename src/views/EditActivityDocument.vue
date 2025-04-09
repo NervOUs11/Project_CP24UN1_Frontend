@@ -408,38 +408,64 @@ const limitExpensesLength = () => {
     expenses.value = parseInt(expenses.value.toString().slice(0, 7));
   }
 };
-// ฟังก์ชันแปลงตัวเลขเป็นข้อความภาษาไทย
+
+const handleExpensesInput = () => {
+  expenses.value = expenses.value.replace(/[^0-9.]/g, '')
+  const parts = expenses.value.split('.')
+  if (parts.length > 2) {
+    expenses.value = parts[0] + '.' + parts[1]
+  }
+}
+
+const formatExpenses = () => {
+  const num = parseFloat(expenses.value)
+  if (!isNaN(num)) {
+    expenses.value = num.toFixed(2)
+  }
+}
+
 const convertNumberToThaiText = (num) => {
-  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
-  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน']
+  const numbers = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า']
 
-  if (isNaN(num) || num === 0) return 'ศูนย์บาท';
+  if (isNaN(num) || parseFloat(num) === 0) return 'ศูนย์บาทถ้วน'
 
-  let bahtText = '';
-  const numStr = num.toString();
-  const len = numStr.length;
+  const toText = (numberStr) => {
+    let text = ''
+    const len = numberStr.length
+    for (let i = 0; i < len; i++) {
+      const digit = parseInt(numberStr[i])
+      const position = len - i - 1
 
-  for (let i = 0; i < len; i++) {
-    const digit = parseInt(numStr[i]);
-    const position = len - i - 1;
-
-    if (digit !== 0) {
-      if (position === 1 && digit === 1) {
-        bahtText += 'สิบ';
-      } else if (position === 1 && digit === 2) {
-        bahtText += 'ยี่สิบ';
-      } else if (position === 0 && digit === 1 && len > 1) {
-        bahtText += 'เอ็ด';
-      } else {
-        bahtText += numbers[digit] + units[position];
+      if (digit !== 0) {
+        if (position === 1 && digit === 1) {
+          text += 'สิบ'
+        } else if (position === 1 && digit === 2) {
+          text += 'ยี่สิบ'
+        } else if (position === 0 && digit === 1 && len > 1) {
+          text += 'เอ็ด'
+        } else {
+          text += numbers[digit] + units[position]
+        }
       }
     }
+    return text
   }
 
-  return bahtText + 'บาท';
-};
+  const [bahtPart, satangPartRaw = ''] = parseFloat(num).toFixed(2).split('.')
+  const satangPart = parseInt(satangPartRaw)
 
-// คำนวณข้อความภาษาไทยของค่าใช้จ่าย
+  const bahtText = toText(bahtPart) + 'บาท'
+  const satangText = satangPart === 0 ? 'ถ้วน' : toText(satangPartRaw) + 'สตางค์'
+
+  return bahtText + satangText
+}
+
+const thaiText = computed(() => {
+  const num = parseFloat(expenses.value)
+  return isNaN(num) ? '' : convertNumberToThaiText(num)
+})
+
 const expensesThaiText = computed(() => {
   return convertNumberToThaiText(expenses.value);
 });
@@ -958,12 +984,19 @@ const validateProjectNames = () => {
               <tr>
                 <td class="p-2 border  border-white">เป็นจำนวนเงิน</td>
                 <td class="p-2 border  border-white">
-                  <input type="number" id="expenses" v-model.number="expenses"
-                    class="input-field my-4 py-2 ml-6 w-60 border border-gray-300 text-right rounded-3xl" required
-                    :max="9999999" maxlength="7" @input="limitExpensesLength" />
+                  <input
+                    type="text"
+                    id="expenses"
+                    v-model="expenses"
+                    class="input-field my-4 py-2 ml-6 w-60 border border-gray-300 text-right rounded-3xl"
+                    required
+                    maxlength="10"
+                    @input="handleExpensesInput"
+                    @blur="formatExpenses"
+                  />
                 </td>
                 <td class="p-2 border  border-white">บาท</td>
-                <td class="p-2 border w-auto 0  border-white">( {{ expensesThaiText }}<span>ถ้วน )</span></td>
+                <td class="p-2 border w-auto 0  border-white">( {{ thaiText }}<span> )</span></td>
               </tr>
             </tbody>
           </table>
