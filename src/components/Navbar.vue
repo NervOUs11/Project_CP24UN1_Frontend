@@ -30,7 +30,7 @@ const navigateTo = (path) => {
 
 <template>
   <nav class="navbar">
-    <div class="navbar-brand">K-MUTTRACK</div>
+    <div class="navbar-brand">KMUTT TRACK</div>
     <ul class="navbar-menu">
       <li>
         <button @click="navigateTo('/home')" class="nav-button">Home</button>
@@ -43,7 +43,7 @@ const navigateTo = (path) => {
       </li>
       <li>
         <!-- <button @click="navigateTo('/about')" class="nav-button">About K-MUTTRACK</button> -->
-        <button class="nav-button">About K-MUTTRACK</button>
+        <button class="nav-button">About KMUTT TRACK</button>
       </li>
       <li v-if="firstName" class="navbar-item">
         <span class="welcome-message">Welcome, {{ firstName }}!</span>

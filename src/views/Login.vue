@@ -43,7 +43,7 @@ const doLogin = async () => {
     <!-- <div class="flex justify-center items-center min-h-screen bg-orange-100"> -->
       <div class="flex justify-center items-center min-h-screen bg-container">
         <div class="bg-white p-8 rounded-lg shadow-lg text-center w-1/3">
-            <h1 class="text-orange-500 text-4xl font-bold mb-8">K-MUTTRACK</h1>
+            <h1 class="text-orange-500 text-4xl font-bold mb-8">KMUTT TRACK</h1>
             <div v-if="message" :class="{ 'bg-red-100 text-red-700 border-red-500': messageType === 'error', 'bg-green-100 text-green-700 border-green-500': messageType === 'success'}" 
             class="mb-6 border-l-4 p-4 rounded" >
             {{ message }}
