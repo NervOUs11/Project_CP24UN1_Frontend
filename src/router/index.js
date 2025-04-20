@@ -12,6 +12,7 @@ import AllUser from '../views/AllUser.vue'
 import ActivityDocumentDetail from '@/views/ActivityDocumentDetail.vue'
 import EditActivityDocument from '@/views/EditActivityDocument.vue'
 import AccessDenied from '@/views/AccessDenied.vue'
+import About from '@/views/About.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -83,6 +84,11 @@ const router = createRouter({
       path: "/accessDenied",
       name: "AccessDenied",
       component: AccessDenied
+    },
+    {
+      path: "/about",
+      name: "About",
+      component: About
     }
 
   ]

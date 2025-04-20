@@ -42,8 +42,7 @@ const navigateTo = (path) => {
         <button @click="navigateTo('/allUser')" class="nav-button">Users</button>
       </li>
       <li>
-        <!-- <button @click="navigateTo('/about')" class="nav-button">About K-MUTTRACK</button> -->
-        <button class="nav-button">About KMUTT TRACK</button>
+        <button @click="navigateTo('/about')" class="nav-button">About KMUTT TRACK</button>
       </li>
       <li v-if="firstName" class="navbar-item">
         <span class="welcome-message">Welcome, {{ firstName }}!</span>
