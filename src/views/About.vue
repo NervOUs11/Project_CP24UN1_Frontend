@@ -73,20 +73,27 @@ onMounted(async () => {
 
     <!-- Submitting Activity Request -->
     <section class="space-y-6">
-      <h5 class="text-3xl font-semibold text-center">Submitting an Activity Resquest Form</h5>
+      <h5 class="text-3xl font-semibold text-center">Submitting an Activity Request Form</h5>
       <img src="/images/activity.jpg" alt="Absence Form Template" class="mx-auto rounded-lg shadow-md" style="width: 40%;" />
       <div class="space-y-2 text-lg text-left">
+      <p>In the Activity Request Form, you must attach the following files: prepareFile, evaluationFile, budgetDetails, and scheduleDetails.</p>
         <ul class="list-disc pl-8 space-y-2">
           <li>
-            Example data in schedule details.
+            Example data in prepare file.
             <div class="mt-2">
-              <img src="/images/step.jpg" alt="Dropdown for Leave Type" class="rounded-md shadow" style="width: 40%;" />
+              <img src="/images/preparefile.jpg" alt="Dropdown for Leave Type" class="rounded-md shadow" style="width: 40%;" />
             </div>
           </li>
           <li>
             Example data in budget file.
             <div class="mt-2">
               <img src="/images/budget.jpg" alt="Dropdown for Leave Type" class="rounded-md shadow" style="width: 40%;" />
+            </div>
+          </li>
+          <li>
+            Example data in schedule detail.
+            <div class="mt-2">
+              <img src="/images/schedule.jpg" alt="Dropdown for Leave Type" class="rounded-md shadow" style="width: 40%;" />
             </div>
           </li>
         </ul>
