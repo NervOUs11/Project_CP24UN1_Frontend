@@ -93,7 +93,7 @@ onMounted(async () => {
   const documentData = await fetchDocumentDetail(studentID, role);
 
   if (documentData) {
-    console.log(documentData)
+    // console.log(documentData)
     type.value = documentData.DocumentType || '';
     detail.value = documentData.detail || '';
 
@@ -189,7 +189,7 @@ function convertToISOWithTimezone(dateString, time) {
 }
 
 const handleFile1Change = async (e) => {
-  console.log("Input changed:", e.target.files)
+  // console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
     const allowedExtensions = ["pdf"];
@@ -207,7 +207,7 @@ const handleFile1Change = async (e) => {
 }
 
 const handleFile2Change = async (e) => {
-  console.log("Input changed:", e.target.files)
+  // console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
     const allowedExtensions = ["pdf"];

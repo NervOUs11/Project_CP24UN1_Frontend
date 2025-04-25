@@ -151,7 +151,7 @@ const sustainabilityDescriptions = {
 const handleApprove = async () => {
   try {
     const data = { progressID: progressID.value, staffID: staffID, documentID: documentId.value }
-    console.log(data)
+    // console.log(data)
     const res = await approveActivity(data);
     if (res.ok) {
       showSuccess("approve")
@@ -323,7 +323,7 @@ onMounted(async () => {
       sustainabilityData.value = await fetchAllSustainability();
       goalData.value = await fetchAllGoal();
       activity.value = await fetchAllActivity();
-      console.log(activityData.value);
+      // console.log(activityData.value);
       expenses.value = activityData.value.payment
       entrepreneurialData.value = activityData.value.entrepreneurial
       sustainabilityData.value = activityData.value.sustainability
@@ -636,7 +636,7 @@ const thaiText = computed(() => {
               <tr v-for="(file, index) in [activityData.scheduleDetails]" :key="index">
                 <td class="px-4 py-2">ไฟล์ขั้นตอนการดำเนินงาน:</td>
                 <td class="px-4 py-2">
-                  <a href="javascript:void(0);"
+                  <a href="#"
                     @click="openFileInNewTab(activityData.scheduleDetails, 'application/pdf')"
                     class="text-orange-500 underline underline-offset-2">
                     Click to open file in new tab.
@@ -693,7 +693,7 @@ const thaiText = computed(() => {
               <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
                 <td class="px-4 py-2">ไฟล์รูปแบบการประเมินผล:</td>
                 <td class="px-4 py-2">
-                  <a href="javascript:void(0);"
+                  <a href="#"
                     @click="openFileInNewTab(activityData.evaluationFile, 'application/pdf')"
                     class="text-orange-500 underline">
                     Click to open file in new tab.
@@ -757,7 +757,7 @@ const thaiText = computed(() => {
               <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
                 <td class="px-4 py-2">ไฟล์รายละเอียดงบประมาณ:</td>
                 <td class="px-4 py-2">
-                  <a href="javascript:void(0);" @click="openFileInNewTab(activityData.budgetDetails, 'application/pdf')"
+                  <a href="#" @click="openFileInNewTab(activityData.budgetDetails, 'application/pdf')"
                     class="text-orange-500 underline">
                     Click to open file in new tab.
                   </a>
@@ -774,7 +774,7 @@ const thaiText = computed(() => {
               <tr v-for="(file, index) in [activityData.prepareFile]" :key="index">
                 <td class="px-4 py-2">ไฟล์เพิ่มเติม:</td>
                 <td class="px-4 py-2">
-                  <a href="javascript:void(0);" @click="openFileInNewTab(activityData.prepareFile, 'application/pdf')"
+                  <a href="#" @click="openFileInNewTab(activityData.prepareFile, 'application/pdf')"
                     class="text-orange-500 underline">
                     Click to open file in new tab.
                   </a>

@@ -247,7 +247,7 @@ onMounted(async () => {
       file2: `data:image/jpeg;base64,${rawData.file2}`,
     };
   }
-  console.log(data.value)
+  // console.log(data.value)
   documentID.value = rawData.DocumentID;
   progressID.value = rawData.progressID;
 });
@@ -333,7 +333,7 @@ onMounted(async () => {
                   <td class="px-4 pt-2 pb-3 border border-white font-medium whitespace-nowrap">
                     หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์:</td>
                   <td class="py-2 border border-white">
-                    <a v-if="data.file1.length > 30" href="javascript:void(0);"
+                    <a v-if="data.file1.length > 30" href="#"
                       @click="openFileInNewTab(data.file1, 'application/pdf')"
                       class="text-orange-500 underline whitespace-nowrap">
                       หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
@@ -344,7 +344,7 @@ onMounted(async () => {
                 <tr v-if="data.file2">
                   <td class="px-4 py-2 border border-white font-medium">เอกสารแนบอื่น ๆ :</td>
                   <td class="py-2 border border-white">
-                    <a v-if="data.file2.length > 30" href="javascript:void(0);"
+                    <a v-if="data.file2.length > 30" href="#"
                       @click="openFileInNewTab(data.file2, 'application/pdf')" class="text-orange-500 underline">
                       เอกสารแนบอื่น ๆ
                     </a>

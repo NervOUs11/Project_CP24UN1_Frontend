@@ -86,7 +86,7 @@ onMounted(() => {
 })
 
 const handleFile1Change = async (e) => {
-  console.log("Input changed:", e.target.files)
+  // console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
     const allowedExtensions = ["pdf"];
@@ -104,7 +104,7 @@ const handleFile1Change = async (e) => {
 }
 
 const handleFile2Change = async (e) => {
-  console.log("Input changed:", e.target.files)
+  // console.log("Input changed:", e.target.files)
   const file = e.target.files[0];
   if (file) {
     const allowedExtensions = ["pdf"];

@@ -83,7 +83,7 @@ const openFileInNewTab = async (base64String, mimeType) => {
   if (base64String instanceof Promise) {
     base64String = await base64String;  // รอให้ Promise เสร็จ
   }
-  console.log(base64String);  // ตรวจสอบค่าหลังจาก await
+  // console.log(base64String);  // ตรวจสอบค่าหลังจาก await
 
   if (!base64String) {
     return;
@@ -227,7 +227,7 @@ onMounted(async () => {
       evaluationFile.value = activityData.value.evaluationFile;
       prepareFile.value = activityData.value.prepareFile;
 
-      console.log(activityData.value.activity);
+      // console.log(activityData.value.activity);
 
       if (activityData.value.activity.length > 0) {
         isHourCount.value = true;
@@ -820,7 +820,7 @@ const handleEditDocument = async () => {
       staffIDProgress2: president.value,
       staffIDProgress3: departmentPresident.value,
     }
-    console.log("Data to send:", dataToSend);
+    // console.log("Data to send:", dataToSend);
     const res = await editActivityDocument(studentID, documentId.value.toString(), dataToSend);
     if (res.ok) {
       showSuccess("edit")

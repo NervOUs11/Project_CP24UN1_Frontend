@@ -2,7 +2,7 @@ const URL = import.meta.env.VITE_API_ROOT;
 
 const tracking = async (id) => {
     try {
-        console.log(id)
+        // console.log(id)
         const res = await fetch(`${URL}/document/all/${id}`, {
             method: "GET",
             headers: {
@@ -14,7 +14,7 @@ const tracking = async (id) => {
             throw new Error(`HTTP error! Status: ${res.status}`);
         }
         const data = await res.json();
-        console.log(data)
+        // console.log(data)
         return data;
     } catch (error) {
         console.error("Error fetching tracking data:", error);
