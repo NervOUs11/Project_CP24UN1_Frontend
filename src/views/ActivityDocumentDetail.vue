@@ -190,8 +190,58 @@ const closeRejectPopup = () => {
 };
 
 const isBase64 = (str) => {
-  // ใช้ regex เพื่อตรวจสอบรูปแบบ base64 ที่ถูกต้อง
   return /^[A-Za-z0-9+/=]+$/.test(str);
+};
+
+const downloadFileFromBase64 = async (base64String, mimeType) => {
+  if (!base64String) {
+    popupMessage.value = 'No file available.';
+    showPopup.value = true;
+    return;
+  }
+
+  let base64Data = base64String;
+  if (base64String.startsWith('data:')) {
+    base64Data = base64String.split(',')[1];
+  }
+
+  if (!isBase64(base64Data)) {
+    popupMessage.value = 'Invalid Base64 string.';
+    showPopup.value = true;
+    return;
+  }
+
+  try {
+    console.log('Base64 Length:', base64Data.length);
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteNumbers], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+
+    // ตั้งชื่อไฟล์อัตโนมัติ เช่น 'downloaded_file.pdf'
+    const extension = mimeType.split('/')[1] || 'file'; // ถ้าไม่มี type ให้ default เป็น 'file'
+    link.download = '';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (error) {
+    popupMessage.value = 'Error downloading the file.';
+    showPopup.value = true;
+    console.error('Error decoding Base64:', error);
+  }
 };
 
 const openFileInNewTab = async (base64String, mimeType) => {
@@ -637,7 +687,7 @@ const thaiText = computed(() => {
                 <td class="px-4 py-2">ไฟล์ขั้นตอนการดำเนินงาน:</td>
                 <td class="px-4 py-2">
                   <a href="#"
-                    @click="openFileInNewTab(activityData.scheduleDetails, 'application/pdf')"
+                    @click="downloadFileFromBase64(activityData.scheduleDetails, 'application/pdf')"
                     class="text-orange-500 underline underline-offset-2">
                     Click to open file in new tab.
                   </a>
@@ -694,7 +744,7 @@ const thaiText = computed(() => {
                 <td class="px-4 py-2">ไฟล์รูปแบบการประเมินผล:</td>
                 <td class="px-4 py-2">
                   <a href="#"
-                    @click="openFileInNewTab(activityData.evaluationFile, 'application/pdf')"
+                    @click="downloadFileFromBase64(activityData.evaluationFile, 'application/pdf')"
                     class="text-orange-500 underline">
                     Click to open file in new tab.
                   </a>
@@ -757,7 +807,7 @@ const thaiText = computed(() => {
               <tr v-for="(file, index) in [activityData.evaluationFile]" :key="index">
                 <td class="px-4 py-2">ไฟล์รายละเอียดงบประมาณ:</td>
                 <td class="px-4 py-2">
-                  <a href="#" @click="openFileInNewTab(activityData.budgetDetails, 'application/pdf')"
+                  <a href="#" @click="downloadFileFromBase64(activityData.budgetDetails, 'application/pdf')"
                     class="text-orange-500 underline">
                     Click to open file in new tab.
                   </a>
@@ -774,7 +824,7 @@ const thaiText = computed(() => {
               <tr v-for="(file, index) in [activityData.prepareFile]" :key="index">
                 <td class="px-4 py-2">ไฟล์เพิ่มเติม:</td>
                 <td class="px-4 py-2">
-                  <a href="#" @click="openFileInNewTab(activityData.prepareFile, 'application/pdf')"
+                  <a href="#" @click="downloadFileFromBase64(activityData.prepareFile, 'application/pdf')"
                     class="text-orange-500 underline">
                     Click to open file in new tab.
                   </a>

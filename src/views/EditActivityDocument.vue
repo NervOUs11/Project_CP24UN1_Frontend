@@ -78,6 +78,57 @@ const isBase64 = (str) => {
   return /^[A-Za-z0-9+/=]+$/.test(str);
 };
 
+const downloadFileFromBase64 = async (base64String, mimeType) => {
+  if (!base64String) {
+    popupMessage.value = 'No file available.';
+    showPopup.value = true;
+    return;
+  }
+
+  let base64Data = base64String;
+  if (base64String.startsWith('data:')) {
+    base64Data = base64String.split(',')[1];
+  }
+
+  if (!isBase64(base64Data)) {
+    popupMessage.value = 'Invalid Base64 string.';
+    showPopup.value = true;
+    return;
+  }
+
+  try {
+    console.log('Base64 Length:', base64Data.length);
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteNumbers], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+
+    // ตั้งชื่อไฟล์อัตโนมัติ เช่น 'downloaded_file.pdf'
+    const extension = mimeType.split('/')[1] || 'file'; // ถ้าไม่มี type ให้ default เป็น 'file'
+    link.download = '';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (error) {
+    popupMessage.value = 'Error downloading the file.';
+    showPopup.value = true;
+    console.error('Error decoding Base64:', error);
+  }
+};
+
 const openFileInNewTab = async (base64String, mimeType) => {
   // ตรวจสอบว่า base64String เป็น Promise หรือไม่
   if (base64String instanceof Promise) {
@@ -1276,7 +1327,7 @@ const validateProjectNames = () => {
                 <hr class="border-gray-300 mb-3">
 
                 <div v-if="scheduleDetails" class="mb-3">
-                  <a @click="openFileInNewTab(scheduleDetails, 'application/pdf')" target="_blank"
+                  <a @click="downloadFileFromBase64(scheduleDetails, 'application/pdf')" target="_blank"
                     class="text-blue-600 hover:text-blue-800 underline">
                     🔗 ดูไฟล์ขั้นตอนการดำเนินงานที่อัปโหลดแล้ว
                   </a>
@@ -1380,7 +1431,7 @@ const validateProjectNames = () => {
               <hr class="border-gray-300 mb-3">
 
               <div v-if="evaluationFile" class="mb-3">
-                <a @click="openFileInNewTab(evaluationFile, 'application/pdf')" target="_blank"
+                <a @click="downloadFileFromBase64(evaluationFile, 'application/pdf')" target="_blank"
                   class="text-blue-600 hover:text-blue-800 underline">
                   🔗 ดูไฟล์ตัวอย่างการประเมินผลที่อัปโหลดแล้ว
                 </a>
@@ -1458,7 +1509,7 @@ const validateProjectNames = () => {
               <hr class="border-gray-300 mb-3">
 
               <div v-if="budgetDetails" class="mb-3">
-                <a @click="openFileInNewTab(budgetDetails, 'application/pdf')" target="_blank"
+                <a @click="downloadFileFromBase64(budgetDetails, 'application/pdf')" target="_blank"
                   class="text-blue-600 hover:text-blue-800 underline">
                   🔗 ดูไฟล์รายละเอียดงบประมาณที่อัปโหลดแล้ว
                 </a>
@@ -1480,7 +1531,7 @@ const validateProjectNames = () => {
                 <hr class="border-gray-300 mb-3">
 
                 <div v-if="prepareFile" class="mb-3">
-                  <a @click="openFileInNewTab(prepareFile, 'application/pdf')" target="_blank"
+                  <a @click="downloadFileFromBase64(prepareFile, 'application/pdf')" target="_blank"
                     class="text-blue-600 hover:text-blue-800 underline">
                     🔗 ดูไฟล์อัปโหลดไฟล์เพิ่มเติมที่อัปโหลดแล้ว
                   </a>

@@ -177,6 +177,61 @@ const openFileInNewTab = (base64String, mimeType) => {
   }, 1000);
 };
 
+const isBase64 = (str) => {
+  return /^[A-Za-z0-9+/=]+$/.test(str);
+};
+
+const downloadFileFromBase64 = async (base64String, mimeType) => {
+  if (!base64String) {
+    popupMessage.value = 'No file available.';
+    showPopup.value = true;
+    return;
+  }
+
+  let base64Data = base64String;
+  if (base64String.startsWith('data:')) {
+    base64Data = base64String.split(',')[1];
+  }
+
+  if (!isBase64(base64Data)) {
+    popupMessage.value = 'Invalid Base64 string.';
+    showPopup.value = true;
+    return;
+  }
+
+  try {
+    console.log('Base64 Length:', base64Data.length);
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteNumbers], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+
+    // ตั้งชื่อไฟล์อัตโนมัติ เช่น 'downloaded_file.pdf'
+    const extension = mimeType.split('/')[1] || 'file'; // ถ้าไม่มี type ให้ default เป็น 'file'
+    link.download = '';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (error) {
+    popupMessage.value = 'Error downloading the file.';
+    showPopup.value = true;
+    console.error('Error decoding Base64:', error);
+  }
+};
+
 const allApproved = () => {
   const allProgress = data.value?.allProgress;
   if (Array.isArray(allProgress) && allProgress.length > 0) {
@@ -334,7 +389,7 @@ onMounted(async () => {
                     หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์:</td>
                   <td class="py-2 border border-white">
                     <a v-if="data.file1.length > 30" href="#"
-                      @click="openFileInNewTab(data.file1, 'application/pdf')"
+                      @click="downloadFileFromBase64(data.file1, 'application/pdf')"
                       class="text-orange-500 underline whitespace-nowrap">
                       หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์
                     </a>
@@ -345,7 +400,7 @@ onMounted(async () => {
                   <td class="px-4 py-2 border border-white font-medium">เอกสารแนบอื่น ๆ :</td>
                   <td class="py-2 border border-white">
                     <a v-if="data.file2.length > 30" href="#"
-                      @click="openFileInNewTab(data.file2, 'application/pdf')" class="text-orange-500 underline">
+                      @click="downloadFileFromBase64(data.file2, 'application/pdf')" class="text-orange-500 underline">
                       เอกสารแนบอื่น ๆ
                     </a>
                     <span v-else class="text-gray-500 whitespace-nowrap">No Attachment File </span>

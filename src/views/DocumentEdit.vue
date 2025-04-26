@@ -139,26 +139,6 @@ onMounted(async () => {
   documentID.value = documentData.DocumentID
 });
 
-// function convertToISOWithTimezone(dateString, time) {
-//   if (!dateString || typeof dateString !== "string" || !dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-//     throw new Error(`Invalid dateString: ${dateString}`);
-//   }
-
-//   if (!time || typeof time !== "string" || !time.match(/^\d{2}:\d{2}:\d{2}$/)) {
-//     throw new Error(`Invalid time: ${time}`);
-//   }
-
-//   const date = new Date(`${dateString}T${time}`);
-
-//   if (isNaN(date.getTime())) {
-//     throw new Error(`Invalid combined date/time: ${dateString}T${time}`);
-//   }
-
-//   const timezoneOffset = date.getTimezoneOffset(); // offset เป็นนาที
-//   date.setMinutes(date.getMinutes() - timezoneOffset); // ปรับเวลาให้ตรงกับ timezone ของระบบ
-//   return date.toISOString();
-// }
-
 function convertToISOWithTimezone(dateString, time) {
   try {
     let date;
@@ -234,7 +214,6 @@ function fileToBase64(file) {
 }
 
 const isBase64 = (str) => {
-  // ใช้ regex เพื่อตรวจสอบรูปแบบ base64 ที่ถูกต้อง
   return /^[A-Za-z0-9+/=]+$/.test(str);
 };
 
@@ -272,6 +251,57 @@ const openFileInNewTab = async (base64String, mimeType) => {
     }, 1000);
   } catch (error) {
     popupMessage.value = 'Error opening the file.';
+    showPopup.value = true;
+    console.error('Error decoding Base64:', error);
+  }
+};
+
+const downloadFileFromBase64 = async (base64String, mimeType) => {
+  if (!base64String) {
+    popupMessage.value = 'No file available.';
+    showPopup.value = true;
+    return;
+  }
+
+  let base64Data = base64String;
+  if (base64String.startsWith('data:')) {
+    base64Data = base64String.split(',')[1];
+  }
+
+  if (!isBase64(base64Data)) {
+    popupMessage.value = 'Invalid Base64 string.';
+    showPopup.value = true;
+    return;
+  }
+
+  try {
+    console.log('Base64 Length:', base64Data.length);
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteNumbers], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+
+    // ตั้งชื่อไฟล์อัตโนมัติ เช่น 'downloaded_file.pdf'
+    const extension = mimeType.split('/')[1] || 'file'; // ถ้าไม่มี type ให้ default เป็น 'file'
+    link.download = '';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
+  } catch (error) {
+    popupMessage.value = 'Error downloading the file.';
     showPopup.value = true;
     console.error('Error decoding Base64:', error);
   }
@@ -558,7 +588,7 @@ const handleEditDocument = async () => {
               <hr class="border-gray-300 mb-3">
 
               <div v-if="attachmentFile1" class="mb-3">
-                <a @click="openFileInNewTab(attachmentFile1, 'application/pdf')" target="_blank"
+                <a @click="downloadFileFromBase64(attachmentFile1, 'application/pdf')" target="_blank"
                   class="text-blue-600 hover:text-blue-800 underline">
                   🔗 ดูไฟล์หนังสือรับรองผู้ปกครอง/ใบรับรองแพทย์ที่อัปโหลดแล้ว
                 </a>
@@ -579,7 +609,7 @@ const handleEditDocument = async () => {
               <hr class="border-gray-300 mb-3">
 
               <div v-if="attachmentFile2" class="mb-3">
-                <a @click="openFileInNewTab(attachmentFile2, 'application/pdf')" target="_blank"
+                <a @click="downloadFileFromBase64(attachmentFile2, 'application/pdf')" target="_blank"
                   class="text-blue-600 hover:text-blue-800 underline">
                   🔗 ดูไฟล์หลักฐานอื่น ๆ ที่อัปโหลดแล้ว
                 </a>
