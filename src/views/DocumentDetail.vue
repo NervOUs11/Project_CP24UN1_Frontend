@@ -200,8 +200,6 @@ const downloadFileFromBase64 = async (base64String, mimeType) => {
   }
 
   try {
-    console.log('Base64 Length:', base64Data.length);
-
     const byteCharacters = atob(base64Data);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
